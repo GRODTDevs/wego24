@@ -22,7 +22,7 @@ const mockRestaurants = [
   {
     name: "Tokyo Nights",
     cuisine: "Japanese, Sushi",
-    image: "https://images.unsplash.com/photo-1429554429301-01bcd64c6eab?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.pexels.com/photos/31002119/pexels-photo-31002119/free-photo-of-vibrant-japanese-lantern-display-in-tokyo.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
   {
     name: "Fresh Greens",
