@@ -65,7 +65,7 @@ const Index = () => {
         <div className="flex w-full max-w-md justify-center mb-8 gap-2">
           <input
             className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
-            placeholder="Search restaurants, food, "
+            placeholder="Search restaurants or food... "
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
