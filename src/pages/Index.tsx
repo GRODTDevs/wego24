@@ -57,7 +57,7 @@ const Index = () => {
       <div className="relative z-10 flex flex-col items-center pt-20 px-4">
         <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FOOD DELIVERY PLATFORM</span>
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
-          Discover Restaurants <span className="text-red-500">near you</span>
+          Food Delivery <span className="text-red-500">near you</span>
         </h1>
         <p className="text-gray-600 text-lg mb-6 text-center max-w-md">
           Order food from your favorite local spots, track your order, and enjoy fast delivery.
