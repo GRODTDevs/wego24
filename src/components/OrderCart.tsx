@@ -17,7 +17,14 @@ interface OrderCartProps {
   onCheckout: () => void;
 }
 
-export function OrderCart({ open, items, onUpdateQty, onRemove, onClose, onCheckout }: OrderCartProps) {
+export function OrderCart({
+  open,
+  items,
+  onUpdateQty,
+  onRemove,
+  onClose,
+  onCheckout
+}: OrderCartProps) {
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   if (!open) return null;
@@ -30,6 +37,28 @@ export function OrderCart({ open, items, onUpdateQty, onRemove, onClose, onCheck
           <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close cart">
             <X />
           </Button>
+        </div>
+        <div className="px-4 pt-4 space-y-4">
+          {/* Delivery info section */}
+          <div className="bg-orange-50 rounded-lg border border-orange-100 p-3 flex flex-col gap-1">
+            <span className="text-sm font-semibold text-orange-500">Delivery info</span>
+            {/* Static demo text, easily replaced with input or database later */}
+            <span className="text-base text-gray-800">
+              101 Demo Street, Cityname
+            </span>
+            <Button variant="outline" size="sm" className="mt-2 w-fit text-xs px-2 py-1">
+              Change
+            </Button>
+          </div>
+          {/* Info/instructions section */}
+          <div className="bg-muted rounded-lg border border-gray-200 p-3 flex flex-col gap-1">
+            <span className="text-sm font-semibold text-gray-600">Order info</span>
+            <span className="text-xs text-gray-500">E.g. Allergies, no onions, contactless delivery...</span>
+            {/* For now, static demo. Future: replace with input/textarea for notes */}
+            <Button variant="outline" size="sm" className="mt-2 w-fit text-xs px-2 py-1">
+              Add note
+            </Button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {items.length === 0 ? (
