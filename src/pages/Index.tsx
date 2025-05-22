@@ -27,7 +27,7 @@ const mockRestaurants = [
   {
     name: "Fresh Greens",
     cuisine: "Healthy, Salad",
-    image: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.pexels.com/photos/2291347/pexels-photo-2291347.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
   {
     name: "Burger Barn",
