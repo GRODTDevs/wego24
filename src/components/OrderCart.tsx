@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { X, Trash } from "lucide-react";
+import { X, Trash, Minus, Plus } from "lucide-react";
 
 interface CartItem {
   title: string;
