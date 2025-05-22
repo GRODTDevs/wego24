@@ -1,0 +1,89 @@
+
+import { Button } from "@/components/ui/button";
+
+const demoOrders = [
+  {
+    id: "ORD-4001",
+    customer: "Alice Johnson",
+    items: ["Pizza Margherita", "Cola"],
+    status: "Pending",
+    total: "€18.80",
+    time: "12:41",
+  },
+  {
+    id: "ORD-4002",
+    customer: "Carlos Rivera",
+    items: ["Spicy Chicken Curry", "Rice"],
+    status: "Accepted",
+    total: "€13.50",
+    time: "12:44",
+  },
+  {
+    id: "ORD-4003",
+    customer: "Sophie Martin",
+    items: ["Salmon Sushi", "Miso Soup"],
+    status: "Preparing",
+    total: "€23.00",
+    time: "12:52",
+  },
+];
+
+export default function RestaurantDashboard() {
+  return (
+    <main className="min-h-screen bg-white py-6">
+      <div className="max-w-4xl mx-auto px-4">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-6">Dashboard</h1>
+        <section className="bg-orange-50 rounded-xl shadow p-6 mb-8">
+          <h2 className="text-xl font-bold mb-2 text-orange-600">Incoming Orders</h2>
+          <div className="overflow-auto">
+            <table className="min-w-full border-separate border-spacing-y-2">
+              <thead>
+                <tr className="text-left text-gray-700">
+                  <th>Order ID</th>
+                  <th>Time</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demoOrders.map(order => (
+                  <tr key={order.id} className="bg-white border rounded shadow-sm">
+                    <td>{order.id}</td>
+                    <td>{order.time}</td>
+                    <td>{order.customer}</td>
+                    <td>
+                      <ul>
+                        {order.items.map(item => <li key={item}>{item}</li>)}
+                      </ul>
+                    </td>
+                    <td>
+                      <span className={
+                        order.status === "Pending"
+                        ? "text-yellow-600 font-semibold"
+                        : order.status === "Accepted"
+                        ? "text-green-700 font-semibold"
+                        : "text-blue-600 font-semibold"
+                      }>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td>{order.total}</td>
+                    <td>
+                      <Button variant="outline" size="sm">View</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <div>
+          <Button className="bg-gradient-to-r from-red-500 to-orange-400 text-white">Add Test Order</Button>
+        </div>
+      </div>
+    </main>
+  );
+}

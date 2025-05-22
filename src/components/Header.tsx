@@ -14,6 +14,8 @@ export function Header() {
           <a href="/" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Home</a>
           <a href="/driver" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Driver</a>
           <a href="/restaurant" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Restaurant</a>
+          <a href="/restaurant/login" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Restaurant Login</a>
+          <a href="/restaurant/dashboard" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Dashboard</a>
         </nav>
         <div className="md:hidden">
           <MobileNav />

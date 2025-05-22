@@ -9,6 +9,8 @@ const navLinks = [
   { to: "/", label: "Home" },
   { to: "/driver", label: "Driver" },
   { to: "/restaurant", label: "Restaurant" },
+  { to: "/restaurant/login", label: "Restaurant Login" },
+  { to: "/restaurant/dashboard", label: "Dashboard" }
 ];
 
 export function MobileNav() {
