@@ -7,10 +7,8 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { to: "/", label: "Home" },
-  { to: "/driver", label: "Driver" },
-  { to: "/restaurant", label: "Restaurant" },
-  { to: "/restaurant/login", label: "Restaurant Login" },
-  { to: "/restaurant/dashboard", label: "Dashboard" }
+  { to: "/driver", label: "Driver Login" },
+  { to: "/restaurant/login", label: "Restaurant" }
 ];
 
 export function MobileNav() {

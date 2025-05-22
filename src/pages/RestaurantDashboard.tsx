@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { Header } from "@/components/Header";
 
 const demoOrders = [
   {
@@ -31,6 +32,19 @@ const demoOrders = [
 export default function RestaurantDashboard() {
   return (
     <main className="min-h-screen bg-white py-6">
+      <Header />
+      <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-6 mt-4 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
+        <h2 className="text-lg font-semibold text-orange-700 mb-1">Restaurant Dashboard Demo</h2>
+        <p className="text-gray-700">
+          Here, restaurant users can see, accept, and process incoming demo orders.<br />
+          <span className="font-medium text-orange-500">Product Owner Steps:</span>
+          <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
+            <li>View the order list and process demo orders.</li>
+            <li>Click "View" for more details (future feature).</li>
+            <li>Try switching between customer, restaurant, and (eventually) driver roles.</li>
+          </ul>
+        </p>
+      </section>
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-extrabold text-gray-900 mb-6">Dashboard</h1>
         <section className="bg-orange-50 rounded-xl shadow p-6 mb-8">

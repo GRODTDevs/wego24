@@ -1,7 +1,7 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { Header } from "@/components/Header";
 
 const demoMenus = [
   {
@@ -27,6 +27,19 @@ export default function RestaurantPage() {
 
   return (
     <main className="min-h-screen bg-white relative pb-10">
+      <Header />
+      <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-4 mt-4 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
+        <h2 className="text-lg font-semibold text-orange-700 mb-1">Restaurant Page Demo</h2>
+        <p className="text-gray-700">
+          This is a sample menu page for a selected restaurant.<br />
+          <span className="font-medium text-orange-500">Product Owner Steps:</span>
+          <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
+            <li>Explore sample menu items (static data).</li>
+            <li>Test the "Order" button to simulate a customer experience.</li>
+            <li>Return to home or restaurant dashboard to try other flows.</li>
+          </ul>
+        </p>
+      </section>
       <div className="bg-orange-50 w-full py-4 px-4 border-b border-orange-200 mb-4 flex items-center gap-2 sticky top-0">
         <Button
           variant="ghost"
