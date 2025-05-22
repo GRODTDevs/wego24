@@ -57,7 +57,7 @@ const Index = () => {
       <div className="relative z-10 flex flex-col items-center pt-20 px-4">
         <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FOOD DELIVERY PLATFORM</span>
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
-          Food Delivery <span className="text-red-500">near you</span>
+          Food Delivery <span className="text-red-500">Near You</span>
         </h1>
         <p className="text-gray-600 text-lg mb-6 text-center max-w-md">
           Order food from your favorite local spots, track your order, and enjoy fast delivery.
@@ -65,7 +65,7 @@ const Index = () => {
         <div className="flex w-full max-w-md justify-center mb-8 gap-2">
           <input
             className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
-            placeholder="Search restaurant or cuisine"
+            placeholder="Search restaurants, food, "
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
