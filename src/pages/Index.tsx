@@ -55,7 +55,7 @@ const Index = () => {
         <div className="w-[500px] h-[500px] bg-gradient-radial from-red-100 via-white to-transparent rounded-full absolute right-10 top-1/3 opacity-40"></div>
       </div>
       <div className="relative z-10 flex flex-col items-center pt-20 px-4">
-        <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FOOD DELIVERY PLATFORM</span>
+        <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FRIGILIANA, NERJA, TORROX</span>
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
           Food Delivery <span className="text-red-500">Near You</span>
         </h1>
