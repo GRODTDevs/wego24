@@ -1,5 +1,5 @@
-
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface RestaurantCardProps {
   name: string;
@@ -19,8 +19,20 @@ export function RestaurantCard({
   image,
   highlightColor = "red",
 }: RestaurantCardProps) {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    // Encode for URL safety, but keep readable demo name
+    navigate(`/restaurant/${encodeURIComponent(name)}`);
+  };
+
   return (
-    <Card className={`transition-shadow hover:shadow-xl ${gradientStyles[highlightColor]} min-h-[300px]`}>
+    <button
+      className={`w-full text-left transition-shadow hover:shadow-xl ${gradientStyles[highlightColor]} min-h-[300px] rounded-lg overflow-hidden outline-none focus:ring-2 focus:ring-orange-300`}
+      onClick={handleClick}
+      aria-label={`View ${name}`}
+      type="button"
+    >
       <div className="relative z-10">
         <img
           src={image}
@@ -34,6 +46,6 @@ export function RestaurantCard({
           <div className="text-gray-500 text-sm mb-2">{cuisine}</div>
         </CardContent>
       </div>
-    </Card>
+    </button>
   );
 }
