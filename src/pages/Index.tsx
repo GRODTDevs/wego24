@@ -12,7 +12,7 @@ const mockRestaurants = [
   {
     name: "Spice Symphony",
     cuisine: "Indian, Curry",
-    image: "https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.pexels.com/photos/20943933/pexels-photo-20943933/free-photo-of-close-up-of-a-person-eating-a-meal.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
     name: "La Vita Pizzeria",
