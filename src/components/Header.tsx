@@ -1,3 +1,4 @@
+
 import { MobileNav } from "./MobileNav";
 
 export function Header() {
@@ -11,7 +12,7 @@ export function Header() {
         </div>
         <nav className="hidden md:flex items-center gap-6">
           <a href="/" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Home</a>
-          <a href="/driver" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Driver Login</a>
+          <a href="/driver/login" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Drivers</a>
           <a href="/restaurant/login" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">Restaurant</a>
         </nav>
         <div className="md:hidden">
