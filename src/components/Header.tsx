@@ -7,7 +7,7 @@ export function Header() {
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-2 h-16">
         <div className="flex items-center gap-2">
           <span className="text-2xl mr-2">🍽️</span>
-          <span className="font-bold text-xl text-gray-900 tracking-tight select-none">BiteToGo</span>
+          <span className="font-bold text-xl text-gray-900 tracking-tight select-none">ToGoo</span>
           <span className="ml-2 text-xs font-semibold text-orange-400 italic tracking-widest uppercase">Beta</span>
         </div>
         <nav className="hidden md:flex items-center gap-6">
