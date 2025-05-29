@@ -1,86 +1,195 @@
 
 import { Header } from "@/components/Header";
-import { MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { MapPin, Package, Clock } from "lucide-react";
+import { useState } from "react";
+
+interface Order {
+  id: string;
+  restaurant: string;
+  customer: string;
+  pickupAddress: string;
+  deliveryAddress: string;
+  status: string;
+  time: string;
+  items: string[];
+}
 
 export default function DriverDashboard() {
+  const { toast } = useToast();
+  
+  const [orders, setOrders] = useState<Order[]>([
+    {
+      id: "Order #101",
+      restaurant: "Sunrise Diner",
+      customer: "Maria Garcia",
+      pickupAddress: "17 C/ Real, Nerja",
+      deliveryAddress: "9 Calle Pintada, Nerja",
+      status: "Ready",
+      time: "12:30 PM",
+      items: ["Paella Valenciana", "Gazpacho", "Sangria"]
+    },
+    {
+      id: "Order #102",
+      restaurant: "Spice Symphony",
+      customer: "John Smith",
+      pickupAddress: "12 Plaza Balcón, Torrox",
+      deliveryAddress: "14 Av. Castilla Perez, Nerja",
+      status: "Assigned",
+      time: "12:45 PM",
+      items: ["Chicken Curry", "Naan Bread", "Mango Lassi"]
+    }
+  ]);
+
   const openGoogleMaps = (address: string, type: 'pickup' | 'delivery') => {
     const encodedAddress = encodeURIComponent(address);
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
     window.open(googleMapsUrl, '_blank');
   };
 
+  const getStatusColor = (status: string) => {
+    const statusColors: { [key: string]: string } = {
+      "New": "bg-yellow-200 text-yellow-800",
+      "Assigned": "bg-yellow-100 text-yellow-900", 
+      "Ready": "bg-green-100 text-green-800",
+      "Collected": "bg-blue-100 text-blue-800",
+      "Delivered": "bg-gray-100 text-gray-800",
+      "Returned": "bg-red-100 text-red-800"
+    };
+    return statusColors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const canUpdateStatus = (currentStatus: string) => {
+    return currentStatus === "Ready" || currentStatus === "Collected";
+  };
+
+  const getAvailableStatusUpdates = (currentStatus: string) => {
+    if (currentStatus === "Ready") {
+      return ["Collected"];
+    }
+    if (currentStatus === "Collected") {
+      return ["Delivered", "Returned"];
+    }
+    return [];
+  };
+
+  const updateOrderStatus = (orderId: string, newStatus: string) => {
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        order.id === orderId 
+          ? { ...order, status: newStatus }
+          : order
+      )
+    );
+    
+    toast({
+      title: "Status Updated",
+      description: `${orderId} marked as ${newStatus}`,
+    });
+  };
+
   return (
     <main className="min-h-screen bg-white pb-8">
       <Header />
       <section className="w-full max-w-2xl mx-auto px-4 py-6 mt-6 mb-8 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
-        <h2 className="text-lg font-semibold text-orange-700 mb-2">Demo: Driver Dashboard</h2>
+        <h2 className="text-lg font-semibold text-orange-700 mb-2">Driver Dashboard</h2>
         <p className="text-gray-700">
-          This is the driver dashboard. It shows a list of new and pending delivery orders for assigned drivers (demo only).<br />
-          <span className="font-medium text-orange-500">Product Owner Steps:</span>
-          <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
-            <li>Review the format of new delivery orders and order statuses.</li>
-            <li>Test driver actions and status changes (will be interactive in future sprints).</li>
-          </ul>
+          Manage your delivery orders. Click on addresses to get directions and update order status as you progress.
         </p>
       </section>
-      <section className="w-full max-w-3xl mx-auto px-4">
-        <div className="border border-orange-200 rounded-lg shadow px-6 py-6 bg-white">
-          <h3 className="text-lg font-bold mb-2 text-gray-800">Incoming Orders</h3>
-          <ul className="divide-y divide-orange-100">
-            {/* Demo order entries */}
-            <li className="py-4 flex justify-between items-center">
-              <div>
-                <span className="font-semibold">Order #101</span> from <span className="text-orange-500">Sunrise Diner</span>
-                <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>Pickup: </span>
-                  <button 
-                    onClick={() => openGoogleMaps("17 C/ Real, Nerja", "pickup")}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    17 C/ Real, Nerja
-                  </button>
+      
+      <section className="w-full max-w-4xl mx-auto px-4">
+        <div className="space-y-4">
+          {orders.map(order => (
+            <Card key={order.id} className="border border-orange-200 shadow">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-900">
+                      {order.id}
+                    </CardTitle>
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {order.time}
+                      </div>
+                      <span className="text-orange-500 font-medium">{order.restaurant}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">Customer: {order.customer}</div>
+                  </div>
+                  <Badge className={getStatusColor(order.status)}>
+                    {order.status}
+                  </Badge>
                 </div>
-                <div className="text-xs text-gray-500 flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>Drop-off: </span>
-                  <button 
-                    onClick={() => openGoogleMaps("9 Calle Pintada, Nerja", "delivery")}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    9 Calle Pintada, Nerja
-                  </button>
+              </CardHeader>
+              
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-1 text-sm">
+                      <MapPin className="w-4 h-4 text-orange-500" />
+                      <span className="font-medium">Pickup:</span>
+                      <button 
+                        onClick={() => openGoogleMaps(order.pickupAddress, "pickup")}
+                        className="text-blue-600 hover:text-blue-800 underline ml-1"
+                      >
+                        {order.pickupAddress}
+                      </button>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 text-sm">
+                      <MapPin className="w-4 h-4 text-green-500" />
+                      <span className="font-medium">Drop-off:</span>
+                      <button 
+                        onClick={() => openGoogleMaps(order.deliveryAddress, "delivery")}
+                        className="text-blue-600 hover:text-blue-800 underline ml-1"
+                      >
+                        {order.deliveryAddress}
+                      </button>
+                    </div>
+                    
+                    <div className="flex items-start gap-1 text-sm">
+                      <Package className="w-4 h-4 mt-0.5" />
+                      <div>
+                        <span className="font-medium">Items:</span>
+                        <ul className="text-gray-600 ml-1">
+                          {order.items.map((item, index) => (
+                            <li key={index}>• {item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col justify-center">
+                    <h4 className="font-medium text-gray-700 mb-3">Update Status</h4>
+                    {canUpdateStatus(order.status) ? (
+                      <div className="flex flex-wrap gap-2">
+                        {getAvailableStatusUpdates(order.status).map(status => (
+                          <Button
+                            key={status}
+                            onClick={() => updateOrderStatus(order.id, status)}
+                            variant="outline"
+                            size="sm"
+                            className="bg-orange-50 border-orange-200 hover:bg-orange-100"
+                          >
+                            Mark as {status}
+                          </Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        No status updates available for {order.status} orders
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <span className="text-sm bg-yellow-200 text-yellow-800 px-3 py-1 rounded">New</span>
-            </li>
-            <li className="py-4 flex justify-between items-center">
-              <div>
-                <span className="font-semibold">Order #102</span> from <span className="text-orange-500">Spice Symphony</span>
-                <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>Pickup: </span>
-                  <button 
-                    onClick={() => openGoogleMaps("12 Plaza Balcón, Torrox", "pickup")}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    12 Plaza Balcón, Torrox
-                  </button>
-                </div>
-                <div className="text-xs text-gray-500 flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>Drop-off: </span>
-                  <button 
-                    onClick={() => openGoogleMaps("14 Av. Castilla Perez, Nerja", "delivery")}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    14 Av. Castilla Perez, Nerja
-                  </button>
-                </div>
-              </div>
-              <span className="text-sm bg-yellow-100 text-yellow-900 px-3 py-1 rounded">Assigned</span>
-            </li>
-          </ul>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </section>
     </main>
