@@ -1,7 +1,14 @@
 
 import { Header } from "@/components/Header";
+import { MapPin } from "lucide-react";
 
 export default function DriverDashboard() {
+  const openGoogleMaps = (address: string, type: 'pickup' | 'delivery') => {
+    const encodedAddress = encodeURIComponent(address);
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
+    window.open(googleMapsUrl, '_blank');
+  };
+
   return (
     <main className="min-h-screen bg-white pb-8">
       <Header />
@@ -24,16 +31,52 @@ export default function DriverDashboard() {
             <li className="py-4 flex justify-between items-center">
               <div>
                 <span className="font-semibold">Order #101</span> from <span className="text-orange-500">Sunrise Diner</span>
-                <div className="text-xs text-gray-500">Pickup: 17 C/ Real, Nerja</div>
-                <div className="text-xs text-gray-500">Drop-off: 9 Calle Pintada, Nerja</div>
+                <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Pickup: </span>
+                  <button 
+                    onClick={() => openGoogleMaps("17 C/ Real, Nerja", "pickup")}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    17 C/ Real, Nerja
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Drop-off: </span>
+                  <button 
+                    onClick={() => openGoogleMaps("9 Calle Pintada, Nerja", "delivery")}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    9 Calle Pintada, Nerja
+                  </button>
+                </div>
               </div>
               <span className="text-sm bg-yellow-200 text-yellow-800 px-3 py-1 rounded">New</span>
             </li>
             <li className="py-4 flex justify-between items-center">
               <div>
                 <span className="font-semibold">Order #102</span> from <span className="text-orange-500">Spice Symphony</span>
-                <div className="text-xs text-gray-500">Pickup: 12 Plaza Balcón, Torrox</div>
-                <div className="text-xs text-gray-500">Drop-off: 14 Av. Castilla Perez, Nerja</div>
+                <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Pickup: </span>
+                  <button 
+                    onClick={() => openGoogleMaps("12 Plaza Balcón, Torrox", "pickup")}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    12 Plaza Balcón, Torrox
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Drop-off: </span>
+                  <button 
+                    onClick={() => openGoogleMaps("14 Av. Castilla Perez, Nerja", "delivery")}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    14 Av. Castilla Perez, Nerja
+                  </button>
+                </div>
               </div>
               <span className="text-sm bg-yellow-100 text-yellow-900 px-3 py-1 rounded">Assigned</span>
             </li>
