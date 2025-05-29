@@ -13,6 +13,7 @@ const demoOrders = [
     status: "Pending",
     total: "€18.80",
     time: "12:41",
+    paymentMethod: "Card",
   },
   {
     id: "ORD-4002",
@@ -21,6 +22,7 @@ const demoOrders = [
     status: "Accepted",
     total: "€13.50",
     time: "12:44",
+    paymentMethod: "Cash",
   },
   {
     id: "ORD-4003",
@@ -29,6 +31,7 @@ const demoOrders = [
     status: "Preparing",
     total: "€23.00",
     time: "12:52",
+    paymentMethod: "Card",
   },
 ];
 

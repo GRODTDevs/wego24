@@ -9,7 +9,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Clock, User, Package } from "lucide-react";
+import { Clock, User, Package, CreditCard, Banknote } from "lucide-react";
 
 interface Order {
   id: string;
@@ -18,6 +18,7 @@ interface Order {
   status: string;
   total: string;
   time: string;
+  paymentMethod: string;
 }
 
 interface OrderManagementProps {
@@ -37,6 +38,14 @@ const orderStatuses = [
 const getStatusColor = (status: string) => {
   const statusConfig = orderStatuses.find(s => s.value === status);
   return statusConfig?.color || "bg-gray-100 text-gray-800";
+};
+
+const getPaymentMethodIcon = (paymentMethod: string) => {
+  return paymentMethod === "Card" ? (
+    <CreditCard className="w-4 h-4" />
+  ) : (
+    <Banknote className="w-4 h-4" />
+  );
 };
 
 export function OrderManagement({ orders, onOrderStatusChange }: OrderManagementProps) {
@@ -70,6 +79,10 @@ export function OrderManagement({ orders, onOrderStatusChange }: OrderManagement
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
                           {order.customer}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {getPaymentMethodIcon(order.paymentMethod)}
+                          {order.paymentMethod}
                         </div>
                       </div>
                     </div>
