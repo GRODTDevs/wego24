@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { MenuManagement } from "@/components/MenuManagement";
 import { OrderManagement } from "@/components/OrderManagement";
+import { ProfileManagement } from "@/components/ProfileManagement";
+import { StaffManagement } from "@/components/StaffManagement";
 
 const demoOrders = [
   {
@@ -39,7 +40,7 @@ const demoOrders = [
 ];
 
 export default function RestaurantDashboard() {
-  const [activeTab, setActiveTab] = useState<"orders" | "menu">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff">("orders");
   const [orders, setOrders] = useState(demoOrders);
 
   const handleOrderStatusChange = (orderId: string, newStatus: string) => {
@@ -59,6 +60,7 @@ export default function RestaurantDashboard() {
           <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
             <li>View the order list and process demo orders.</li>
             <li>Switch to Menu Management to add/remove menu items.</li>
+            <li>Manage your profile and staff members.</li>
             <li>Try switching between customer, restaurant, and (eventually) driver roles.</li>
           </ul>
         </p>
@@ -67,7 +69,7 @@ export default function RestaurantDashboard() {
         <h1 className="text-3xl font-extrabold text-gray-900 mb-6">Dashboard</h1>
         
         {/* Tab Navigation */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-4 mb-6 flex-wrap">
           <Button 
             variant={activeTab === "orders" ? "default" : "outline"}
             onClick={() => setActiveTab("orders")}
@@ -82,13 +84,34 @@ export default function RestaurantDashboard() {
           >
             Menu Management
           </Button>
+          <Button 
+            variant={activeTab === "profile" ? "default" : "outline"}
+            onClick={() => setActiveTab("profile")}
+            className={activeTab === "profile" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
+          >
+            Profile
+          </Button>
+          <Button 
+            variant={activeTab === "staff" ? "default" : "outline"}
+            onClick={() => setActiveTab("staff")}
+            className={activeTab === "staff" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
+          >
+            Staff Management
+          </Button>
         </div>
 
         {/* Tab Content */}
-        {activeTab === "orders" ? (
+        {activeTab === "orders" && (
           <OrderManagement orders={orders} onOrderStatusChange={handleOrderStatusChange} />
-        ) : (
+        )}
+        {activeTab === "menu" && (
           <MenuManagement />
+        )}
+        {activeTab === "profile" && (
+          <ProfileManagement />
+        )}
+        {activeTab === "staff" && (
+          <StaffManagement />
         )}
       </div>
     </main>
