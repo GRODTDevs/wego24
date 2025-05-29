@@ -6,6 +6,7 @@ import { OrderManagement } from "@/components/OrderManagement";
 import { ProfileManagement } from "@/components/ProfileManagement";
 import { StaffManagement } from "@/components/StaffManagement";
 import { PaymentManagement } from "@/components/PaymentManagement";
+import { ReviewManagement } from "@/components/ReviewManagement";
 
 const demoOrders = [
   {
@@ -41,7 +42,7 @@ const demoOrders = [
 ];
 
 export default function RestaurantDashboard() {
-  const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff" | "payments">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff" | "payments" | "reviews">("orders");
   const [orders, setOrders] = useState(demoOrders);
 
   const handleOrderStatusChange = (orderId: string, newStatus: string) => {
@@ -63,6 +64,7 @@ export default function RestaurantDashboard() {
             <li>Switch to Menu Management to add/remove menu items.</li>
             <li>Manage your profile and staff members.</li>
             <li>View and filter payment history by different time periods.</li>
+            <li>View and reply to customer reviews to maintain good relationships.</li>
             <li>Try switching between customer, restaurant, and (eventually) driver roles.</li>
           </ul>
         </p>
@@ -94,6 +96,13 @@ export default function RestaurantDashboard() {
             Payments
           </Button>
           <Button 
+            variant={activeTab === "reviews" ? "default" : "outline"}
+            onClick={() => setActiveTab("reviews")}
+            className={activeTab === "reviews" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
+          >
+            Reviews
+          </Button>
+          <Button 
             variant={activeTab === "profile" ? "default" : "outline"}
             onClick={() => setActiveTab("profile")}
             className={activeTab === "profile" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
@@ -118,6 +127,9 @@ export default function RestaurantDashboard() {
         )}
         {activeTab === "payments" && (
           <PaymentManagement />
+        )}
+        {activeTab === "reviews" && (
+          <ReviewManagement />
         )}
         {activeTab === "profile" && (
           <ProfileManagement />
