@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash, Image } from "lucide-react";
+import { Plus, Trash, Image, Edit, Save, X } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -43,6 +44,14 @@ export function MenuManagement() {
     image: ""
   });
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState({
+    title: "",
+    description: "",
+    price: "",
+    image: ""
+  });
+
   const handleAddItem = () => {
     if (!newItem.title || !newItem.description || !newItem.price) return;
     
@@ -60,6 +69,40 @@ export function MenuManagement() {
 
   const handleRemoveItem = (id: string) => {
     setMenuItems(menuItems.filter(item => item.id !== id));
+  };
+
+  const handleEditItem = (item: MenuItem) => {
+    setEditingId(item.id);
+    setEditingItem({
+      title: item.title,
+      description: item.description,
+      price: item.price.toString(),
+      image: item.image || ""
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingItem.title || !editingItem.description || !editingItem.price) return;
+    
+    setMenuItems(menuItems.map(item => 
+      item.id === editingId 
+        ? {
+            ...item,
+            title: editingItem.title,
+            description: editingItem.description,
+            price: parseFloat(editingItem.price),
+            image: editingItem.image || undefined
+          }
+        : item
+    ));
+    
+    setEditingId(null);
+    setEditingItem({ title: "", description: "", price: "", image: "" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditingItem({ title: "", description: "", price: "", image: "" });
   };
 
   return (
@@ -143,19 +186,87 @@ export function MenuManagement() {
                       <Image className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{item.title}</h3>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                    <span className="text-orange-500 font-medium">€{item.price.toFixed(2)}</span>
+                  
+                  {editingId === item.id ? (
+                    <div className="flex-1 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <Input
+                          value={editingItem.title}
+                          onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                          placeholder="Title"
+                          className="font-semibold"
+                        />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={editingItem.price}
+                          onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })}
+                          placeholder="Price"
+                        />
+                      </div>
+                      <Textarea
+                        value={editingItem.description}
+                        onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                        placeholder="Description"
+                        className="text-sm"
+                      />
+                      <Input
+                        value={editingItem.image}
+                        onChange={(e) => setEditingItem({ ...editingItem, image: e.target.value })}
+                        placeholder="Image URL (optional)"
+                        className="text-sm"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                      <span className="text-orange-500 font-medium">€{item.price.toFixed(2)}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    {editingId === item.id ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleSaveEdit}
+                          className="text-green-500 hover:text-green-700"
+                          disabled={!editingItem.title || !editingItem.description || !editingItem.price}
+                        >
+                          <Save className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleCancelEdit}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEditItem(item)}
+                          className="text-blue-500 hover:text-blue-700"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleRemoveItem(item.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
                 </div>
               ))}
             </div>
