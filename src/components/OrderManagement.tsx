@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -9,7 +8,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Clock, User, Package, CreditCard, Banknote } from "lucide-react";
+import { Clock, User, Package, CreditCard, Banknote, MapPin } from "lucide-react";
 
 interface Order {
   id: string;
@@ -19,6 +18,7 @@ interface Order {
   total: string;
   time: string;
   paymentMethod: string;
+  address: string;
 }
 
 interface OrderManagementProps {
@@ -88,6 +88,10 @@ export function OrderManagement({ orders, onOrderStatusChange }: OrderManagement
                           {order.customer}
                         </div>
                         {getPaymentMethodDisplay(order.paymentMethod)}
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{order.address}</span>
                       </div>
                     </div>
                     <Badge className={getStatusColor(order.status)}>

@@ -14,6 +14,7 @@ const demoOrders = [
     total: "€18.80",
     time: "12:41",
     paymentMethod: "Card",
+    address: "123 Main St, Downtown, City Center",
   },
   {
     id: "ORD-4002",
@@ -23,6 +24,7 @@ const demoOrders = [
     total: "€13.50",
     time: "12:44",
     paymentMethod: "Cash",
+    address: "456 Oak Avenue, Riverside District",
   },
   {
     id: "ORD-4003",
@@ -32,6 +34,7 @@ const demoOrders = [
     total: "€23.00",
     time: "12:52",
     paymentMethod: "Card",
+    address: "789 Pine Road, Garden Quarter, Apt 2B",
   },
 ];
 
