@@ -40,11 +40,18 @@ const getStatusColor = (status: string) => {
   return statusConfig?.color || "bg-gray-100 text-gray-800";
 };
 
-const getPaymentMethodIcon = (paymentMethod: string) => {
-  return paymentMethod === "Card" ? (
+const getPaymentMethodDisplay = (paymentMethod: string) => {
+  const icon = paymentMethod === "Card" ? (
     <CreditCard className="w-4 h-4" />
   ) : (
     <Banknote className="w-4 h-4" />
+  );
+  
+  return (
+    <div className="flex items-center gap-1">
+      {icon}
+      <span>{paymentMethod}</span>
+    </div>
   );
 };
 
@@ -80,10 +87,7 @@ export function OrderManagement({ orders, onOrderStatusChange }: OrderManagement
                           <User className="w-4 h-4" />
                           {order.customer}
                         </div>
-                        <div className="flex items-center gap-1">
-                          {getPaymentMethodIcon(order.paymentMethod)}
-                          {order.paymentMethod}
-                        </div>
+                        {getPaymentMethodDisplay(order.paymentMethod)}
                       </div>
                     </div>
                     <Badge className={getStatusColor(order.status)}>
