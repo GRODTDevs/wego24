@@ -5,6 +5,7 @@ import { MenuManagement } from "@/components/MenuManagement";
 import { OrderManagement } from "@/components/OrderManagement";
 import { ProfileManagement } from "@/components/ProfileManagement";
 import { StaffManagement } from "@/components/StaffManagement";
+import { PaymentManagement } from "@/components/PaymentManagement";
 
 const demoOrders = [
   {
@@ -40,7 +41,7 @@ const demoOrders = [
 ];
 
 export default function RestaurantDashboard() {
-  const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff" | "payments">("orders");
   const [orders, setOrders] = useState(demoOrders);
 
   const handleOrderStatusChange = (orderId: string, newStatus: string) => {
@@ -61,6 +62,7 @@ export default function RestaurantDashboard() {
             <li>View the order list and process demo orders.</li>
             <li>Switch to Menu Management to add/remove menu items.</li>
             <li>Manage your profile and staff members.</li>
+            <li>View and filter payment history by different time periods.</li>
             <li>Try switching between customer, restaurant, and (eventually) driver roles.</li>
           </ul>
         </p>
@@ -85,6 +87,13 @@ export default function RestaurantDashboard() {
             Menu Management
           </Button>
           <Button 
+            variant={activeTab === "payments" ? "default" : "outline"}
+            onClick={() => setActiveTab("payments")}
+            className={activeTab === "payments" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
+          >
+            Payments
+          </Button>
+          <Button 
             variant={activeTab === "profile" ? "default" : "outline"}
             onClick={() => setActiveTab("profile")}
             className={activeTab === "profile" ? "bg-gradient-to-r from-orange-400 to-red-400 text-white" : ""}
@@ -106,6 +115,9 @@ export default function RestaurantDashboard() {
         )}
         {activeTab === "menu" && (
           <MenuManagement />
+        )}
+        {activeTab === "payments" && (
+          <PaymentManagement />
         )}
         {activeTab === "profile" && (
           <ProfileManagement />
