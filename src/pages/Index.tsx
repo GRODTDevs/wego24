@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { User, LogIn, LogOut } from "lucide-react";
+import { User, LogIn, LogOut, Truck } from "lucide-react";
 import { toast } from "sonner";
 
 type Location = Tables<"restaurants">;
@@ -108,19 +108,33 @@ const Index = () => {
           <p className="text-gray-600 text-lg mb-6 text-center max-w-md">
             {t('home.description')}
           </p>
-          <div className="flex w-full max-w-md justify-center mb-8 gap-2">
-            <input
-              className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
-              placeholder={t('home.searchPlaceholder')}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-            <Button
-              className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-12 px-6 shadow-md"
-              type="button"
-            >
-              {t('home.searchButton')}
-            </Button>
+          <div className="flex flex-col sm:flex-row w-full max-w-2xl justify-center mb-8 gap-3">
+            <div className="flex w-full max-w-md gap-2">
+              <input
+                className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
+                placeholder={t('home.searchPlaceholder')}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+              <Button
+                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-12 px-6 shadow-md"
+                type="button"
+              >
+                {t('home.searchButton')}
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-500 font-medium">or</span>
+              <Link to="/courier-request">
+                <Button
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
+                  type="button"
+                >
+                  <Truck className="w-4 h-4" />
+                  Get a Courier
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Locations grid */}

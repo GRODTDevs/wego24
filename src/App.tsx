@@ -16,6 +16,7 @@ import DriverLogin from "./pages/DriverLogin";
 import DriverDashboard from "./pages/DriverDashboard";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import LocationPage from "./pages/LocationPage";
+import CourierRequest from "./pages/CourierRequest";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/courier-request" element={<CourierRequest />} />
                 <Route path="/restaurant/login" element={<RestaurantLogin />} />
                 <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
                 <Route path="/location/:name" element={<LocationPage />} />
