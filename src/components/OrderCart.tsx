@@ -1,6 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { X, Trash, Minus, Plus } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 interface CartItem {
   title: string;
@@ -72,7 +72,7 @@ export function OrderCart({
                     <div className="text-gray-400 text-xs">x{item.quantity}</div>
                   </div>
                   <div className="flex gap-2 items-center">
-                    <span className="font-semibold">€{(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-semibold">{formatCurrency(item.price * item.quantity)}</span>
                     <Button size="icon" variant="ghost" onClick={() => onUpdateQty(item.title, item.quantity - 1)} disabled={item.quantity <= 1}>
                       <Minus />
                     </Button>
@@ -91,7 +91,7 @@ export function OrderCart({
         <div className="p-4 border-t flex flex-col gap-3">
           <div className="flex justify-between text-base font-bold">
             <span>Total</span>
-            <span>€{total.toFixed(2)}</span>
+            <span>{formatCurrency(total)}</span>
           </div>
           <Button className="w-full bg-gradient-to-r from-orange-400 to-red-400 text-white" onClick={onCheckout} disabled={items.length === 0}>
             Checkout

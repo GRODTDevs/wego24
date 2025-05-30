@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 interface MenuItemCardProps {
   title: string;
@@ -19,7 +20,7 @@ export function MenuItemCard({ title, description, price, quantity, onAdd, onRem
           <span className="font-semibold text-gray-900">{title}</span>
           <span className="ml-3 text-gray-500 text-sm">{description}</span>
         </div>
-        <span className="font-medium text-orange-500">€{price.toFixed(2)}</span>
+        <span className="font-medium text-orange-500">{formatCurrency(price)}</span>
       </div>
       <div className="flex gap-2 items-center mt-2">
         <Button size="icon" variant="outline" onClick={onRemove} disabled={quantity === 0} aria-label="Remove">

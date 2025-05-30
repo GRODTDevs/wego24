@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash, Image, Edit, Save, X } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 interface MenuItem {
   id: string;
@@ -221,7 +221,7 @@ export function MenuManagement() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{item.title}</h3>
                       <p className="text-sm text-gray-600">{item.description}</p>
-                      <span className="text-orange-500 font-medium">€{item.price.toFixed(2)}</span>
+                      <span className="text-orange-500 font-medium">{formatCurrency(item.price)}</span>
                     </div>
                   )}
                   
