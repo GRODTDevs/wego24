@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface EmptyStateProps {
   title: string;
@@ -8,12 +7,23 @@ interface EmptyStateProps {
   additionalContent?: React.ReactNode;
 }
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'dotlottie-player': any;
+    }
+  }
+}
+
 export function EmptyState({ title, description, additionalContent }: EmptyStateProps) {
   return (
     <div className="text-center py-16">
-      <div className="mx-auto mb-6">
-        <DotLottieReact
+      <div className="mx-auto mb-6 flex justify-center">
+        <dotlottie-player
           src="https://lottie.host/45bab164-5c01-4dc7-8aee-222644371965/Uumhvz82hk.lottie"
+          background="transparent"
+          speed="1"
+          style={{ width: '300px', height: '300px' }}
           loop
           autoplay
         />
