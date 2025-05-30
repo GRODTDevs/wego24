@@ -1,3 +1,4 @@
+
 import { MobileNav } from "./MobileNav";
 
 export function Header() {
@@ -10,9 +11,6 @@ export function Header() {
             alt="ToGoo Logo" 
             className="h-10 w-auto"
           />
-          <div className="flex flex-col">
-            <span className="font-bold text-xl text-white tracking-tight select-none">ToGoo</span>
-          </div>
         </div>
         <nav className="hidden md:flex items-center gap-6">
           <a href="/" className="text-white hover:text-red-200 font-medium transition-colors">Home</a>

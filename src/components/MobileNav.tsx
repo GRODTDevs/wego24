@@ -35,7 +35,6 @@ export function MobileNav() {
                 alt="ToGoo Logo" 
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-white">ToGoo</span>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-white hover:bg-red-700">
               <X />
