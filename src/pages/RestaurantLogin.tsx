@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function RestaurantLogin() {
   const [name, setName] = useState("");
@@ -16,9 +17,9 @@ export default function RestaurantLogin() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <main className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-4">
         <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-6 mt-8 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
           <h2 className="text-lg font-semibold text-orange-700 mb-1">Restaurant Login Demo</h2>
           <p className="text-gray-700">
@@ -59,6 +60,7 @@ export default function RestaurantLogin() {
           </form>
         </div>
       </main>
-    </>
+      <Footer />
+    </div>
   );
 }
