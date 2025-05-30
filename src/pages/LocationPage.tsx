@@ -1,17 +1,11 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { OrderCart } from "@/components/OrderCart";
 import { MenuItemCard } from "@/components/MenuItemCard";
-import { supabase } from "@/integrations/supabase/client";
-import { Tables } from "@/integrations/supabase/types";
-import { toast } from "sonner";
-
-type Location = Tables<"restaurants">;
-type MenuItem = Tables<"menu_items">;
 
 const demoMenus = [
   {
@@ -34,49 +28,10 @@ const demoMenus = [
 export default function LocationPage() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
-  const [location, setLocation] = useState<Location | null>(null);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Cart State
   const [cart, setCart] = useState<{ [title: string]: { price: number; quantity: number } }>({});
   const [cartOpen, setCartOpen] = useState(false);
-
-  useEffect(() => {
-    if (name) {
-      fetchLocation(decodeURIComponent(name));
-    }
-  }, [name]);
-
-  const fetchLocation = async (locationName: string) => {
-    try {
-      const { data: locationData, error: locationError } = await supabase
-        .from("restaurants")
-        .select("*")
-        .eq("name", locationName)
-        .eq("status", "active")
-        .single();
-
-      if (locationError) throw locationError;
-      setLocation(locationData);
-
-      // Fetch menu items for this location
-      const { data: menuData, error: menuError } = await supabase
-        .from("menu_items")
-        .select("*")
-        .eq("restaurant_id", locationData.id)
-        .eq("status", "available")
-        .order("display_order", { ascending: true });
-
-      if (menuError) throw menuError;
-      setMenuItems(menuData || []);
-    } catch (error) {
-      console.error("Error fetching location:", error);
-      toast.error("Location not found");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAdd = (item: typeof demoMenus[0]) => {
     setCart(prev => ({
@@ -132,34 +87,6 @@ export default function LocationPage() {
     setCartOpen(false);
   };
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-white">
-        <Header />
-        <div className="flex justify-center items-center h-64">
-          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      </main>
-    );
-  }
-
-  if (!location) {
-    return (
-      <main className="min-h-screen bg-white">
-        <Header />
-        <div className="flex justify-center items-center h-64">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Location Not Found</h2>
-            <p className="text-gray-600 mb-4">The location you're looking for doesn't exist or is not available.</p>
-            <Button onClick={() => navigate("/")} className="bg-gradient-to-r from-red-500 to-orange-400">
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-white relative pb-10">
       <Header />
@@ -187,7 +114,7 @@ export default function LocationPage() {
           <ChevronRight className="rotate-180 text-orange-400" />
         </Button>
         <h2 className="font-bold text-lg text-orange-900 tracking-tight">
-          {location.name}
+          {decodeURIComponent(name || "")}
         </h2>
         <Button
           className="ml-auto bg-gradient-to-r from-orange-400 to-red-400 text-white font-semibold"
@@ -198,45 +125,26 @@ export default function LocationPage() {
       </div>
       <section className="flex flex-col items-center px-4">
         <img
-          src={location.banner_url || location.image_url || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80"}
-          alt={location.name}
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80"
+          alt={name}
           className="w-full max-w-lg rounded-lg shadow mb-4 aspect-[3/1] object-cover"
         />
         <div className="max-w-xl w-full bg-white rounded-xl shadow p-6 flex flex-col gap-6">
           <div className="mb-2">
             <h3 className="text-xl font-bold text-red-500 mb-2">Featured Menu</h3>
-            {menuItems.length > 0 ? (
-              <ul className="space-y-3">
-                {menuItems.map((item) => (
-                  <MenuItemCard
-                    key={item.id}
-                    title={item.name}
-                    description={item.description || ""}
-                    price={Number(item.price)}
-                    quantity={cart[item.name]?.quantity || 0}
-                    onAdd={() => handleAdd({ title: item.name, description: item.description || "", price: Number(item.price) })}
-                    onRemove={() => handleRemove({ title: item.name, description: item.description || "", price: Number(item.price) })}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <div>
-                <p className="text-gray-600 mb-4">Menu items coming soon! For now, here's a demo menu:</p>
-                <ul className="space-y-3">
-                  {demoMenus.map((item) => (
-                    <MenuItemCard
-                      key={item.title}
-                      title={item.title}
-                      description={item.description}
-                      price={item.price}
-                      quantity={cart[item.title]?.quantity || 0}
-                      onAdd={() => handleAdd(item)}
-                      onRemove={() => handleRemove(item)}
-                    />
-                  ))}
-                </ul>
-              </div>
-            )}
+            <ul className="space-y-3">
+              {demoMenus.map((item) => (
+                <MenuItemCard
+                  key={item.title}
+                  title={item.title}
+                  description={item.description}
+                  price={item.price}
+                  quantity={cart[item.title]?.quantity || 0}
+                  onAdd={() => handleAdd(item)}
+                  onRemove={() => handleRemove(item)}
+                />
+              ))}
+            </ul>
           </div>
         </div>
       </section>

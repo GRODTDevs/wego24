@@ -15,7 +15,7 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-6">
           <a href="/" className="text-white hover:text-red-200 font-medium transition-colors">Home</a>
           <a href="/driver/login" className="text-white hover:text-red-200 font-medium transition-colors">Drivers</a>
-          <a href="/restaurant/login" className="text-white hover:text-red-200 font-medium transition-colors">Restaurant</a>
+          <a href="/restaurant/login" className="text-white hover:text-red-200 font-medium transition-colors">Business</a>
           <a href="/admin/dashboard" className="text-white hover:text-red-200 font-medium transition-colors">Admin</a>
         </nav>
         <div className="md:hidden">
