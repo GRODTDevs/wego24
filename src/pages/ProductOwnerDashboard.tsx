@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +12,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { formatCurrency } from "@/lib/currency";
 
 const mockStats = {
   totalOrders: 1245,
@@ -59,7 +59,7 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">${mockStats.totalRevenue.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(mockStats.totalRevenue)}</div>
                   <Badge variant="secondary" className="mt-1">+8% {t('dashboard.stats.fromLastMonth')}</Badge>
                 </CardContent>
               </Card>
@@ -106,7 +106,12 @@ export default function ProductOwnerDashboard() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip 
+                      formatter={(value, name) => [
+                        name === 'revenue' ? formatCurrency(Number(value)) : value,
+                        name === 'revenue' ? t('dashboard.chart.revenue') : t('dashboard.chart.orders')
+                      ]}
+                    />
                     <Bar dataKey="revenue" fill="#8884d8" name={t('dashboard.chart.revenue')} />
                     <Bar dataKey="orders" fill="#82ca9d" name={t('dashboard.chart.orders')} />
                   </BarChart>
