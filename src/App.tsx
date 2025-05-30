@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import LocationPage from "./pages/LocationPage";
 import CourierRequest from "./pages/CourierRequest";
+import CourierSuccess from "./pages/CourierSuccess";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +40,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/courier-request" element={<CourierRequest />} />
+                <Route path="/courier-success" element={<CourierSuccess />} />
                 <Route path="/restaurant/login" element={<RestaurantLogin />} />
                 <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
                 <Route path="/location/:name" element={<LocationPage />} />

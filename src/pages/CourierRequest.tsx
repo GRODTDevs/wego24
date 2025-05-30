@@ -7,10 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, MapPin, Clock, Package } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { geocodeAddress, calculateStraightLineDistance } from "@/utils/geocoding";
+import { formatCurrency } from "@/lib/currency";
+import { ArrowLeft, MapPin, Clock, Package, Calculator, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 const CourierRequest = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     pickupLocation: "",
     pickupDate: "",
@@ -23,9 +28,124 @@ const CourierRequest = () => {
     dropoffTime: "",
     specialInstructions: ""
   });
+  
+  const [priceCalculation, setPriceCalculation] = useState<{
+    distance: number;
+    totalPrice: number;
+    baseFee: number;
+    distanceFee: number;
+  } | null>(null);
+  
+  const [loading, setLoading] = useState(false);
+  const [calculatingPrice, setCalculatingPrice] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Reset price calculation when addresses change
+    if (field === 'pickupLocation' || field === 'dropoffLocation') {
+      setPriceCalculation(null);
+    }
+  };
+
+  const calculatePrice = async () => {
+    if (!formData.pickupLocation || !formData.dropoffLocation) {
+      toast.error("Please enter both pickup and dropoff locations");
+      return;
+    }
+
+    setCalculatingPrice(true);
+    try {
+      // Geocode both addresses
+      const [pickupCoords, dropoffCoords] = await Promise.all([
+        geocodeAddress(formData.pickupLocation),
+        geocodeAddress(formData.dropoffLocation)
+      ]);
+
+      if (!pickupCoords || !dropoffCoords) {
+        toast.error("Could not find one or both addresses. Please check and try again.");
+        return;
+      }
+
+      // Calculate distance
+      const distance = calculateStraightLineDistance(
+        pickupCoords.lat, 
+        pickupCoords.lng, 
+        dropoffCoords.lat, 
+        dropoffCoords.lng
+      );
+
+      const baseFee = 6.50;
+      const distanceFee = distance * 0.50;
+      const totalPrice = baseFee + distanceFee;
+
+      setPriceCalculation({
+        distance,
+        totalPrice,
+        baseFee,
+        distanceFee
+      });
+
+      toast.success(`Price calculated: ${formatCurrency(totalPrice)}`);
+    } catch (error) {
+      console.error("Error calculating price:", error);
+      toast.error("Failed to calculate price. Please try again.");
+    } finally {
+      setCalculatingPrice(false);
+    }
+  };
+
+  const handlePayment = async () => {
+    if (!user) {
+      toast.error("Please sign in to proceed with payment");
+      return;
+    }
+
+    if (!priceCalculation) {
+      toast.error("Please calculate the price first");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Geocode addresses again for payment
+      const [pickupCoords, dropoffCoords] = await Promise.all([
+        geocodeAddress(formData.pickupLocation),
+        geocodeAddress(formData.dropoffLocation)
+      ]);
+
+      if (!pickupCoords || !dropoffCoords) {
+        toast.error("Could not find addresses. Please try again.");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-courier-payment', {
+        body: {
+          pickupLat: pickupCoords.lat,
+          pickupLng: pickupCoords.lng,
+          dropoffLat: dropoffCoords.lat,
+          dropoffLng: dropoffCoords.lng,
+          pickupLocation: formData.pickupLocation,
+          dropoffLocation: formData.dropoffLocation,
+          itemDescription: formData.itemDescription,
+          userEmail: user.email
+        }
+      });
+
+      if (error) {
+        console.error("Payment error:", error);
+        toast.error("Failed to create payment session");
+        return;
+      }
+
+      // Redirect to Stripe checkout
+      window.open(data.url, '_blank');
+      
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Failed to process payment");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,9 +157,12 @@ const CourierRequest = () => {
       return;
     }
 
-    // For now, just show success message
-    toast.success("Courier request submitted! We'll contact you soon.");
-    console.log("Courier request:", formData);
+    if (!priceCalculation) {
+      toast.error("Please calculate the price before proceeding");
+      return;
+    }
+
+    handlePayment();
   };
 
   return (
@@ -199,14 +322,65 @@ const CourierRequest = () => {
               />
             </div>
 
+            {/* Price Calculation Section */}
+            <div className="bg-blue-50 p-6 rounded-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <Calculator className="w-5 h-5 text-blue-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Price Calculation</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <Button
+                  type="button"
+                  onClick={calculatePrice}
+                  disabled={calculatingPrice || !formData.pickupLocation || !formData.dropoffLocation}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {calculatingPrice ? "Calculating..." : "Calculate Price"}
+                </Button>
+                
+                {priceCalculation && (
+                  <div className="bg-white p-4 rounded-md border">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Distance:</span>
+                        <span>{priceCalculation.distance.toFixed(2)} km</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Base fee:</span>
+                        <span>{formatCurrency(priceCalculation.baseFee)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Distance fee ({formatCurrency(0.50)}/km):</span>
+                        <span>{formatCurrency(priceCalculation.distanceFee)}</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="flex justify-between font-semibold text-lg">
+                        <span>Total:</span>
+                        <span>{formatCurrency(priceCalculation.totalPrice)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Submit Button */}
             <div className="text-center">
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-8 py-3 text-lg"
+                disabled={loading || !priceCalculation || !user}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-8 py-3 text-lg flex items-center gap-2"
               >
-                Submit Courier Request
+                <CreditCard className="w-5 h-5" />
+                {loading ? "Processing..." : `Pay ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} & Book Courier`}
               </Button>
+              
+              {!user && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Please <Link to="/auth" className="text-blue-600 hover:underline">sign in</Link> to proceed with payment
+                </p>
+              )}
             </div>
           </form>
         </div>
