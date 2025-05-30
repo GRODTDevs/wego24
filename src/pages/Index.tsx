@@ -1,8 +1,11 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
+import { useAuth } from "@/contexts/AuthContext";
+import { User, LogIn, LogOut } from "lucide-react";
 
 const mockRestaurants = [
   {
@@ -39,6 +42,7 @@ const mockRestaurants = [
 
 const Index = () => {
   const [search, setSearch] = useState("");
+  const { user, signOut, loading } = useAuth();
 
   const filteredRestaurants = search.length === 0
     ? mockRestaurants
@@ -47,9 +51,46 @@ const Index = () => {
         r.cuisine.toLowerCase().includes(search.toLowerCase())
       );
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <main className="min-h-screen bg-white relative pb-16">
       <Header />
+      
+      {/* Auth section */}
+      <div className="absolute top-4 right-4 z-20">
+        {loading ? (
+          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        ) : user ? (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-md">
+              <User className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">
+                Welcome, {user.user_metadata?.first_name || "User"}!
+              </span>
+            </div>
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </Button>
+          </div>
+        ) : (
+          <Link to="/auth">
+            <Button className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white flex items-center gap-2">
+              <LogIn className="w-4 h-4" />
+              Login / Sign Up
+            </Button>
+          </Link>
+        )}
+      </div>
+
       {/* Info section */}
       <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-4 mt-4 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
         <h2 className="text-lg font-semibold text-orange-700 mb-1">Welcome to the BiteToGo Demo</h2>
@@ -61,14 +102,17 @@ const Index = () => {
             <li>Try searching or browsing restaurants.</li>
             <li>Click a restaurant to view its menu.</li>
             <li>Use the Restaurant or Driver login to review order and delivery flows.</li>
+            <li>{user ? "You are now logged in! Try exploring the features." : "Click 'Login / Sign Up' to create an account and access full features."}</li>
           </ul>
         </p>
       </section>
+
       {/* Subtle radial gradient background */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="w-[900px] h-[900px] bg-gradient-radial from-orange-100 via-white to-transparent rounded-full absolute left-1/2 -top-52 -translate-x-1/2 opacity-60"></div>
         <div className="w-[500px] h-[500px] bg-gradient-radial from-red-100 via-white to-transparent rounded-full absolute right-10 top-1/3 opacity-40"></div>
       </div>
+      
       <div className="relative z-10 flex flex-col items-center pt-20 px-4">
         <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FRIGILIANA, NERJA, TORROX</span>
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">

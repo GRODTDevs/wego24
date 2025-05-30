@@ -9,7 +9,81 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          address: string | null
+          allergies: string[] | null
+          avatar_url: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          delivery_instructions: string | null
+          dietary_preferences: string[] | null
+          email: string | null
+          email_notifications: boolean | null
+          first_name: string | null
+          id: string
+          is_active: boolean | null
+          last_name: string | null
+          marketing_emails: boolean | null
+          phone: string | null
+          phone_verified: boolean | null
+          postal_code: string | null
+          preferred_language: string | null
+          sms_notifications: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          delivery_instructions?: string | null
+          dietary_preferences?: string[] | null
+          email?: string | null
+          email_notifications?: boolean | null
+          first_name?: string | null
+          id: string
+          is_active?: boolean | null
+          last_name?: string | null
+          marketing_emails?: boolean | null
+          phone?: string | null
+          phone_verified?: boolean | null
+          postal_code?: string | null
+          preferred_language?: string | null
+          sms_notifications?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          delivery_instructions?: string | null
+          dietary_preferences?: string[] | null
+          email?: string | null
+          email_notifications?: boolean | null
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_name?: string | null
+          marketing_emails?: boolean | null
+          phone?: string | null
+          phone_verified?: boolean | null
+          postal_code?: string | null
+          preferred_language?: string | null
+          sms_notifications?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
