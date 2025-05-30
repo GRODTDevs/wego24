@@ -23,7 +23,7 @@ export function EmptyState({ title, description, additionalContent }: EmptyState
           src="https://lottie.host/45bab164-5c01-4dc7-8aee-222644371965/Uumhvz82hk.lottie"
           background="transparent"
           speed="1"
-          style={{ width: '300px', height: '300px' }}
+          style={{ width: '120px', height: '120px' }}
           loop
           autoplay
         />
