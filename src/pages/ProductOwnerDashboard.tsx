@@ -12,6 +12,7 @@ import { SuperuserCreation } from "@/components/SuperuserCreation";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const mockStats = {
   totalOrders: 1245,
@@ -31,63 +32,65 @@ const mockOrderData = [
 ];
 
 export default function ProductOwnerDashboard() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
       <ProtectedRoute requireAdmin={true}>
         <main className="flex-1 bg-gray-50 p-6">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Product Owner Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
             
             {/* Overview Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Orders</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalOrders')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{mockStats.totalOrders.toLocaleString()}</div>
-                  <Badge variant="secondary" className="mt-1">+12% from last month</Badge>
+                  <Badge variant="secondary" className="mt-1">+12% {t('dashboard.stats.fromLastMonth')}</Badge>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">${mockStats.totalRevenue.toLocaleString()}</div>
-                  <Badge variant="secondary" className="mt-1">+8% from last month</Badge>
+                  <Badge variant="secondary" className="mt-1">+8% {t('dashboard.stats.fromLastMonth')}</Badge>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Active Locations</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeLocations')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{mockStats.activeLocations}</div>
-                  <Badge variant="secondary" className="mt-1">+3 new this month</Badge>
+                  <Badge variant="secondary" className="mt-1">+3 {t('dashboard.stats.newThisMonth')}</Badge>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Active Drivers</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeDrivers')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{mockStats.activeDrivers}</div>
-                  <Badge variant="secondary" className="mt-1">+2 new this month</Badge>
+                  <Badge variant="secondary" className="mt-1">+2 {t('dashboard.stats.newThisMonth')}</Badge>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Users</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalUsers')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{mockStats.totalUsers}</div>
-                  <Badge variant="secondary" className="mt-1">+45 new this month</Badge>
+                  <Badge variant="secondary" className="mt-1">+45 {t('dashboard.stats.newThisMonth')}</Badge>
                 </CardContent>
               </Card>
             </div>
@@ -95,7 +98,7 @@ export default function ProductOwnerDashboard() {
             {/* Revenue Chart */}
             <Card className="mb-8">
               <CardHeader>
-                <CardTitle>Monthly Revenue & Orders</CardTitle>
+                <CardTitle>{t('dashboard.chart.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -104,8 +107,8 @@ export default function ProductOwnerDashboard() {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="revenue" fill="#8884d8" name="Revenue ($)" />
-                    <Bar dataKey="orders" fill="#82ca9d" name="Orders" />
+                    <Bar dataKey="revenue" fill="#8884d8" name={t('dashboard.chart.revenue')} />
+                    <Bar dataKey="orders" fill="#82ca9d" name={t('dashboard.chart.orders')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -114,12 +117,12 @@ export default function ProductOwnerDashboard() {
             {/* Management Tabs */}
             <Tabs defaultValue="users" className="space-y-6">
               <TabsList className="grid grid-cols-6 w-full">
-                <TabsTrigger value="users">Users</TabsTrigger>
-                <TabsTrigger value="locations">Locations</TabsTrigger>
-                <TabsTrigger value="drivers">Drivers</TabsTrigger>
-                <TabsTrigger value="commissions">Commissions</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                <TabsTrigger value="admin">Admin</TabsTrigger>
+                <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
+                <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
+                <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
+                <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
+                <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
+                <TabsTrigger value="admin">{t('dashboard.tabs.admin')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users">
@@ -141,10 +144,10 @@ export default function ProductOwnerDashboard() {
               <TabsContent value="analytics">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Advanced Analytics</CardTitle>
+                    <CardTitle>{t('dashboard.analytics.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">Advanced analytics and reporting features coming soon...</p>
+                    <p className="text-gray-600">{t('dashboard.analytics.comingSoon')}</p>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -153,10 +156,10 @@ export default function ProductOwnerDashboard() {
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Admin Management</CardTitle>
+                      <CardTitle>{t('dashboard.admin.title')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-600 mb-6">Manage administrator privileges and system settings.</p>
+                      <p className="text-gray-600 mb-6">{t('dashboard.admin.description')}</p>
                       <SuperuserCreation />
                     </CardContent>
                   </Card>

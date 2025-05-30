@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
@@ -44,6 +45,29 @@ const translations = {
     'location.step4': 'All data is local until future backend/database is added.',
     'location.viewCart': 'View Cart',
     'location.featuredMenu': 'Featured Menu',
+    
+    // Product Owner Dashboard
+    'dashboard.title': 'Product Owner Dashboard',
+    'dashboard.stats.totalOrders': 'Total Orders',
+    'dashboard.stats.totalRevenue': 'Total Revenue',
+    'dashboard.stats.activeLocations': 'Active Locations',
+    'dashboard.stats.activeDrivers': 'Active Drivers',
+    'dashboard.stats.totalUsers': 'Total Users',
+    'dashboard.stats.fromLastMonth': 'from last month',
+    'dashboard.stats.newThisMonth': 'new this month',
+    'dashboard.chart.title': 'Monthly Revenue & Orders',
+    'dashboard.chart.revenue': 'Revenue ($)',
+    'dashboard.chart.orders': 'Orders',
+    'dashboard.tabs.users': 'Users',
+    'dashboard.tabs.locations': 'Locations',
+    'dashboard.tabs.drivers': 'Drivers',
+    'dashboard.tabs.commissions': 'Commissions',
+    'dashboard.tabs.analytics': 'Analytics',
+    'dashboard.tabs.admin': 'Admin',
+    'dashboard.analytics.title': 'Advanced Analytics',
+    'dashboard.analytics.comingSoon': 'Advanced analytics and reporting features coming soon...',
+    'dashboard.admin.title': 'Admin Management',
+    'dashboard.admin.description': 'Manage administrator privileges and system settings.',
     
     // Courier Request
     'courier.title': 'Request a Courier',
@@ -143,6 +167,29 @@ const translations = {
     'location.step4': 'Todos los datos son locales hasta que se agregue una base de datos/backend futuro.',
     'location.viewCart': 'Ver Carrito',
     'location.featuredMenu': 'Menú Destacado',
+    
+    // Product Owner Dashboard
+    'dashboard.title': 'Panel del Propietario del Producto',
+    'dashboard.stats.totalOrders': 'Pedidos Totales',
+    'dashboard.stats.totalRevenue': 'Ingresos Totales',
+    'dashboard.stats.activeLocations': 'Ubicaciones Activas',
+    'dashboard.stats.activeDrivers': 'Conductores Activos',
+    'dashboard.stats.totalUsers': 'Usuarios Totales',
+    'dashboard.stats.fromLastMonth': 'del mes pasado',
+    'dashboard.stats.newThisMonth': 'nuevos este mes',
+    'dashboard.chart.title': 'Ingresos y Pedidos Mensuales',
+    'dashboard.chart.revenue': 'Ingresos ($)',
+    'dashboard.chart.orders': 'Pedidos',
+    'dashboard.tabs.users': 'Usuarios',
+    'dashboard.tabs.locations': 'Ubicaciones',
+    'dashboard.tabs.drivers': 'Conductores',
+    'dashboard.tabs.commissions': 'Comisiones',
+    'dashboard.tabs.analytics': 'Analíticos',
+    'dashboard.tabs.admin': 'Admin',
+    'dashboard.analytics.title': 'Análisis Avanzados',
+    'dashboard.analytics.comingSoon': 'Funciones avanzadas de análisis e informes próximamente...',
+    'dashboard.admin.title': 'Gestión de Administrador',
+    'dashboard.admin.description': 'Gestionar privilegios de administrador y configuraciones del sistema.',
     
     // Courier Request
     'courier.title': 'Solicitar un Mensajero',
