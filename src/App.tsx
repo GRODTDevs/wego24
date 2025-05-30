@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import RestaurantDashboard from "./pages/RestaurantDashboard";
 import DriverLogin from "./pages/DriverLogin";
 import DriverDashboard from "./pages/DriverDashboard";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
+import LocationPage from "./pages/LocationPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +37,7 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/restaurant/login" element={<RestaurantLogin />} />
               <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-              <Route path="/restaurant/:name" element={<RestaurantPage />} />
+              <Route path="/location/:name" element={<LocationPage />} />
               <Route path="/driver/login" element={<DriverLogin />} />
               <Route path="/driver/dashboard" element={<DriverDashboard />} />
               <Route path="/admin/dashboard" element={<ProductOwnerDashboard />} />

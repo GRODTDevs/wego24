@@ -1,55 +1,53 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { RestaurantCard } from "@/components/RestaurantCard";
+import { LocationCard } from "@/components/LocationCard";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { InfoModal } from "@/components/InfoModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, LogIn, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/integrations/supabase/types";
+import { User, LogIn, LogOut, MapPin } from "lucide-react";
+import { toast } from "sonner";
 
-const mockRestaurants = [
-  {
-    name: "Sunrise Diner",
-    cuisine: "American, Breakfast",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    name: "Spice Symphony",
-    cuisine: "Indian, Curry",
-    image: "https://images.pexels.com/photos/20943933/pexels-photo-20943933/free-photo-of-close-up-of-a-person-eating-a-meal.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    name: "La Vita Pizzeria",
-    cuisine: "Italian, Pizza",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    name: "Tokyo Nights",
-    cuisine: "Japanese, Sushi",
-    image: "https://images.pexels.com/photos/31002119/pexels-photo-31002119/free-photo-of-vibrant-japanese-lantern-display-in-tokyo.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    name: "Fresh Greens",
-    cuisine: "Healthy, Salad",
-    image: "https://images.pexels.com/photos/2291347/pexels-photo-2291347.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    name: "Burger Barn",
-    cuisine: "Burgers, Sandwiches",
-    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80",
-  },
-];
+type Location = Tables<"restaurants">;
 
 const Index = () => {
   const [search, setSearch] = useState("");
-  const { user, signOut, loading } = useAuth();
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user, signOut, loading: authLoading } = useAuth();
 
-  const filteredRestaurants = search.length === 0
-    ? mockRestaurants
-    : mockRestaurants.filter(r =>
-        r.name.toLowerCase().includes(search.toLowerCase()) ||
-        r.cuisine.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  const fetchLocations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setLocations(data || []);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      toast.error("Failed to load locations");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredLocations = search.length === 0
+    ? locations
+    : locations.filter(location =>
+        location.name.toLowerCase().includes(search.toLowerCase()) ||
+        (location.cuisine_type && location.cuisine_type.toLowerCase().includes(search.toLowerCase())) ||
+        location.city.toLowerCase().includes(search.toLowerCase())
       );
 
   const handleSignOut = async () => {
@@ -63,7 +61,7 @@ const Index = () => {
       <main className="flex-1 relative pb-16">
         {/* Auth section */}
         <div className="absolute top-4 right-4 z-20">
-          {loading ? (
+          {authLoading ? (
             <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
           ) : user ? (
             <div className="flex items-center gap-3">
@@ -102,15 +100,15 @@ const Index = () => {
         <div className="relative z-10 flex flex-col items-center pt-20 px-4">
           <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">FRIGILIANA, NERJA, TORROX</span>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
-            Food Delivery <span className="text-red-500">Near You</span>
+            Local Delivery <span className="text-red-500">Near You</span>
           </h1>
           <p className="text-gray-600 text-lg mb-6 text-center max-w-md">
-            Order food from your favorite local spots, track your order, and enjoy fast delivery.
+            Order from your favorite local businesses, track your order, and enjoy fast delivery.
           </p>
           <div className="flex w-full max-w-md justify-center mb-8 gap-2">
             <input
               className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
-              placeholder="Search restaurants or food... "
+              placeholder="Search businesses or locations..."
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -121,17 +119,39 @@ const Index = () => {
               Search
             </Button>
           </div>
-          {/* Restaurant grid */}
-          <section className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {filteredRestaurants.map((r, idx) => (
-              <RestaurantCard
-                key={r.name}
-                name={r.name}
-                cuisine={r.cuisine}
-                image={r.image}
-                highlightColor={idx % 2 === 0 ? "red" : "orange"}
-              />
-            ))}
+
+          {/* Locations grid */}
+          <section className="w-full max-w-5xl mx-auto">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : filteredLocations.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                {filteredLocations.map((location, idx) => (
+                  <LocationCard
+                    key={location.id}
+                    name={location.name}
+                    businessType={location.cuisine_type || "Business"}
+                    image={location.image_url || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"}
+                    highlightColor={idx % 2 === 0 ? "red" : "orange"}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <MapPin className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-900 mb-2">No Locations Available</h3>
+                <p className="text-gray-600 mb-6">
+                  We're working on adding local businesses to your area. Check back soon!
+                </p>
+                {search && (
+                  <p className="text-sm text-gray-500">
+                    No results found for "{search}". Try a different search term.
+                  </p>
+                )}
+              </div>
+            )}
           </section>
         </div>
 

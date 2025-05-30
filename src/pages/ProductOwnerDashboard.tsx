@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { UserManagement } from "@/components/UserManagement";
-import { RestaurantManagement } from "@/components/RestaurantManagement";
+import { LocationManagement } from "@/components/LocationManagement";
 import { DriverManagement } from "@/components/DriverManagement";
 import { CommissionManagement } from "@/components/CommissionManagement";
 import { SuperuserCreation } from "@/components/SuperuserCreation";
@@ -15,7 +16,7 @@ import { Footer } from "@/components/Footer";
 const mockStats = {
   totalOrders: 1245,
   totalRevenue: 45670,
-  activeRestaurants: 28,
+  activeLocations: 28,
   activeDrivers: 15,
   totalUsers: 523
 };
@@ -62,10 +63,10 @@ export default function ProductOwnerDashboard() {
               
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Active Restaurants</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">Active Locations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.activeRestaurants}</div>
+                  <div className="text-2xl font-bold">{mockStats.activeLocations}</div>
                   <Badge variant="secondary" className="mt-1">+3 new this month</Badge>
                 </CardContent>
               </Card>
@@ -114,7 +115,7 @@ export default function ProductOwnerDashboard() {
             <Tabs defaultValue="users" className="space-y-6">
               <TabsList className="grid grid-cols-6 w-full">
                 <TabsTrigger value="users">Users</TabsTrigger>
-                <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
+                <TabsTrigger value="locations">Locations</TabsTrigger>
                 <TabsTrigger value="drivers">Drivers</TabsTrigger>
                 <TabsTrigger value="commissions">Commissions</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -125,8 +126,8 @@ export default function ProductOwnerDashboard() {
                 <UserManagement />
               </TabsContent>
 
-              <TabsContent value="restaurants">
-                <RestaurantManagement />
+              <TabsContent value="locations">
+                <LocationManagement />
               </TabsContent>
 
               <TabsContent value="drivers">
