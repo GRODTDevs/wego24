@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +30,7 @@ interface Expense {
 
 export function VehicleManagement() {
   const { toast } = useToast();
+  
   const [vehicles, setVehicles] = useState<Vehicle[]>([
     {
       id: "1",
@@ -72,7 +72,7 @@ export function VehicleManagement() {
 
   const [expenseForm, setExpenseForm] = useState({
     vehicleId: "",
-    type: "fuel" as const,
+    type: "fuel" as "fuel" | "maintenance" | "insurance" | "other",
     amount: 0,
     description: "",
     date: new Date().toISOString().split('T')[0],
