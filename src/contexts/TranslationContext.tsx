@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
@@ -26,6 +25,7 @@ const translations = {
     'home.description': 'Order from your favorite local businesses, track your order, and enjoy fast delivery.',
     'home.searchPlaceholder': 'Search businesses or locations...',
     'home.searchButton': 'Search',
+    'home.getCourier': 'Get a Courier',
     'home.welcome': 'Welcome,',
     'home.loginButton': 'Login / Sign Up',
     'home.signOut': 'Sign Out',
@@ -124,6 +124,7 @@ const translations = {
     'home.description': 'Pide de tus negocios locales favoritos, rastrea tu pedido y disfruta de entrega rápida.',
     'home.searchPlaceholder': 'Buscar negocios o ubicaciones...',
     'home.searchButton': 'Buscar',
+    'home.getCourier': 'Obtener un Mensajero',
     'home.welcome': 'Bienvenido,',
     'home.loginButton': 'Iniciar Sesión / Registrarse',
     'home.signOut': 'Cerrar Sesión',

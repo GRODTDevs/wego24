@@ -129,7 +129,7 @@ const Index = () => {
                   type="button"
                 >
                   <Truck className="w-4 h-4" />
-                  Get a Courier
+                  {t('home.getCourier')}
                 </Button>
               </Link>
             </div>
