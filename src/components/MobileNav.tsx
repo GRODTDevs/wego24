@@ -18,19 +18,26 @@ export function MobileNav() {
   return (
     <>
       <Button
-        className="md:hidden bg-transparent hover:bg-gray-100 px-3 py-2"
+        className="md:hidden bg-transparent hover:bg-red-700 px-3 py-2"
         variant="ghost"
         size="icon"
         aria-label="Open menu"
         onClick={() => setOpen(true)}
       >
-        <Menu className="h-6 w-6 text-gray-700" />
+        <Menu className="h-6 w-6 text-white" />
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetContent side="left" className="p-0 w-64 bg-gradient-to-b from-red-600 to-red-700">
           <div className="flex items-center justify-between px-6 py-6">
-            <span className="text-xl font-bold text-orange-500">🍽️</span>
-            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/lovable-uploads/d34e1469-dfda-43a5-b6b6-9f830c0e10aa.png" 
+                alt="ToGoo Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold text-white">ToGoo</span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-white hover:bg-red-700">
               <X />
             </Button>
           </div>
@@ -40,7 +47,7 @@ export function MobileNav() {
                 key={link.to}
                 href={link.to}
                 className={cn(
-                  "text-lg font-medium text-gray-700 hover:text-orange-600 py-2 transition-colors"
+                  "text-lg font-medium text-white hover:text-red-200 py-2 transition-colors"
                 )}
                 onClick={() => setOpen(false)}
               >

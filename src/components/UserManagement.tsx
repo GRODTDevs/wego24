@@ -1,129 +1,209 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Trash2, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface User {
   id: string;
-  name: string;
   email: string;
-  phone: string;
-  status: "active" | "inactive" | "suspended";
-  joinDate: string;
-  totalOrders: number;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  role: "admin" | "user";
+  created_at: string;
+  is_active?: boolean;
 }
 
 export function UserManagement() {
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1234567890",
-      status: "active",
-      joinDate: "2024-01-15",
-      totalOrders: 25
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "+1234567891",
-      status: "active",
-      joinDate: "2024-02-20",
-      totalOrders: 18
-    },
-    {
-      id: "3",
-      name: "Bob Wilson",
-      email: "bob@example.com",
-      phone: "+1234567892",
-      status: "suspended",
-      joinDate: "2024-01-10",
-      totalOrders: 45
-    }
-  ]);
-
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userForm, setUserForm] = useState({
-    name: "",
     email: "",
+    first_name: "",
+    last_name: "",
     phone: "",
-    status: "active" as "active" | "inactive" | "suspended"
+    role: "user" as "admin" | "user"
   });
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  const handleAddUser = () => {
-    setEditingUser(null);
-    setUserForm({ name: "", email: "", phone: "", status: "active" });
-    setIsDialogOpen(true);
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch users from profiles table joined with user_roles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          email,
+          first_name,
+          last_name,
+          phone,
+          created_at,
+          is_active
+        `);
+
+      if (profilesError) throw profilesError;
+
+      // Fetch user roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const usersWithRoles = profilesData?.map(profile => {
+        const userRole = rolesData?.find(role => role.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || 'user'
+        };
+      }) || [];
+
+      setUsers(usersWithRoles);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const filteredUsers = users.filter(user =>
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setUserForm({
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      status: user.status
+      email: user.email || "",
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      phone: user.phone || "",
+      role: user.role
     });
     setIsDialogOpen(true);
   };
 
-  const handleSaveUser = () => {
-    if (editingUser) {
-      setUsers(users.map(user =>
-        user.id === editingUser.id
-          ? { ...user, ...userForm }
-          : user
-      ));
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+
+    try {
+      // Update profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: userForm.first_name,
+          last_name: userForm.last_name,
+          phone: userForm.phone,
+          email: userForm.email
+        })
+        .eq('id', editingUser.id);
+
+      if (profileError) throw profileError;
+
+      // Update role if changed
+      if (userForm.role !== editingUser.role) {
+        // Delete existing role
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', editingUser.id);
+
+        // Insert new role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: editingUser.id,
+            role: userForm.role
+          });
+
+        if (roleError) throw roleError;
+      }
+
       toast({ title: "User updated successfully" });
-    } else {
-      const newUser: User = {
-        id: Date.now().toString(),
-        ...userForm,
-        joinDate: new Date().toISOString().split('T')[0],
-        totalOrders: 0
-      };
-      setUsers([...users, newUser]);
-      toast({ title: "User added successfully" });
-    }
-    setIsDialogOpen(false);
-  };
-
-  const handleDeleteUser = (id: string) => {
-    setUsers(users.filter(user => user.id !== id));
-    toast({ title: "User deleted successfully" });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-gray-100 text-gray-800";
-      case "suspended": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      setIsDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user",
+        variant: "destructive"
+      });
     }
   };
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({ 
+        title: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
+      });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getStatusColor = (isActive: boolean) => {
+    return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+  };
+
+  const getRoleColor = (role: string) => {
+    return role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800";
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>User Management</CardTitle>
-          <Button onClick={handleAddUser} className="flex items-center gap-2">
+          <Button onClick={() => toast({ title: "Feature coming soon", description: "User creation will be available soon" })} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add User
           </Button>
@@ -146,25 +226,34 @@ export function UserManagement() {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Join Date</TableHead>
-              <TableHead>Total Orders</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="font-medium">
+                  {user.first_name || user.last_name 
+                    ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                    : 'N/A'
+                  }
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone}</TableCell>
+                <TableCell>{user.phone || 'N/A'}</TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(user.status)}>
-                    {user.status}
+                  <Badge className={getRoleColor(user.role)}>
+                    {user.role}
                   </Badge>
                 </TableCell>
-                <TableCell>{user.joinDate}</TableCell>
-                <TableCell>{user.totalOrders}</TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(user.is_active ?? true)}>
+                    {user.is_active ?? true ? 'Active' : 'Inactive'}
+                  </Badge>
+                </TableCell>
+                <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button
@@ -177,9 +266,9 @@ export function UserManagement() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDeleteUser(user.id)}
+                      onClick={() => toggleUserStatus(user.id, user.is_active ?? true)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {user.is_active ?? true ? <Trash2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                     </Button>
                   </div>
                 </TableCell>
@@ -191,24 +280,29 @@ export function UserManagement() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {editingUser ? "Edit User" : "Add New User"}
-              </DialogTitle>
+              <DialogTitle>Edit User</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Name</label>
-                <Input
-                  value={userForm.name}
-                  onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-                />
-              </div>
               <div>
                 <label className="text-sm font-medium">Email</label>
                 <Input
                   type="email"
                   value={userForm.email}
                   onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">First Name</label>
+                <Input
+                  value={userForm.first_name}
+                  onChange={(e) => setUserForm({ ...userForm, first_name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Last Name</label>
+                <Input
+                  value={userForm.last_name}
+                  onChange={(e) => setUserForm({ ...userForm, last_name: e.target.value })}
                 />
               </div>
               <div>
@@ -219,15 +313,14 @@ export function UserManagement() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Status</label>
+                <label className="text-sm font-medium">Role</label>
                 <select
-                  value={userForm.status}
-                  onChange={(e) => setUserForm({ ...userForm, status: e.target.value as "active" | "inactive" | "suspended" })}
+                  value={userForm.role}
+                  onChange={(e) => setUserForm({ ...userForm, role: e.target.value as "admin" | "user" })}
                   className="w-full p-2 border rounded-md"
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="suspended">Suspended</option>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
                 </select>
               </div>
               <div className="flex justify-end gap-2">
@@ -235,7 +328,7 @@ export function UserManagement() {
                   Cancel
                 </Button>
                 <Button onClick={handleSaveUser}>
-                  {editingUser ? "Update" : "Add"} User
+                  Update User
                 </Button>
               </div>
             </div>
