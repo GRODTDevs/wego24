@@ -1,4 +1,3 @@
-
 import { MobileNav } from "./MobileNav";
 
 export function Header() {
@@ -13,7 +12,6 @@ export function Header() {
           />
           <div className="flex flex-col">
             <span className="font-bold text-xl text-white tracking-tight select-none">ToGoo</span>
-            <span className="text-xs font-semibold text-red-200 italic tracking-widest uppercase">Beta</span>
           </div>
         </div>
         <nav className="hidden md:flex items-center gap-6">
