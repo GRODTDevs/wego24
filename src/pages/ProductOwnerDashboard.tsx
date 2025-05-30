@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +9,8 @@ import { DriverManagement } from "@/components/DriverManagement";
 import { CommissionManagement } from "@/components/CommissionManagement";
 import { SuperuserCreation } from "@/components/SuperuserCreation";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const mockStats = {
   totalOrders: 1245,
@@ -30,137 +31,141 @@ const mockOrderData = [
 
 export default function ProductOwnerDashboard() {
   return (
-    <ProtectedRoute requireAdmin={true}>
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Product Owner Dashboard</h1>
-          
-          {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.totalOrders.toLocaleString()}</div>
-                <Badge variant="secondary" className="mt-1">+12% from last month</Badge>
-              </CardContent>
-            </Card>
+    <div className="min-h-screen bg-white flex flex-col">
+      <Header />
+      <ProtectedRoute requireAdmin={true}>
+        <main className="flex-1 bg-gray-50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Product Owner Dashboard</h1>
             
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">${mockStats.totalRevenue.toLocaleString()}</div>
-                <Badge variant="secondary" className="mt-1">+8% from last month</Badge>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Active Restaurants</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.activeRestaurants}</div>
-                <Badge variant="secondary" className="mt-1">+3 new this month</Badge>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Active Drivers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.activeDrivers}</div>
-                <Badge variant="secondary" className="mt-1">+2 new this month</Badge>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Users</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.totalUsers}</div>
-                <Badge variant="secondary" className="mt-1">+45 new this month</Badge>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Revenue Chart */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Monthly Revenue & Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mockOrderData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#8884d8" name="Revenue ($)" />
-                  <Bar dataKey="orders" fill="#82ca9d" name="Orders" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Management Tabs */}
-          <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid grid-cols-6 w-full">
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
-              <TabsTrigger value="drivers">Drivers</TabsTrigger>
-              <TabsTrigger value="commissions">Commissions</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="admin">Admin</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="users">
-              <UserManagement />
-            </TabsContent>
-
-            <TabsContent value="restaurants">
-              <RestaurantManagement />
-            </TabsContent>
-
-            <TabsContent value="drivers">
-              <DriverManagement />
-            </TabsContent>
-
-            <TabsContent value="commissions">
-              <CommissionManagement />
-            </TabsContent>
-
-            <TabsContent value="analytics">
+            {/* Overview Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <Card>
-                <CardHeader>
-                  <CardTitle>Advanced Analytics</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Orders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Advanced analytics and reporting features coming soon...</p>
+                  <div className="text-2xl font-bold">{mockStats.totalOrders.toLocaleString()}</div>
+                  <Badge variant="secondary" className="mt-1">+12% from last month</Badge>
                 </CardContent>
               </Card>
-            </TabsContent>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">${mockStats.totalRevenue.toLocaleString()}</div>
+                  <Badge variant="secondary" className="mt-1">+8% from last month</Badge>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Active Restaurants</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockStats.activeRestaurants}</div>
+                  <Badge variant="secondary" className="mt-1">+3 new this month</Badge>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Active Drivers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockStats.activeDrivers}</div>
+                  <Badge variant="secondary" className="mt-1">+2 new this month</Badge>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockStats.totalUsers}</div>
+                  <Badge variant="secondary" className="mt-1">+45 new this month</Badge>
+                </CardContent>
+              </Card>
+            </div>
 
-            <TabsContent value="admin">
-              <div className="space-y-6">
+            {/* Revenue Chart */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Monthly Revenue & Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={mockOrderData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="revenue" fill="#8884d8" name="Revenue ($)" />
+                    <Bar dataKey="orders" fill="#82ca9d" name="Orders" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Management Tabs */}
+            <Tabs defaultValue="users" className="space-y-6">
+              <TabsList className="grid grid-cols-6 w-full">
+                <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
+                <TabsTrigger value="drivers">Drivers</TabsTrigger>
+                <TabsTrigger value="commissions">Commissions</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="admin">Admin</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="users">
+                <UserManagement />
+              </TabsContent>
+
+              <TabsContent value="restaurants">
+                <RestaurantManagement />
+              </TabsContent>
+
+              <TabsContent value="drivers">
+                <DriverManagement />
+              </TabsContent>
+
+              <TabsContent value="commissions">
+                <CommissionManagement />
+              </TabsContent>
+
+              <TabsContent value="analytics">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Admin Management</CardTitle>
+                    <CardTitle>Advanced Analytics</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600 mb-6">Manage administrator privileges and system settings.</p>
-                    <SuperuserCreation />
+                    <p className="text-gray-600">Advanced analytics and reporting features coming soon...</p>
                   </CardContent>
                 </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </ProtectedRoute>
+              </TabsContent>
+
+              <TabsContent value="admin">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Admin Management</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 mb-6">Manage administrator privileges and system settings.</p>
+                      <SuperuserCreation />
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
+      </ProtectedRoute>
+      <Footer />
+    </div>
   );
 }
