@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { InfoModal } from "@/components/InfoModal";
+import { EmptyState } from "@/components/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { User, LogIn, LogOut, MapPin } from "lucide-react";
+import { User, LogIn, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 type Location = Tables<"restaurants">;
@@ -141,18 +142,17 @@ const Index = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <MapPin className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">{t('home.noLocations')}</h3>
-                <p className="text-gray-600 mb-6">
-                  {t('home.noLocationsDesc')}
-                </p>
-                {search && (
-                  <p className="text-sm text-gray-500">
-                    {t('home.noResults')} "{search}". {t('home.tryDifferent')}
-                  </p>
-                )}
-              </div>
+              <EmptyState
+                title={t('home.noLocations')}
+                description={t('home.noLocationsDesc')}
+                additionalContent={
+                  search ? (
+                    <p className="text-sm text-gray-500">
+                      {t('home.noResults')} "{search}". {t('home.tryDifferent')}
+                    </p>
+                  ) : null
+                }
+              />
             )}
           </section>
         </div>
