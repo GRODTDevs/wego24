@@ -11,6 +11,7 @@ import RestaurantLogin from "./pages/RestaurantLogin";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import DriverLogin from "./pages/DriverLogin";
 import DriverDashboard from "./pages/DriverDashboard";
+import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +36,7 @@ function App() {
             <Route path="/restaurant/:name" element={<RestaurantPage />} />
             <Route path="/driver/login" element={<DriverLogin />} />
             <Route path="/driver/dashboard" element={<DriverDashboard />} />
+            <Route path="/admin/dashboard" element={<ProductOwnerDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
