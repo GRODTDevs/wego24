@@ -2,20 +2,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { PickupSection } from "@/components/courier/PickupSection";
+import { ItemSection } from "@/components/courier/ItemSection";
+import { DropoffSection } from "@/components/courier/DropoffSection";
+import { PriceCalculationSection } from "@/components/courier/PriceCalculationSection";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { geocodeAddress, calculateStraightLineDistance } from "@/utils/geocoding";
 import { formatCurrency } from "@/lib/currency";
-import { ArrowLeft, MapPin, Clock, Package, Calculator, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 const CourierRequest = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     pickupLocation: "",
     pickupDate: "",
@@ -49,7 +54,7 @@ const CourierRequest = () => {
 
   const calculatePrice = async () => {
     if (!formData.pickupLocation || !formData.dropoffLocation) {
-      toast.error("Please enter both pickup and dropoff locations");
+      toast.error(t('courier.errors.bothAddresses'));
       return;
     }
 
@@ -62,7 +67,7 @@ const CourierRequest = () => {
       ]);
 
       if (!pickupCoords || !dropoffCoords) {
-        toast.error("Could not find one or both addresses. Please check and try again.");
+        toast.error(t('courier.errors.addressNotFound'));
         return;
       }
 
@@ -85,10 +90,10 @@ const CourierRequest = () => {
         distanceFee
       });
 
-      toast.success(`Price calculated: ${formatCurrency(totalPrice)}`);
+      toast.success(`${t('courier.success.priceCalculated')} ${formatCurrency(totalPrice)}`);
     } catch (error) {
       console.error("Error calculating price:", error);
-      toast.error("Failed to calculate price. Please try again.");
+      toast.error(t('courier.errors.priceCalculation'));
     } finally {
       setCalculatingPrice(false);
     }
@@ -96,12 +101,12 @@ const CourierRequest = () => {
 
   const handlePayment = async () => {
     if (!user) {
-      toast.error("Please sign in to proceed with payment");
+      toast.error(t('courier.signInRequired'));
       return;
     }
 
     if (!priceCalculation) {
-      toast.error("Please calculate the price first");
+      toast.error(t('courier.errors.calculatePrice'));
       return;
     }
 
@@ -114,7 +119,7 @@ const CourierRequest = () => {
       ]);
 
       if (!pickupCoords || !dropoffCoords) {
-        toast.error("Could not find addresses. Please try again.");
+        toast.error(t('courier.errors.addressNotFound'));
         return;
       }
 
@@ -133,7 +138,7 @@ const CourierRequest = () => {
 
       if (error) {
         console.error("Payment error:", error);
-        toast.error("Failed to create payment session");
+        toast.error(t('courier.errors.paymentSession'));
         return;
       }
 
@@ -142,7 +147,7 @@ const CourierRequest = () => {
       
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error("Failed to process payment");
+      toast.error(t('courier.errors.paymentProcessing'));
     } finally {
       setLoading(false);
     }
@@ -153,12 +158,12 @@ const CourierRequest = () => {
     
     // Basic validation
     if (!formData.pickupLocation || !formData.dropoffLocation || !formData.itemDescription) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('courier.errors.fillRequired'));
       return;
     }
 
     if (!priceCalculation) {
-      toast.error("Please calculate the price before proceeding");
+      toast.error(t('courier.errors.calculateFirst'));
       return;
     }
 
@@ -174,196 +179,49 @@ const CourierRequest = () => {
           {/* Back button */}
           <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6">
             <ArrowLeft className="w-4 h-4" />
-            Back to Home
+            {t('courier.backToHome')}
           </Link>
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Request a Courier</h1>
-            <p className="text-gray-600">Fill in the details below and we'll arrange pickup and delivery for you</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('courier.title')}</h1>
+            <p className="text-gray-600">{t('courier.description')}</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Pickup Section */}
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Pickup Details</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="pickupLocation">Pickup Location *</Label>
-                  <Input
-                    id="pickupLocation"
-                    placeholder="Enter pickup address"
-                    value={formData.pickupLocation}
-                    onChange={(e) => handleInputChange("pickupLocation", e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="pickupDate">Pickup Date</Label>
-                    <Input
-                      id="pickupDate"
-                      type="date"
-                      value={formData.pickupDate}
-                      onChange={(e) => handleInputChange("pickupDate", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="pickupTime">Pickup Time</Label>
-                    <Input
-                      id="pickupTime"
-                      type="time"
-                      value={formData.pickupTime}
-                      onChange={(e) => handleInputChange("pickupTime", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PickupSection 
+              formData={formData} 
+              onInputChange={handleInputChange} 
+            />
 
-            {/* Item Section */}
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center gap-2 mb-4">
-                <Package className="w-5 h-5 text-orange-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Item Details</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="itemDescription">Item Description *</Label>
-                  <Textarea
-                    id="itemDescription"
-                    placeholder="Describe what needs to be delivered"
-                    value={formData.itemDescription}
-                    onChange={(e) => handleInputChange("itemDescription", e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="itemSize">Size/Dimensions</Label>
-                    <Input
-                      id="itemSize"
-                      placeholder="e.g., 30cm x 20cm x 10cm"
-                      value={formData.itemSize}
-                      onChange={(e) => handleInputChange("itemSize", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="itemWeight">Weight</Label>
-                    <Input
-                      id="itemWeight"
-                      placeholder="e.g., 2kg"
-                      value={formData.itemWeight}
-                      onChange={(e) => handleInputChange("itemWeight", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ItemSection 
+              formData={formData} 
+              onInputChange={handleInputChange} 
+            />
 
-            {/* Dropoff Section */}
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-red-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Dropoff Details</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="dropoffLocation">Dropoff Location *</Label>
-                  <Input
-                    id="dropoffLocation"
-                    placeholder="Enter delivery address"
-                    value={formData.dropoffLocation}
-                    onChange={(e) => handleInputChange("dropoffLocation", e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="dropoffDate">Preferred Delivery Date</Label>
-                    <Input
-                      id="dropoffDate"
-                      type="date"
-                      value={formData.dropoffDate}
-                      onChange={(e) => handleInputChange("dropoffDate", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="dropoffTime">Preferred Delivery Time</Label>
-                    <Input
-                      id="dropoffTime"
-                      type="time"
-                      value={formData.dropoffTime}
-                      onChange={(e) => handleInputChange("dropoffTime", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <DropoffSection 
+              formData={formData} 
+              onInputChange={handleInputChange} 
+            />
 
             {/* Special Instructions */}
             <div>
-              <Label htmlFor="specialInstructions">Special Instructions</Label>
+              <Label htmlFor="specialInstructions">{t('courier.specialInstructions')}</Label>
               <Textarea
                 id="specialInstructions"
-                placeholder="Any special handling instructions or notes"
+                placeholder={t('courier.specialInstructionsPlaceholder')}
                 value={formData.specialInstructions}
                 onChange={(e) => handleInputChange("specialInstructions", e.target.value)}
               />
             </div>
 
-            {/* Price Calculation Section */}
-            <div className="bg-blue-50 p-6 rounded-lg">
-              <div className="flex items-center gap-2 mb-4">
-                <Calculator className="w-5 h-5 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Price Calculation</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <Button
-                  type="button"
-                  onClick={calculatePrice}
-                  disabled={calculatingPrice || !formData.pickupLocation || !formData.dropoffLocation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {calculatingPrice ? "Calculating..." : "Calculate Price"}
-                </Button>
-                
-                {priceCalculation && (
-                  <div className="bg-white p-4 rounded-md border">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Distance:</span>
-                        <span>{priceCalculation.distance.toFixed(2)} km</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Base fee:</span>
-                        <span>{formatCurrency(priceCalculation.baseFee)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Distance fee ({formatCurrency(0.50)}/km):</span>
-                        <span>{formatCurrency(priceCalculation.distanceFee)}</span>
-                      </div>
-                      <hr className="my-2" />
-                      <div className="flex justify-between font-semibold text-lg">
-                        <span>Total:</span>
-                        <span>{formatCurrency(priceCalculation.totalPrice)}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <PriceCalculationSection
+              priceCalculation={priceCalculation}
+              calculatingPrice={calculatingPrice}
+              canCalculate={!!formData.pickupLocation && !!formData.dropoffLocation}
+              onCalculatePrice={calculatePrice}
+            />
 
             {/* Submit Button */}
             <div className="text-center">
@@ -373,12 +231,12 @@ const CourierRequest = () => {
                 className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-8 py-3 text-lg flex items-center gap-2"
               >
                 <CreditCard className="w-5 h-5" />
-                {loading ? "Processing..." : `Pay ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} & Book Courier`}
+                {loading ? t('courier.processing') : `${t('courier.pay')} ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} ${t('courier.book')}`}
               </Button>
               
               {!user && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Please <Link to="/auth" className="text-blue-600 hover:underline">sign in</Link> to proceed with payment
+                  {t('courier.signInRequired')} <Link to="/auth" className="text-blue-600 hover:underline">{t('courier.signInLink')}</Link>
                 </p>
               )}
             </div>
