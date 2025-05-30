@@ -4,16 +4,19 @@ import { Menu, X } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/driver/login", label: "Drivers" },
-  { to: "/restaurant/login", label: "Partners" },
-  { to: "/admin/dashboard", label: "Admin" }
-];
+import { useTranslation } from "@/contexts/TranslationContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { to: "/", label: t('nav.home') },
+    { to: "/driver/login", label: t('nav.drivers') },
+    { to: "/restaurant/login", label: t('nav.partners') },
+    { to: "/admin/dashboard", label: t('nav.admin') }
+  ];
 
   return (
     <>
@@ -53,6 +56,9 @@ export function MobileNav() {
                 {link.label}
               </a>
             ))}
+            <div className="mt-4 pt-4 border-t border-red-500">
+              <LanguageSwitcher />
+            </div>
           </nav>
         </SheetContent>
       </Sheet>

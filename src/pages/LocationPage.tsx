@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { OrderCart } from "@/components/OrderCart";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const demoMenus = [
   {
@@ -28,6 +29,7 @@ const demoMenus = [
 export default function LocationPage() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Cart State
   const [cart, setCart] = useState<{ [title: string]: { price: number; quantity: number } }>({});
@@ -91,15 +93,15 @@ export default function LocationPage() {
     <main className="min-h-screen bg-white relative pb-10">
       <Header />
       <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-4 mt-4 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
-        <h2 className="text-lg font-semibold text-orange-700 mb-1">Location Page Demo</h2>
+        <h2 className="text-lg font-semibold text-orange-700 mb-1">{t('location.demo')}</h2>
         <p className="text-gray-700">
-          This page is the public ordering page for a location. Product Owners: this is a demo UI for browsing a menu, adjusting item quantities, and adding to a cart.<br />
-          <span className="font-medium text-orange-500">Product Owner Steps:</span>
+          {t('location.demoDesc')}<br />
+          <span className="font-medium text-orange-500">{t('location.steps')}</span>
           <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
-            <li>Click + to add menu items to your cart.</li>
-            <li>Adjust item quantity using +/- buttons.</li>
-            <li>Open the cart & simulate checking out your order.</li>
-            <li>All data is local until future backend/database is added.</li>
+            <li>{t('location.step1')}</li>
+            <li>{t('location.step2')}</li>
+            <li>{t('location.step3')}</li>
+            <li>{t('location.step4')}</li>
           </ul>
         </p>
       </section>
@@ -120,7 +122,7 @@ export default function LocationPage() {
           className="ml-auto bg-gradient-to-r from-orange-400 to-red-400 text-white font-semibold"
           onClick={() => setCartOpen(true)}
         >
-          View Cart ({cartItems.reduce((total, item) => total + item.quantity, 0)})
+          {t('location.viewCart')} ({cartItems.reduce((total, item) => total + item.quantity, 0)})
         </Button>
       </div>
       <section className="flex flex-col items-center px-4">
@@ -131,7 +133,7 @@ export default function LocationPage() {
         />
         <div className="max-w-xl w-full bg-white rounded-xl shadow p-6 flex flex-col gap-6">
           <div className="mb-2">
-            <h3 className="text-xl font-bold text-red-500 mb-2">Featured Menu</h3>
+            <h3 className="text-xl font-bold text-red-500 mb-2">{t('location.featuredMenu')}</h3>
             <ul className="space-y-3">
               {demoMenus.map((item) => (
                 <MenuItemCard
