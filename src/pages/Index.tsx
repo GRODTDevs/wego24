@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LocationCard } from "@/components/LocationCard";
@@ -123,11 +122,10 @@ const Index = () => {
                 {t('home.searchButton')}
               </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-gray-500 font-medium">or</span>
+            <div className="flex items-center">
               <Link to="/courier-request">
                 <Button
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
+                  className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
                   type="button"
                 >
                   <Truck className="w-4 h-4" />
