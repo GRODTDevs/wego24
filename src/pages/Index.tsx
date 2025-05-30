@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
+import { InfoModal } from "@/components/InfoModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, LogIn, LogOut } from "lucide-react";
 
@@ -91,22 +91,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Info section */}
-      <section className="w-full max-w-3xl mx-auto px-4 py-6 mb-4 mt-4 rounded-lg bg-orange-50 border border-orange-200 shadow-sm">
-        <h2 className="text-lg font-semibold text-orange-700 mb-1">Welcome to the BiteToGo Demo</h2>
-        <p className="text-gray-700">
-          This is the main customer/home page. Here users can search and select restaurants to view their menu and place demo orders.
-          <br />
-          <span className="font-medium text-orange-500">Product Owner Steps:</span>
-          <ul className="list-disc pl-6 text-gray-600 mt-1 text-sm">
-            <li>Try searching or browsing restaurants.</li>
-            <li>Click a restaurant to view its menu.</li>
-            <li>Use the Restaurant or Driver login to review order and delivery flows.</li>
-            <li>{user ? "You are now logged in! Try exploring the features." : "Click 'Login / Sign Up' to create an account and access full features."}</li>
-          </ul>
-        </p>
-      </section>
-
       {/* Subtle radial gradient background */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="w-[900px] h-[900px] bg-gradient-radial from-orange-100 via-white to-transparent rounded-full absolute left-1/2 -top-52 -translate-x-1/2 opacity-60"></div>
@@ -148,6 +132,9 @@ const Index = () => {
           ))}
         </section>
       </div>
+
+      {/* Info Modal */}
+      <InfoModal />
     </main>
   );
 };
