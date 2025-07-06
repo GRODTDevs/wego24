@@ -59,7 +59,7 @@ export function useUserData() {
         return;
       }
 
-      // Then get all user roles
+      // Then get all user roles with a fresh query
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
@@ -70,7 +70,7 @@ export function useUserData() {
         console.error('Error fetching roles:', rolesError);
       }
 
-      // Create a map of user_id to role for faster lookup
+      // Create a fresh map of user_id to role for faster lookup
       const roleMap = new Map<string, string>();
       rolesData?.forEach(roleRecord => {
         roleMap.set(roleRecord.user_id, roleRecord.role);
@@ -78,7 +78,7 @@ export function useUserData() {
 
       console.log('Role map:', Object.fromEntries(roleMap));
 
-      // Combine the data manually with proper role assignment
+      // Combine the data with proper role assignment and force fresh state
       const transformedUsers = profilesData?.map(profile => {
         const userRole = roleMap.get(profile.id) || 'user';
         
@@ -97,7 +97,14 @@ export function useUserData() {
       }) || [];
 
       console.log('Final transformed users:', transformedUsers);
-      setUsers(transformedUsers);
+      
+      // Force a fresh state update by clearing first
+      setUsers([]);
+      // Use setTimeout to ensure the state is cleared before setting new data
+      setTimeout(() => {
+        setUsers(transformedUsers);
+      }, 0);
+      
     } catch (error) {
       console.error('Error in fetchUsers:', error);
       toast({

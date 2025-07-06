@@ -107,8 +107,10 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
       setIsDialogOpen(false);
       setEditingUser(null);
       
-      // Force a fresh fetch to ensure we get the latest data
-      await onUserUpdated();
+      // Add a small delay to ensure database updates are complete
+      setTimeout(async () => {
+        await onUserUpdated();
+      }, 500);
       
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -139,8 +141,10 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
         description: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
       });
       
-      // Force a fresh fetch
-      await onUserUpdated();
+      // Add a delay and force refresh
+      setTimeout(async () => {
+        await onUserUpdated();
+      }, 300);
       
     } catch (error: any) {
       console.error('Error updating user status:', error);
