@@ -29,28 +29,29 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
   - Edge functions for custom logic
   - File storage capabilities
 
-### Key Features
+## Key Features
 
-#### For Customers
+### For Customers
 - Browse restaurants and services
 - Search and filter locations
 - Request courier services
 - Multi-language support (EN/ES/DE)
 - User authentication and profiles
 
-#### For Partners (Restaurants/Businesses)
-- Partner application system
+### For Partners (Restaurants/Businesses)
+- Partner application system with approval workflow
 - Restaurant dashboard and management
 - Menu and product management
 - Order processing
 - Settings and configuration
 
-#### For Administrators
-- Complete admin dashboard with analytics
+### For Administrators
+- Complete admin dashboard with real-time analytics
 - Partner application review and approval
 - User management with role-based access control
 - System-wide settings and monitoring
 - Real-time statistics and reporting
+- Optimized authentication with session caching
 
 ## Database Schema
 
@@ -61,8 +62,8 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - **restaurant_settings** - Restaurant-specific configuration and settings
 - **menu_categories** - Menu organization and categorization
 - **menu_items** - Products and services with pricing and availability
-- **profiles** - User profile information with preferences and settings
-- **user_roles** - Role-based access control (admin, user)
+- **profiles** - User profile information with preferences and settings (using JSONB roles field)
+- **user_roles** - Legacy role-based access control table (being migrated to profiles.roles)
 - **orders** - Order management and tracking with status updates
 - **order_items** - Individual items within orders
 - **payments** - Payment processing and history
@@ -71,11 +72,11 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 ### Security Features
 - Row Level Security (RLS) policies on all tables
-- Role-based access control (admin, user)
+- Role-based access control using JSONB roles in profiles table
 - Restaurant-specific data isolation
 - Secure authentication with Supabase Auth
 - Admin policies for complete system oversight
-- Developer authentication system for initial access
+- Optimized role checking with session storage caching
 
 ## Partner Registration Process
 
@@ -88,7 +89,7 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 2. **Application Review**
    - Applications stored in `partner_applications` table with "pending" status
-   - Admin reviews through Product Owner Dashboard
+   - Admin reviews through Product Owner Dashboard at `/admin/dashboard`
    - Admin can approve or reject with reason
 
 3. **Approval Process**
@@ -111,155 +112,141 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - Business description (optional)
 - Valid user account (must be logged in)
 
+## Authentication System
+
+### Current Implementation ✅
+- **Optimized Loading States**: Cascaded authentication checks prevent UI flicker
+- **Session Storage Caching**: User roles cached in session storage to reduce database calls
+- **Role-Based Access Control**: Uses JSONB roles field in profiles table
+- **Protected Routes**: Comprehensive route protection for admin and partner areas
+- **Developer Login**: Available for initial setup at `/developer-login`
+
+### Authentication Flow
+1. **AuthContext** manages user session and authentication state
+2. **useUserRole** hook handles role determination with caching
+3. **ProtectedRoute** component ensures proper access control
+4. **Admin Setup** component allows initial admin role assignment
+
+### Access Levels
+- **Public**: Home page, location browsing, authentication pages
+- **Authenticated**: User profile, partner registration, courier requests
+- **Admin**: Complete dashboard access, user management, partner approvals
+- **Partner**: Restaurant dashboard and management tools
+
 ## Admin System
 
 ### Features ✅
-- **User Management**: Complete CRUD operations for user profiles with role assignment
-- **Role Management**: Admin/user role assignment and management
-- **Partner Applications**: Review, approve, and reject partner applications
-- **Analytics Dashboard**: Real-time statistics and performance metrics
-- **System Monitoring**: Comprehensive oversight of platform operations
-- **Admin Setup**: Self-service admin role assignment for initial setup
+- **Real-time Dashboard**: Live statistics for orders, revenue, locations, drivers, users
+- **User Management**: Complete CRUD operations with role assignment and search
+- **Partner Applications**: Review, approve, and reject partner applications with reasons
+- **Location Management**: Restaurant and business oversight
+- **Driver Management**: Delivery driver administration
+- **Commission Management**: Financial oversight and settings
+- **Admin Setup**: Self-service admin role assignment for initial configuration
 
 ### Access Control
-- Developer authentication system for initial access
-- Role-based permissions with RLS policies
+- Role-based permissions with optimized RLS policies
+- Session storage caching for improved performance
 - Secure admin operations with audit trails
 - Admin setup component for granting initial admin privileges
 
-### Admin Dashboard Features
-- Real-time statistics display (orders, revenue, locations, drivers, users)
-- User management with search and filtering
-- Partner application processing
-- Driver management interface
-- Commission management
-- SuperUser creation tools
+### Dashboard Statistics
+- Total orders with real-time updates
+- Total revenue from completed orders
+- Active locations count
+- Active drivers count
+- Total users registered
 
 ## Current System Status
 
 ### Recently Implemented ✅
-- Complete admin dashboard with real-time statistics
-- Enhanced user management with role assignment
-- Improved RLS policies for admin access
-- Multi-language translation system improvements
-- Developer authentication system
-- Analytics and reporting features
-- Admin setup for initial role assignment
-- Real-time dashboard statistics from database
+- **Optimized Authentication Flow**: Eliminated UI flicker with cascaded loading states
+- **Session Storage Caching**: Reduced database calls for role checking
+- **Enhanced Admin Dashboard**: Real-time statistics and improved user management
+- **Role-Based Security**: Comprehensive RLS policies with performance optimization
+- **Multi-language Support**: Full translation system for EN/ES/DE
+- **Developer Authentication**: Secure initial setup system
 
 ### Core Features ✅
-- User authentication and authorization
+- User authentication and authorization with optimized performance
 - Multi-language support (EN/ES/DE)
 - Partner registration system with approval workflow
-- Admin dashboard for application review
+- Real-time admin dashboard with live statistics
 - Partner dashboard with restaurant management
 - Responsive design for mobile and desktop
-- Location browsing and search
+- Location browsing and search functionality
 - Courier request system
-- User management with role assignment
-- Real-time order and revenue tracking
-
-### Authentication & Authorization ✅
-- Supabase Auth integration
-- Role-based access control (admin/user)
-- Row Level Security (RLS) policies
-- Protected routes for admin and partner areas
-- Developer login for initial setup
-- Admin setup component for role assignment
+- Protected routes with smooth loading states
 
 ### Database Functions ✅
-- `create_superuser()` - Grant admin privileges to users
-- `handle_new_user()` - Auto-create profiles on user signup
+- `create_superuser()` - Grant admin privileges using JSONB roles
+- `handle_new_user()` - Auto-create profiles with default roles on signup
 - `handle_new_restaurant()` - Auto-create restaurant settings
-- `has_role()` - Check user roles for RLS policies
+- `has_role()` - Optimized role checking for RLS policies
 - `create_restaurant_from_application()` - Convert approved applications to restaurants
+- `add_user_role()` - Add roles to user profiles
+- `remove_user_role()` - Remove roles with user fallback
 
-### Known Issues & Limitations ⚠️
+## Known Areas for Improvement
 
-1. **File Management**
-   - Several files are getting large and should be refactored:
-     - `src/pages/Index.tsx` (210+ lines)
-     - `src/pages/PartnerRegister.tsx` (250+ lines)
-     - `src/pages/PartnerDashboard.tsx` (354+ lines)
-     - `src/components/PartnerApplications.tsx` (334+ lines)
+### Code Organization
+- Several large files that could benefit from refactoring:
+  - `src/pages/PartnerDashboard.tsx` (354+ lines)
+  - `src/components/PartnerApplications.tsx` (334+ lines)
+  - `src/pages/PartnerRegister.tsx` (250+ lines)
+  - `src/pages/Index.tsx` (210+ lines)
 
-2. **Missing Features**
-   - Advanced menu item management for partners
-   - Real-time order tracking system
-   - Payment integration completion
-   - Driver/courier management interface
-   - Push notifications
-   - Advanced review and rating system
-   - File storage/upload functionality
+### Missing Features
+- Advanced menu item management for partners
+- Real-time order tracking system
+- Payment integration completion
+- Push notifications system
+- Advanced review and rating system
+- File storage/upload functionality
 
-### Immediate Next Steps 🚀
+## Next Development Steps
 
-#### High Priority
-1. **Code Refactoring**
-   - Break down large page components into focused modules
-   - Create reusable admin components
-   - Implement proper error boundaries
-
-2. **Menu Management Enhancement**
+### High Priority
+1. **Menu Management Enhancement**
    - Complete menu item CRUD operations
    - Image upload for menu items
    - Category management improvements
    - Bulk operations for menu management
 
-3. **Order System Completion**
+2. **Order System Completion**
    - Real-time order status updates
    - Order assignment to drivers
-   - Customer order tracking
-   - Restaurant order management interface
+   - Customer order tracking interface
+   - Restaurant order management dashboard
 
-#### Medium Priority
-1. **Driver Management System**
-   - Driver registration and onboarding
-   - Vehicle and license verification
-   - Route optimization
-   - Real-time location tracking
+3. **Code Refactoring**
+   - Break down large page components
+   - Create focused, reusable components
+   - Implement proper error boundaries
 
-2. **Payment Integration**
+### Medium Priority
+1. **Payment Integration**
    - Complete Stripe integration
    - Payment method management
    - Refund processing
    - Financial reporting
 
-3. **File Storage & Upload**
+2. **File Storage & Upload**
    - Supabase Storage integration
    - Image upload for restaurants and menu items
    - Profile picture uploads
-   - Document management for applications
+   - Document management
 
-4. **Notification System**
-   - Email notifications for order updates
-   - SMS notifications for critical events
-   - In-app notifications
-   - Admin alert system
-
-#### Long Term Goals
-1. **Advanced Analytics**
-   - Revenue analytics and forecasting
-   - User behavior analytics
-   - Performance optimization insights
-   - Business intelligence dashboard
-
-2. **Scalability Improvements**
-   - Database optimization and indexing
-   - Caching strategies implementation
-   - CDN integration for media files
-   - Performance monitoring and alerting
-
-3. **Mobile Application**
-   - React Native mobile apps
-   - Driver mobile application
-   - Customer mobile experience
-   - Real-time synchronization
+3. **Driver Management System**
+   - Driver registration and onboarding
+   - Vehicle and license verification
+   - Route optimization
+   - Real-time location tracking
 
 ## Development Setup
 
 ### Prerequisites
-- Node.js & npm (install with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- Node.js & npm
 - Git
 
 ### Local Development
@@ -279,20 +266,10 @@ npm run dev
 ```
 
 ### Supabase Configuration
-The project is connected to Supabase with the following configuration:
 - **Project ID**: c2a3f942-179e-4365-9b6b-198efba40e49
 - **Database**: PostgreSQL with comprehensive RLS policies
-- **Authentication**: Email/password with role-based access
-- **Edge Functions**: Custom server-side logic
+- **Authentication**: Email/password with role-based access and session caching
 - **Secrets**: Stripe integration configured
-
-### Environment Variables
-The project uses Supabase secrets for sensitive configuration:
-- `STRIPE_SECRET_KEY` - Stripe payment processing
-- `SUPABASE_URL` - Supabase project URL
-- `SUPABASE_ANON_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
-- `SUPABASE_DB_URL` - Database connection string
 
 ## Deployment
 
@@ -306,29 +283,6 @@ The project uses Supabase secrets for sensitive configuration:
 2. Click "Connect Domain"
 3. Follow the setup instructions
 4. Requires paid Lovable plan
-
-## Contributing
-
-### Code Style
-- Use TypeScript for all new code
-- Follow existing component patterns
-- Implement proper error handling
-- Add appropriate loading states
-- Use Tailwind CSS for styling
-- Follow shadcn/ui component patterns
-- Keep components small and focused (under 200 lines)
-
-### Database Changes
-- All database changes must go through SQL migrations
-- Use Row Level Security (RLS) for data protection
-- Test policies thoroughly before deployment
-- Document schema changes in this README
-
-### Admin Development
-- Test admin features with proper role assignments
-- Use developer authentication for initial access
-- Implement proper error handling for admin operations
-- Follow security best practices for sensitive operations
 
 ## Project Structure
 
@@ -347,13 +301,34 @@ src/
 └── utils/               # Helper utilities
 ```
 
+## Contributing
+
+### Code Style
+- Use TypeScript for all new code
+- Follow existing component patterns
+- Implement proper error handling with optimized loading states
+- Keep components small and focused (under 200 lines)
+- Use Tailwind CSS for styling
+- Follow shadcn/ui component patterns
+
+### Database Changes
+- All changes through SQL migrations
+- Use Row Level Security (RLS) for data protection
+- Test policies thoroughly before deployment
+- Document schema changes in this README
+
+### Performance Guidelines
+- Implement session storage caching for frequently accessed data
+- Use cascaded loading states to prevent UI flicker
+- Optimize database queries and RLS policies
+- Follow React best practices for state management
+
 ## Support & Documentation
 
 - [Lovable Documentation](https://docs.lovable.dev/)
 - [Supabase Documentation](https://supabase.com/docs)
 - [Project Discord](https://discord.com/channels/1119885301872070706/1280461670979993613)
-- [Troubleshooting Guide](https://docs.lovable.dev/tips-tricks/troubleshooting)
 
 ## License
 
-This project is built with Lovable and follows standard web development practices. Refer to individual package licenses for third-party dependencies.
+This project is built with Lovable and follows standard web development practices.
