@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -151,7 +152,7 @@ export default function PartnerRegister() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder={t('partner.register.phoneNumberPlaceholder')}
+                      placeholder="+34"
                     />
                   </div>
                 </div>
