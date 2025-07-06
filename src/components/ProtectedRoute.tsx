@@ -12,6 +12,9 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
+  console.log('ProtectedRoute - authLoading:', authLoading, 'roleLoading:', roleLoading, 'user:', user?.email, 'isAdmin:', isAdmin, 'requireAdmin:', requireAdmin);
+
+  // Show loading while checking authentication or role
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -20,11 +23,13 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  if (!user) {
+  // Only redirect to auth if we're sure there's no user after loading is complete
+  if (!authLoading && !user) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (requireAdmin && !isAdmin) {
+  // Only show access denied if we're sure the user exists but lacks admin privileges
+  if (!authLoading && !roleLoading && user && requireAdmin && !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
