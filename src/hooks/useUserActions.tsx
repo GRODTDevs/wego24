@@ -72,51 +72,33 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
       if (userForm.role !== editingUser.role) {
         console.log('Role change detected:', editingUser.role, '->', userForm.role);
         
-        // Use upsert to handle the role update properly
-        const { error: upsertError } = await supabase
+        // First, delete ALL existing roles for this user
+        const { error: deleteError } = await supabase
           .from('user_roles')
-          .upsert(
-            {
-              user_id: editingUser.id,
-              role: userForm.role
-            },
-            {
-              onConflict: 'user_id,role',
-              ignoreDuplicates: false
-            }
-          );
+          .delete()
+          .eq('user_id', editingUser.id);
 
-        if (upsertError) {
-          console.error('Role upsert error:', upsertError);
-          
-          // If upsert fails, try the delete/insert approach with proper transaction handling
-          const { error: deleteError } = await supabase
-            .from('user_roles')
-            .delete()
-            .eq('user_id', editingUser.id);
-
-          if (deleteError) {
-            console.error('Role delete error:', deleteError);
-            throw deleteError;
-          }
-
-          // Wait a moment to ensure deletion is complete
-          await new Promise(resolve => setTimeout(resolve, 100));
-
-          const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: editingUser.id,
-              role: userForm.role
-            });
-
-          if (insertError) {
-            console.error('Role insert error:', insertError);
-            throw insertError;
-          }
+        if (deleteError) {
+          console.error('Role delete error:', deleteError);
+          throw deleteError;
         }
 
-        console.log('Role updated successfully');
+        console.log('Deleted existing roles for user:', editingUser.id);
+
+        // Then insert the new role
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: editingUser.id,
+            role: userForm.role
+          });
+
+        if (insertError) {
+          console.error('Role insert error:', insertError);
+          throw insertError;
+        }
+
+        console.log('Inserted new role:', userForm.role, 'for user:', editingUser.id);
       }
 
       toast({ 
@@ -130,7 +112,7 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
       // Force refresh after a short delay
       setTimeout(async () => {
         await onUserUpdated();
-      }, 300);
+      }, 500);
       
     } catch (error: any) {
       console.error('Error updating user:', error);

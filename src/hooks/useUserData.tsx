@@ -32,11 +32,7 @@ export function useUserData() {
         return;
       }
 
-      // Clear any existing cache and fetch fresh data
-      const timestamp = Date.now();
-      console.log('Fetch timestamp:', timestamp);
-
-      // First get all profiles with no cache
+      // First get all profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -63,11 +59,11 @@ export function useUserData() {
         return;
       }
 
-      // Get all user roles with fresh query - no cache
+      // Get all user roles - get the most recent role for each user
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
-        .order('created_at', { ascending: false }); // Get most recent first
+        .order('created_at', { ascending: false });
 
       console.log('Roles data:', rolesData);
 
@@ -75,7 +71,7 @@ export function useUserData() {
         console.error('Error fetching roles:', rolesError);
       }
 
-      // Create a map of user_id to role - taking the most recent role for each user
+      // Create a map of user_id to their most recent role
       const roleMap = new Map<string, string>();
       rolesData?.forEach(roleRecord => {
         // Only set if we haven't seen this user yet (since we ordered by created_at desc)
@@ -106,7 +102,6 @@ export function useUserData() {
 
       console.log('Final transformed users:', transformedUsers);
       
-      // Set users directly without the setTimeout trick
       setUsers(transformedUsers);
       
     } catch (error) {
