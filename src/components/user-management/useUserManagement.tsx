@@ -159,19 +159,28 @@ export function useUserManagement() {
       if (userForm.role !== editingUser.role) {
         console.log('Role change detected:', editingUser.role, '->', userForm.role);
         
-        // Use upsert to handle role changes more reliably
-        const { error: roleError } = await supabase
+        // First, delete any existing role for this user
+        const { error: deleteError } = await supabase
           .from('user_roles')
-          .upsert({
+          .delete()
+          .eq('user_id', editingUser.id);
+
+        if (deleteError) {
+          console.error('Role delete error:', deleteError);
+          throw deleteError;
+        }
+
+        // Then insert the new role
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
             user_id: editingUser.id,
             role: userForm.role
-          }, {
-            onConflict: 'user_id'
           });
 
-        if (roleError) {
-          console.error('Role update error:', roleError);
-          throw roleError;
+        if (insertError) {
+          console.error('Role insert error:', insertError);
+          throw insertError;
         }
 
         console.log('Role updated successfully');
