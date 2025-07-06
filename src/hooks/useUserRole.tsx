@@ -4,12 +4,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useUserRole = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserRole = async () => {
+      // If auth is still loading, wait
+      if (authLoading) {
+        return;
+      }
+
       if (!user) {
         console.log('No user in useUserRole');
         setUserRole(null);
@@ -18,7 +23,8 @@ export const useUserRole = () => {
       }
 
       // Check session storage first to avoid database calls
-      const cachedRole = sessionStorage.getItem(`user_role_${user.id}`);
+      const cacheKey = `user_role_${user.id}`;
+      const cachedRole = sessionStorage.getItem(cacheKey);
       if (cachedRole) {
         console.log('Using cached role:', cachedRole);
         setUserRole(cachedRole);
@@ -40,7 +46,7 @@ export const useUserRole = () => {
         if (error) {
           console.error('Error fetching user role:', error);
           setUserRole('user'); // Default to user role
-          sessionStorage.setItem(`user_role_${user.id}`, 'user');
+          sessionStorage.setItem(cacheKey, 'user');
         } else {
           // Safely handle the roles JSON data
           let roles: string[] = ['user']; // Default
@@ -61,19 +67,19 @@ export const useUserRole = () => {
           
           setUserRole(primaryRole);
           // Cache the role in session storage
-          sessionStorage.setItem(`user_role_${user.id}`, primaryRole);
+          sessionStorage.setItem(cacheKey, primaryRole);
         }
       } catch (err) {
         console.error('Error in fetchUserRole:', err);
         setUserRole('user');
-        sessionStorage.setItem(`user_role_${user.id}`, 'user');
+        sessionStorage.setItem(cacheKey, 'user');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserRole();
-  }, [user]);
+  }, [user, authLoading]);
 
   // Clear cache when user changes
   useEffect(() => {
@@ -91,5 +97,5 @@ export const useUserRole = () => {
   const isAdmin = userRole === 'admin';
   console.log('isAdmin computed:', isAdmin, 'from role:', userRole);
 
-  return { userRole, isAdmin, loading };
+  return { userRole, isAdmin, loading: loading || authLoading };
 };

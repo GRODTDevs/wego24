@@ -12,8 +12,8 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
-  // Single loading state for all checks - prevents any content flashing
-  const isLoading = authLoading || (user && roleLoading);
+  // Show loading until EVERYTHING is ready
+  const isLoading = authLoading || roleLoading;
 
   if (isLoading) {
     return (

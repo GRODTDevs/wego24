@@ -18,26 +18,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        console.log('Auth state changed:', event, session?.user?.email);
+        if (isMounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          // Only set loading to false after a slight delay to ensure all checks complete
+          setTimeout(() => {
+            if (isMounted) {
+              setLoading(false);
+            }
+          }, 100);
+        }
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      console.log('Initial session check:', session?.user?.email);
+      if (isMounted) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        // Only set loading to false after a slight delay to ensure all checks complete
+        setTimeout(() => {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }, 100);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
   };
 

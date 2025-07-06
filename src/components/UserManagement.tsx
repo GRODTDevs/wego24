@@ -10,10 +10,10 @@ import { useUserManagement } from "./user-management/useUserManagement";
 import { useUserRole } from "@/hooks/useUserRole";
 
 export function UserManagement() {
-  const { isAdmin } = useUserRole(); // No loading check needed - already handled by ProtectedRoute
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const {
     users,
-    loading,
+    loading: usersLoading,
     searchTerm,
     setSearchTerm,
     isDialogOpen,
@@ -27,7 +27,20 @@ export function UserManagement() {
     fetchUsers
   } = useUserManagement();
 
-  // Since ProtectedRoute already handles auth/role loading, we only need to check admin status
+  // Show loading if role is still being determined
+  if (roleLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show admin setup if user is not admin (no flicker since roleLoading is false)
   if (!isAdmin) {
     return (
       <div className="space-y-6">
@@ -48,7 +61,7 @@ export function UserManagement() {
   }
 
   // Show loading while fetching users (only after we know user is admin)
-  if (loading) {
+  if (usersLoading) {
     return (
       <Card>
         <CardContent className="p-6">
