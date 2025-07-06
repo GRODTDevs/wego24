@@ -17,7 +17,7 @@ export function Footer() {
             <span className="text-xs font-semibold text-red-500 italic tracking-widest uppercase bg-red-50 px-2 py-1 rounded">Beta</span>
           </div>
           <div className="text-sm text-gray-600">
-            {t('footer.rights')}
+            © 2024 WeGo. All rights reserved.
           </div>
         </div>
       </div>
