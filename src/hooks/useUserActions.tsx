@@ -72,28 +72,42 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
       if (userForm.role !== editingUser.role) {
         console.log('Role change detected:', editingUser.role, '->', userForm.role);
         
-        // Delete existing role and insert new one
-        const { error: deleteError } = await supabase
+        // Use upsert instead of delete/insert to handle duplicates gracefully
+        const { error: upsertError } = await supabase
           .from('user_roles')
-          .delete()
-          .eq('user_id', editingUser.id);
-
-        if (deleteError) {
-          console.error('Role delete error:', deleteError);
-          throw deleteError;
-        }
-
-        // Insert the new role
-        const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert({
+          .upsert({
             user_id: editingUser.id,
             role: userForm.role
+          }, {
+            onConflict: 'user_id,role'
           });
 
-        if (insertError) {
-          console.error('Role insert error:', insertError);
-          throw insertError;
+        if (upsertError) {
+          console.error('Role upsert error:', upsertError);
+          
+          // If upsert fails, try the delete/insert approach
+          const { error: deleteError } = await supabase
+            .from('user_roles')
+            .delete()
+            .eq('user_id', editingUser.id);
+
+          if (deleteError) {
+            console.error('Role delete error:', deleteError);
+            throw deleteError;
+          }
+
+          // Insert the new role
+          const { error: insertError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: editingUser.id,
+              role: userForm.role
+            });
+
+          if (insertError) {
+            console.error('Role insert error:', insertError);
+            throw insertError;
+          }
         }
 
         console.log('Role updated successfully');

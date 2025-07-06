@@ -71,14 +71,14 @@ export function useUserData() {
       }
 
       // Create a map of user_id to role for faster lookup
-      const roleMap = new Map();
+      const roleMap = new Map<string, string>();
       rolesData?.forEach(roleRecord => {
         roleMap.set(roleRecord.user_id, roleRecord.role);
       });
 
-      console.log('Role map:', roleMap);
+      console.log('Role map:', Object.fromEntries(roleMap));
 
-      // Combine the data manually
+      // Combine the data manually with proper role assignment
       const transformedUsers = profilesData?.map(profile => {
         const userRole = roleMap.get(profile.id) || 'user';
         
