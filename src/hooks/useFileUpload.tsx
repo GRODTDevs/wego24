@@ -56,22 +56,24 @@ export function useFileUpload({
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = folder ? `${folder}/${fileName}` : fileName;
 
+      // Simulate progress for better UX
+      setUploadProgress(30);
+
       // Upload file
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
-        .upload(filePath, file, {
-          onUploadProgress: (progress) => {
-            setUploadProgress((progress.loaded / progress.total) * 100);
-          }
-        });
+        .upload(filePath, file);
 
       if (uploadError) throw uploadError;
+
+      setUploadProgress(80);
 
       // Get public URL
       const { data } = supabase.storage
         .from(bucketName)
         .getPublicUrl(filePath);
 
+      setUploadProgress(100);
       toast.success('File uploaded successfully');
       return data.publicUrl;
     } catch (error) {
