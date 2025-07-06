@@ -43,9 +43,10 @@ export function UserManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      console.log('Fetching users...');
       
-      // Fetch users from profiles table joined with user_roles
-      const { data: profilesData, error: profilesError } = await supabase
+      // First, let's get all profiles with a LEFT JOIN to user_roles
+      const { data: usersData, error: usersError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -54,33 +55,38 @@ export function UserManagement() {
           last_name,
           phone,
           created_at,
-          is_active
+          is_active,
+          user_roles!left (
+            role
+          )
         `);
 
-      if (profilesError) throw profilesError;
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        throw usersError;
+      }
 
-      // Fetch user roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
+      console.log('Fetched users data:', usersData);
 
-      if (rolesError) throw rolesError;
+      // Transform the data to match our User interface
+      const transformedUsers = usersData?.map(user => ({
+        id: user.id,
+        email: user.email || '',
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        phone: user.phone || '',
+        role: (user.user_roles as any)?.[0]?.role || 'user',
+        created_at: user.created_at,
+        is_active: user.is_active ?? true
+      })) || [];
 
-      // Combine the data
-      const usersWithRoles = profilesData?.map(profile => {
-        const userRole = rolesData?.find(role => role.user_id === profile.id);
-        return {
-          ...profile,
-          role: userRole?.role || 'user'
-        };
-      }) || [];
-
-      setUsers(usersWithRoles);
+      console.log('Transformed users:', transformedUsers);
+      setUsers(transformedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch users",
+        description: "Failed to fetch users. Please check your admin permissions.",
         variant: "destructive"
       });
     } finally {
@@ -110,6 +116,8 @@ export function UserManagement() {
     if (!editingUser) return;
 
     try {
+      console.log('Updating user:', editingUser.id, userForm);
+      
       // Update profile
       const { error: profileError } = await supabase
         .from('profiles')
@@ -121,15 +129,25 @@ export function UserManagement() {
         })
         .eq('id', editingUser.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
 
       // Update role if changed
       if (userForm.role !== editingUser.role) {
+        console.log('Updating role from', editingUser.role, 'to', userForm.role);
+        
         // Delete existing role
-        await supabase
+        const { error: deleteError } = await supabase
           .from('user_roles')
           .delete()
           .eq('user_id', editingUser.id);
+
+        if (deleteError) {
+          console.error('Delete role error:', deleteError);
+          throw deleteError;
+        }
 
         // Insert new role
         const { error: roleError } = await supabase
@@ -139,7 +157,10 @@ export function UserManagement() {
             role: userForm.role
           });
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error('Insert role error:', roleError);
+          throw roleError;
+        }
       }
 
       toast({ title: "User updated successfully" });
@@ -157,12 +178,17 @@ export function UserManagement() {
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
+      console.log('Toggling user status:', userId, 'from', currentStatus, 'to', !currentStatus);
+      
       const { error } = await supabase
         .from('profiles')
         .update({ is_active: !currentStatus })
         .eq('id', userId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Status update error:', error);
+        throw error;
+      }
 
       toast({ 
         title: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
@@ -220,62 +246,77 @@ export function UserManagement() {
           />
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Join Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  {user.first_name || user.last_name 
-                    ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
-                    : 'N/A'
-                  }
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone || 'N/A'}</TableCell>
-                <TableCell>
-                  <Badge className={getRoleColor(user.role)}>
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(user.is_active ?? true)}>
-                    {user.is_active ?? true ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
-                <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditUser(user)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleUserStatus(user.id, user.is_active ?? true)}
-                    >
-                      {user.is_active ?? true ? <Trash2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </TableCell>
+        {filteredUsers.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              {searchTerm ? "No users found matching your search." : "No users found. This might be due to permissions or missing data."}
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={fetchUsers} 
+              className="mt-4"
+            >
+              Refresh
+            </Button>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Join Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {user.first_name || user.last_name 
+                      ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                      : 'N/A'
+                    }
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phone || 'N/A'}</TableCell>
+                  <TableCell>
+                    <Badge className={getRoleColor(user.role)}>
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(user.is_active ?? true)}>
+                      {user.is_active ?? true ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleUserStatus(user.id, user.is_active ?? true)}
+                      >
+                        {user.is_active ?? true ? <Trash2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
