@@ -37,8 +37,8 @@ export default function DeveloperLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Developer password"
-              className="w-full"
+              placeholder="Password"
+              className="w-full text-center"
               required
             />
           </div>
