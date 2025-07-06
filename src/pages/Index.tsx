@@ -53,7 +53,20 @@ const Index = () => {
       );
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      console.log('Starting sign out process...');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+        toast.error("Failed to sign out: " + error.message);
+      } else {
+        console.log('Sign out successful');
+        toast.success("Signed out successfully");
+      }
+    } catch (error) {
+      console.error('Unexpected sign out error:', error);
+      toast.error("An unexpected error occurred during sign out");
+    }
   };
 
   return (
