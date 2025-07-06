@@ -1,313 +1,190 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Trash2, Plus, Search } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Car, Search, Star, MapPin, Phone } from "lucide-react";
 
 interface Driver {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  licenseNumber: string;
-  vehicleType: string;
-  status: "active" | "inactive" | "suspended";
-  commission: number;
-  totalDeliveries: number;
-  earnings: number;
+  user_id: string;
+  vehicle_type: string;
+  vehicle_info?: any;
+  license_number?: string;
+  is_active: boolean;
+  is_available: boolean;
+  current_location?: any;
   rating: number;
+  total_deliveries: number;
+  created_at: string;
 }
 
 export function DriverManagement() {
-  const { toast } = useToast();
-  const [drivers, setDrivers] = useState<Driver[]>([
-    {
-      id: "1",
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      phone: "+1234567890",
-      licenseNumber: "DL123456789",
-      vehicleType: "Motorcycle",
-      status: "active",
-      commission: 20,
-      totalDeliveries: 156,
-      earnings: 2340,
-      rating: 4.8
-    },
-    {
-      id: "2",
-      name: "Sarah Wilson",
-      email: "sarah@example.com",
-      phone: "+1234567891",
-      licenseNumber: "DL987654321",
-      vehicleType: "Car",
-      status: "active",
-      commission: 18,
-      totalDeliveries: 203,
-      earnings: 3650,
-      rating: 4.9
-    },
-    {
-      id: "3",
-      name: "Tom Brown",
-      email: "tom@example.com",
-      phone: "+1234567892",
-      licenseNumber: "DL555666777",
-      vehicleType: "Bicycle",
-      status: "inactive",
-      commission: 25,
-      totalDeliveries: 89,
-      earnings: 1780,
-      rating: 4.5
-    }
-  ]);
-
+  const { user } = useAuth();
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [driverForm, setDriverForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    licenseNumber: "",
-    vehicleType: "",
-    status: "active" as "active" | "inactive" | "suspended",
-    commission: 20
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+
+  useEffect(() => {
+    fetchDrivers();
+  }, []);
+
+  const fetchDrivers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("drivers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setDrivers(data || []);
+    } catch (error) {
+      console.error("Error fetching drivers:", error);
+      toast.error("Failed to load drivers");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleDriverStatus = async (driverId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("drivers")
+        .update({ is_active: !currentStatus })
+        .eq("id", driverId);
+
+      if (error) throw error;
+      toast.success("Driver status updated successfully");
+      fetchDrivers();
+    } catch (error) {
+      console.error("Error updating driver status:", error);
+      toast.error("Failed to update driver status");
+    }
+  };
+
+  const filteredDrivers = drivers.filter(driver => {
+    const matchesSearch = driver.license_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         driver.vehicle_type.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === "all" || 
+                         (filterStatus === "active" && driver.is_active) ||
+                         (filterStatus === "available" && driver.is_available) ||
+                         (filterStatus === "inactive" && !driver.is_active);
+
+    return matchesSearch && matchesFilter;
   });
 
-  const filteredDrivers = drivers.filter(driver =>
-    driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleAddDriver = () => {
-    setEditingDriver(null);
-    setDriverForm({
-      name: "",
-      email: "",
-      phone: "",
-      licenseNumber: "",
-      vehicleType: "",
-      status: "active",
-      commission: 20
-    });
-    setIsDialogOpen(true);
-  };
-
-  const handleEditDriver = (driver: Driver) => {
-    setEditingDriver(driver);
-    setDriverForm({
-      name: driver.name,
-      email: driver.email,
-      phone: driver.phone,
-      licenseNumber: driver.licenseNumber,
-      vehicleType: driver.vehicleType,
-      status: driver.status,
-      commission: driver.commission
-    });
-    setIsDialogOpen(true);
-  };
-
-  const handleSaveDriver = () => {
-    if (editingDriver) {
-      setDrivers(drivers.map(driver =>
-        driver.id === editingDriver.id
-          ? { ...driver, ...driverForm }
-          : driver
-      ));
-      toast({ title: "Driver updated successfully" });
-    } else {
-      const newDriver: Driver = {
-        id: Date.now().toString(),
-        ...driverForm,
-        totalDeliveries: 0,
-        earnings: 0,
-        rating: 0
-      };
-      setDrivers([...drivers, newDriver]);
-      toast({ title: "Driver added successfully" });
-    }
-    setIsDialogOpen(false);
-  };
-
-  const handleDeleteDriver = (id: string) => {
-    setDrivers(drivers.filter(driver => driver.id !== id));
-    toast({ title: "Driver deleted successfully" });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-gray-100 text-gray-800";
-      case "suspended": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+  if (loading) {
+    return <div className="flex items-center justify-center p-8">Loading drivers...</div>;
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Driver Management</CardTitle>
-          <Button onClick={handleAddDriver} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Driver
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Search className="h-4 w-4 text-gray-500" />
+          <Car className="w-5 h-5" />
+          <h2 className="text-xl font-semibold">Driver Management</h2>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
-            placeholder="Search drivers..."
+            placeholder="Search by license number or vehicle type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
+            className="pl-10"
           />
         </div>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Drivers</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Vehicle</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Commission (%)</TableHead>
-              <TableHead>Deliveries</TableHead>
-              <TableHead>Earnings</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredDrivers.map((driver) => (
-              <TableRow key={driver.id}>
-                <TableCell className="font-medium">{driver.name}</TableCell>
-                <TableCell>{driver.email}</TableCell>
-                <TableCell>{driver.phone}</TableCell>
-                <TableCell>{driver.vehicleType}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(driver.status)}>
-                    {driver.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{driver.commission}%</TableCell>
-                <TableCell>{driver.totalDeliveries}</TableCell>
-                <TableCell>${driver.earnings.toLocaleString()}</TableCell>
-                <TableCell>{driver.rating > 0 ? driver.rating.toFixed(1) : "N/A"}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditDriver(driver)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteDriver(driver.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+      {/* Drivers Grid */}
+      <div className="grid gap-4">
+        {filteredDrivers.map((driver) => (
+          <Card key={driver.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <Car className="w-6 h-6 text-blue-600" />
                   </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold">Driver #{driver.id.slice(-8)}</h3>
+                      <Badge variant={driver.is_active ? "default" : "secondary"}>
+                        {driver.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                      {driver.is_available && driver.is_active && (
+                        <Badge className="bg-green-100 text-green-800">Available</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                      <span className="capitalize">{driver.vehicle_type}</span>
+                      {driver.license_number && (
+                        <span>License: {driver.license_number}</span>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span>{driver.rating.toFixed(1)}</span>
+                      </div>
+                      <span>{driver.total_deliveries} deliveries</span>
+                    </div>
+                    {driver.current_location && (
+                      <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
+                        <MapPin className="w-4 h-4" />
+                        <span>Location available</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleDriverStatus(driver.id, driver.is_active)}
+                  >
+                    {driver.is_active ? "Deactivate" : "Activate"}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingDriver ? "Edit Driver" : "Add New Driver"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Name</label>
-                <Input
-                  value={driverForm.name}
-                  onChange={(e) => setDriverForm({ ...driverForm, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <Input
-                  type="email"
-                  value={driverForm.email}
-                  onChange={(e) => setDriverForm({ ...driverForm, email: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Phone</label>
-                <Input
-                  value={driverForm.phone}
-                  onChange={(e) => setDriverForm({ ...driverForm, phone: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">License Number</label>
-                <Input
-                  value={driverForm.licenseNumber}
-                  onChange={(e) => setDriverForm({ ...driverForm, licenseNumber: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Vehicle Type</label>
-                <select
-                  value={driverForm.vehicleType}
-                  onChange={(e) => setDriverForm({ ...driverForm, vehicleType: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Vehicle</option>
-                  <option value="Bicycle">Bicycle</option>
-                  <option value="Motorcycle">Motorcycle</option>
-                  <option value="Car">Car</option>
-                  <option value="Van">Van</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Status</label>
-                <select
-                  value={driverForm.status}
-                  onChange={(e) => setDriverForm({ ...driverForm, status: e.target.value as "active" | "inactive" | "suspended" })}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="suspended">Suspended</option>
-                </select>
-              </div>
-              <div className="col-span-2">
-                <label className="text-sm font-medium">Commission (%)</label>
-                <Input
-                  type="number"
-                  value={driverForm.commission}
-                  onChange={(e) => setDriverForm({ ...driverForm, commission: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveDriver}>
-                {editingDriver ? "Update" : "Add"} Driver
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+      {filteredDrivers.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <Car className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No drivers found</h3>
+            <p className="text-gray-600">
+              {drivers.length === 0 
+                ? "No drivers have registered yet" 
+                : "No drivers match your current filters"
+              }
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

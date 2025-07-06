@@ -1,274 +1,213 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Download, CreditCard, TrendingUp, DollarSign, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { CreditCard, TrendingUp, Calendar, Euro } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface Payment {
   id: string;
-  orderId: string;
-  customer: string;
-  amount: string;
-  paymentMethod: string;
+  order_id: string;
+  amount: number;
+  currency: string;
   status: string;
-  date: string;
-  time: string;
+  payment_method?: string;
+  created_at: string;
+  stripe_payment_intent_id?: string;
 }
 
-const demoPayments: Payment[] = [
-  {
-    id: "PAY-001",
-    orderId: "ORD-4001",
-    customer: "Alice Johnson",
-    amount: "€18.80",
-    paymentMethod: "Card",
-    status: "Completed",
-    date: "2024-01-15",
-    time: "12:41"
-  },
-  {
-    id: "PAY-002",
-    orderId: "ORD-4002",
-    customer: "Carlos Rivera",
-    amount: "€13.50",
-    paymentMethod: "Cash",
-    status: "Completed",
-    date: "2024-01-15",
-    time: "12:44"
-  },
-  {
-    id: "PAY-003",
-    orderId: "ORD-4003",
-    customer: "Sophie Martin",
-    amount: "€23.00",
-    paymentMethod: "Card",
-    status: "Pending",
-    date: "2024-01-14",
-    time: "12:52"
-  },
-  {
-    id: "PAY-004",
-    orderId: "ORD-4004",
-    customer: "John Smith",
-    amount: "€31.20",
-    paymentMethod: "Card",
-    status: "Completed",
-    date: "2024-01-14",
-    time: "13:15"
-  },
-  {
-    id: "PAY-005",
-    orderId: "ORD-4005",
-    customer: "Emma Wilson",
-    amount: "€27.90",
-    paymentMethod: "Digital Wallet",
-    status: "Completed",
-    date: "2024-01-13",
-    time: "14:30"
-  }
-];
+interface PaymentStats {
+  total_revenue: number;
+  pending_payments: number;
+  successful_payments: number;
+  failed_payments: number;
+}
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Completed":
-      return "bg-green-100 text-green-800";
-    case "Pending":
-      return "bg-yellow-100 text-yellow-800";
-    case "Failed":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
+interface PaymentManagementProps {
+  businessId: string;
+}
+
+const statusColors = {
+  pending: "bg-yellow-100 text-yellow-800",
+  succeeded: "bg-green-100 text-green-800",
+  failed: "bg-red-100 text-red-800",
+  cancelled: "bg-gray-100 text-gray-800"
 };
 
-export function PaymentManagement() {
-  const [payments, setPayments] = useState(demoPayments);
-  const [filterPeriod, setFilterPeriod] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
+export function PaymentManagement({ businessId }: PaymentManagementProps) {
+  const { user } = useAuth();
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [stats, setStats] = useState<PaymentStats>({
+    total_revenue: 0,
+    pending_payments: 0,
+    successful_payments: 0,
+    failed_payments: 0
+  });
+  const [loading, setLoading] = useState(true);
 
-  const handleExport = () => {
-    console.log("Exporting payment data...");
-    // Implementation for exporting payment data
+  useEffect(() => {
+    if (businessId) {
+      fetchPayments();
+    }
+  }, [businessId]);
+
+  const fetchPayments = async () => {
+    try {
+      // Fetch payments for orders from this business
+      const { data: paymentsData, error: paymentsError } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          orders!inner(business_id)
+        `)
+        .eq("orders.business_id", businessId)
+        .order("created_at", { ascending: false });
+
+      if (paymentsError) throw paymentsError;
+
+      const paymentsWithoutOrders = paymentsData.map(payment => {
+        const { orders, ...paymentData } = payment;
+        return paymentData;
+      }) as Payment[];
+
+      setPayments(paymentsWithoutOrders);
+
+      // Calculate stats
+      const totalRevenue = paymentsWithoutOrders
+        .filter(p => p.status === 'succeeded')
+        .reduce((sum, p) => sum + p.amount, 0);
+
+      const pendingPayments = paymentsWithoutOrders.filter(p => p.status === 'pending').length;
+      const successfulPayments = paymentsWithoutOrders.filter(p => p.status === 'succeeded').length;
+      const failedPayments = paymentsWithoutOrders.filter(p => p.status === 'failed').length;
+
+      setStats({
+        total_revenue: totalRevenue,
+        pending_payments: pendingPayments,
+        successful_payments: successfulPayments,
+        failed_payments: failedPayments
+      });
+
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      toast.error("Failed to load payment data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.orderId.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (!matchesSearch) return false;
-
-    const paymentDate = new Date(payment.date);
-    const now = new Date();
-    
-    switch (filterPeriod) {
-      case "today":
-        return paymentDate.toDateString() === now.toDateString();
-      case "week":
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return paymentDate >= weekAgo;
-      case "month":
-        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        return paymentDate >= monthAgo;
-      case "year":
-        const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-        return paymentDate >= yearAgo;
-      default:
-        return true;
-    }
-  });
-
-  const totalRevenue = filteredPayments
-    .filter(p => p.status === "Completed")
-    .reduce((sum, payment) => sum + parseFloat(payment.amount.replace("€", "")), 0);
-
-  const pendingAmount = filteredPayments
-    .filter(p => p.status === "Pending")
-    .reduce((sum, payment) => sum + parseFloat(payment.amount.replace("€", "")), 0);
+  if (loading) {
+    return <div className="flex items-center justify-center p-8">Loading payments...</div>;
+  }
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="flex items-center gap-2">
+        <CreditCard className="w-5 h-5" />
+        <h2 className="text-xl font-semibold">Payment Management</h2>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">€{totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              From {filteredPayments.filter(p => p.status === "Completed").length} completed payments
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-green-600">€{stats.total_revenue.toFixed(2)}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-green-600" />
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">€{pendingAmount.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              From {filteredPayments.filter(p => p.status === "Pending").length} pending payments
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Successful</p>
+                <p className="text-2xl font-bold text-green-600">{stats.successful_payments}</p>
+              </div>
+              <CreditCard className="w-8 h-8 text-green-600" />
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{filteredPayments.length}</div>
-            <p className="text-xs text-muted-foreground">
-              In selected period
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Pending</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.pending_payments}</p>
+              </div>
+              <Calendar className="w-8 h-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Failed</p>
+                <p className="text-2xl font-bold text-red-600">{stats.failed_payments}</p>
+              </div>
+              <Euro className="w-8 h-8 text-red-600" />
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Payment History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <Select value={filterPeriod} onValueChange={setFilterPeriod}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Filter by period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="week">This Week</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Payments List */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Recent Payments</h3>
+        {payments.map((payment) => (
+          <Card key={payment.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">Order #{payment.order_id.slice(-8)}</p>
+                    <Badge className={statusColors[payment.status as keyof typeof statusColors]}>
+                      {payment.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {payment.payment_method && `${payment.payment_method} • `}
+                    {formatDistanceToNow(new Date(payment.created_at), { addSuffix: true })}
+                  </p>
+                  {payment.stripe_payment_intent_id && (
+                    <p className="text-xs text-gray-500">
+                      Stripe ID: {payment.stripe_payment_intent_id}
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold">
+                    €{payment.amount.toFixed(2)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {payment.currency.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-            <Input
-              placeholder="Search by customer or order ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 max-w-sm"
-            />
-
-            <Button
-              onClick={handleExport}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
-          </div>
-
-          {/* Payments Table */}
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Payment ID</TableHead>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Payment Method</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date & Time</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPayments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      No payments found for the selected criteria.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.id}</TableCell>
-                      <TableCell>{payment.orderId}</TableCell>
-                      <TableCell>{payment.customer}</TableCell>
-                      <TableCell className="font-semibold">{payment.amount}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4" />
-                          {payment.paymentMethod}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(payment.status)}>
-                          {payment.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>{payment.date} at {payment.time}</span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      {payments.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <CreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No payments yet</h3>
+            <p className="text-gray-600">Payments will appear here once you start receiving orders</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
