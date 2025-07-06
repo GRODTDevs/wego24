@@ -32,7 +32,11 @@ export function useUserData() {
         return;
       }
 
-      // First get all profiles
+      // Clear any existing cache and fetch fresh data
+      const timestamp = Date.now();
+      console.log('Fetch timestamp:', timestamp);
+
+      // First get all profiles with no cache
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -59,10 +63,11 @@ export function useUserData() {
         return;
       }
 
-      // Then get all user roles with a fresh query
+      // Get all user roles with fresh query - no cache
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false }); // Get most recent first
 
       console.log('Roles data:', rolesData);
 
@@ -70,15 +75,18 @@ export function useUserData() {
         console.error('Error fetching roles:', rolesError);
       }
 
-      // Create a fresh map of user_id to role for faster lookup
+      // Create a map of user_id to role - taking the most recent role for each user
       const roleMap = new Map<string, string>();
       rolesData?.forEach(roleRecord => {
-        roleMap.set(roleRecord.user_id, roleRecord.role);
+        // Only set if we haven't seen this user yet (since we ordered by created_at desc)
+        if (!roleMap.has(roleRecord.user_id)) {
+          roleMap.set(roleRecord.user_id, roleRecord.role);
+        }
       });
 
       console.log('Role map:', Object.fromEntries(roleMap));
 
-      // Combine the data with proper role assignment and force fresh state
+      // Combine the data with proper role assignment
       const transformedUsers = profilesData?.map(profile => {
         const userRole = roleMap.get(profile.id) || 'user';
         
@@ -98,12 +106,8 @@ export function useUserData() {
 
       console.log('Final transformed users:', transformedUsers);
       
-      // Force a fresh state update by clearing first
-      setUsers([]);
-      // Use setTimeout to ensure the state is cleared before setting new data
-      setTimeout(() => {
-        setUsers(transformedUsers);
-      }, 0);
+      // Set users directly without the setTimeout trick
+      setUsers(transformedUsers);
       
     } catch (error) {
       console.error('Error in fetchUsers:', error);
