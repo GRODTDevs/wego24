@@ -159,45 +159,28 @@ export function useUserManagement() {
       if (userForm.role !== editingUser.role) {
         console.log('Role change detected:', editingUser.role, '->', userForm.role);
         
-        // Use upsert to handle role updates properly
-        const { error: upsertError } = await supabase
+        // First, delete all existing roles for this user
+        const { error: deleteError } = await supabase
           .from('user_roles')
-          .upsert({
+          .delete()
+          .eq('user_id', editingUser.id);
+
+        if (deleteError) {
+          console.error('Role delete error:', deleteError);
+          throw deleteError;
+        }
+
+        // Then insert the new role
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
             user_id: editingUser.id,
             role: userForm.role
-          }, {
-            onConflict: 'user_id,role'
           });
 
-        if (upsertError) {
-          console.error('Role upsert error:', upsertError);
-          
-          // If upsert fails, try the delete/insert approach
-          console.log('Trying delete/insert approach...');
-          
-          // First, delete existing role
-          const { error: deleteError } = await supabase
-            .from('user_roles')
-            .delete()
-            .eq('user_id', editingUser.id);
-
-          if (deleteError) {
-            console.error('Role delete error:', deleteError);
-            throw deleteError;
-          }
-
-          // Then insert the new role
-          const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: editingUser.id,
-              role: userForm.role
-            });
-
-          if (insertError) {
-            console.error('Role insert error:', insertError);
-            throw insertError;
-          }
+        if (insertError) {
+          console.error('Role insert error:', insertError);
+          throw insertError;
         }
 
         console.log('Role updated successfully');
