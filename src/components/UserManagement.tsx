@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function UserManagement() {
   const { user } = useAuth();
-  const { isAdmin, loading: roleLoading, userRole } = useUserRole();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const {
     users,
     loading,
@@ -29,23 +29,21 @@ export function UserManagement() {
     fetchUsers
   } = useUserManagement();
 
-  console.log('UserManagement render - user:', user?.email, 'isAdmin:', isAdmin, 'userRole:', userRole, 'roleLoading:', roleLoading);
-
-  // Show loading while checking role (user is already authenticated via ProtectedRoute)
+  // Show loading while checking role
   if (roleLoading) {
     return (
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // Only show admin setup if we're certain the user is not admin (after role loading is complete)
-  if (!roleLoading && !isAdmin) {
+  // Show admin setup if user is not admin (only after role loading is complete)
+  if (!isAdmin) {
     return (
       <div className="space-y-6">
         <Card>
@@ -55,12 +53,6 @@ export function UserManagement() {
               <p className="text-gray-600">
                 You need admin privileges to access user management. 
                 If you should have admin access, use the form below to grant admin role to your account.
-              </p>
-              <p className="text-sm text-gray-500">
-                Current user: {user?.email}
-              </p>
-              <p className="text-sm text-gray-500">
-                Current role: {userRole || 'none'}
               </p>
             </div>
           </CardContent>
@@ -76,7 +68,7 @@ export function UserManagement() {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         </CardContent>
       </Card>

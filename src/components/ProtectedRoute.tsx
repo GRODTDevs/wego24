@@ -12,18 +12,8 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
-  console.log('ProtectedRoute DEBUG:', {
-    authLoading,
-    roleLoading,
-    user: user?.email,
-    isAdmin,
-    requireAdmin,
-    shouldShowAccessDenied: requireAdmin && !isAdmin && !authLoading && !roleLoading
-  });
-
-  // Show loading while checking authentication or role
+  // Show loading while checking authentication or role - this prevents any flashing
   if (authLoading || roleLoading) {
-    console.log('ProtectedRoute: Showing loading spinner');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
@@ -33,13 +23,11 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
 
   // Redirect to auth if no user
   if (!user) {
-    console.log('ProtectedRoute: No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
-  // Check admin access after loading is complete
+  // Check admin access - only show this after loading is completely done
   if (requireAdmin && !isAdmin) {
-    console.log('ProtectedRoute: Admin required but user is not admin, showing access denied');
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
@@ -51,6 +39,6 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  console.log('ProtectedRoute: Access granted, rendering children');
+  // Only render children when everything is loaded and verified
   return <>{children}</>;
 };
