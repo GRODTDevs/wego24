@@ -9,7 +9,6 @@ import { DriverManagement } from "@/components/DriverManagement";
 import { CommissionManagement } from "@/components/CommissionManagement";
 import { SuperuserCreation } from "@/components/SuperuserCreation";
 import { PartnerApplications } from "@/components/PartnerApplications";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "@/contexts/TranslationContext";
@@ -90,139 +89,137 @@ export default function ProductOwnerDashboard() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <ProtectedRoute requireAdmin={true}>
-        <main className="flex-1 bg-gray-50 p-6">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
+      <main className="flex-1 bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
+          
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalOrders')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <div className="text-2xl font-bold">{stats.totalOrders.toLocaleString()}</div>
+                )}
+              </CardContent>
+            </Card>
             
-            {/* Overview Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeLocations')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <div className="text-2xl font-bold">{stats.activeLocations}</div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeDrivers')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <div className="text-2xl font-bold">{stats.activeDrivers}</div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalUsers')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Management Tabs */}
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList className="grid grid-cols-7 w-full">
+              <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
+              <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
+              <TabsTrigger value="partners">Partners</TabsTrigger>
+              <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
+              <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
+              <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
+              <TabsTrigger value="admin">{t('dashboard.tabs.admin')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+
+            <TabsContent value="locations">
+              <LocationManagement />
+            </TabsContent>
+
+            <TabsContent value="partners">
+              <PartnerApplications />
+            </TabsContent>
+
+            <TabsContent value="drivers">
+              <DriverManagement />
+            </TabsContent>
+
+            <TabsContent value="commissions">
+              <CommissionManagement />
+            </TabsContent>
+
+            <TabsContent value="analytics">
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalOrders')}</CardTitle>
+                <CardHeader>
+                  <CardTitle>{t('dashboard.analytics.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {loading ? (
-                    <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
-                  ) : (
-                    <div className="text-2xl font-bold">{stats.totalOrders.toLocaleString()}</div>
-                  )}
+                  <p className="text-gray-600">{t('dashboard.analytics.comingSoon')}</p>
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
-                  ) : (
-                    <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeLocations')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
-                  ) : (
-                    <div className="text-2xl font-bold">{stats.activeLocations}</div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeDrivers')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
-                  ) : (
-                    <div className="text-2xl font-bold">{stats.activeDrivers}</div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalUsers')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
-                  ) : (
-                    <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+            </TabsContent>
 
-            {/* Management Tabs */}
-            <Tabs defaultValue="users" className="space-y-6">
-              <TabsList className="grid grid-cols-7 w-full">
-                <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
-                <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
-                <TabsTrigger value="partners">Partners</TabsTrigger>
-                <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
-                <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
-                <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
-                <TabsTrigger value="admin">{t('dashboard.tabs.admin')}</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="users">
-                <UserManagement />
-              </TabsContent>
-
-              <TabsContent value="locations">
-                <LocationManagement />
-              </TabsContent>
-
-              <TabsContent value="partners">
-                <PartnerApplications />
-              </TabsContent>
-
-              <TabsContent value="drivers">
-                <DriverManagement />
-              </TabsContent>
-
-              <TabsContent value="commissions">
-                <CommissionManagement />
-              </TabsContent>
-
-              <TabsContent value="analytics">
+            <TabsContent value="admin">
+              <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('dashboard.analytics.title')}</CardTitle>
+                    <CardTitle>{t('dashboard.admin.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">{t('dashboard.analytics.comingSoon')}</p>
+                    <p className="text-gray-600 mb-6">{t('dashboard.admin.description')}</p>
+                    <SuperuserCreation />
                   </CardContent>
                 </Card>
-              </TabsContent>
-
-              <TabsContent value="admin">
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{t('dashboard.admin.title')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-600 mb-6">{t('dashboard.admin.description')}</p>
-                      <SuperuserCreation />
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
-      </ProtectedRoute>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
       <Footer />
     </div>
   );
