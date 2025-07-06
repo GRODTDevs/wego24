@@ -50,22 +50,17 @@ export function useUserManagement() {
         return;
       }
 
-      // First get all profiles with a left join to user_roles
-      const { data: profilesWithRoles, error } = await supabase
+      // First get all profiles
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles!left (
-            role
-          )
-        `);
+        .select('*');
 
-      console.log('Profiles with roles data:', profilesWithRoles);
-      console.log('Query error:', error);
+      console.log('Profiles data:', profilesData);
+      console.log('Profiles error:', profilesError);
 
-      if (error) {
-        console.error('Error fetching profiles with roles:', error);
-        if (error.code === '42501' || error.message?.includes('permission')) {
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        if (profilesError.code === '42501' || profilesError.message?.includes('permission')) {
           toast({
             title: "Access Denied",
             description: "You don't have admin permissions to view users.",
@@ -74,7 +69,7 @@ export function useUserManagement() {
         } else {
           toast({
             title: "Error",
-            description: "Failed to fetch users: " + error.message,
+            description: "Failed to fetch users: " + profilesError.message,
             variant: "destructive"
           });
         }
@@ -82,14 +77,21 @@ export function useUserManagement() {
         return;
       }
 
-      // Transform the data to match our User interface
-      const transformedUsers = profilesWithRoles?.map(profile => {
-        // Get the role from the joined user_roles data
-        const userRoleData = Array.isArray(profile.user_roles) 
-          ? profile.user_roles[0] 
-          : profile.user_roles;
-        
-        const role = userRoleData?.role || 'user';
+      // Then get all user roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      console.log('Roles data:', rolesData);
+      console.log('Roles error:', rolesError);
+
+      if (rolesError) {
+        console.error('Error fetching roles:', rolesError);
+      }
+
+      // Combine the data manually
+      const transformedUsers = profilesData?.map(profile => {
+        const userRole = rolesData?.find(role => role.user_id === profile.id);
         
         return {
           id: profile.id,
@@ -97,7 +99,7 @@ export function useUserManagement() {
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
           phone: profile.phone || '',
-          role: role as "admin" | "user",
+          role: (userRole?.role || 'user') as "admin" | "user",
           created_at: profile.created_at,
           is_active: profile.is_active ?? true
         };
