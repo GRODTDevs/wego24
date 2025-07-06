@@ -42,7 +42,7 @@ export function useUserManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      console.log('Current user:', currentUser?.id, currentUser?.email);
+      console.log('Fetching users - Current user:', currentUser?.id, currentUser?.email);
       
       if (!currentUser) {
         console.log('No current user found');
@@ -50,17 +50,22 @@ export function useUserManagement() {
         return;
       }
 
-      // First get all profiles
-      const { data: profilesData, error: profilesError } = await supabase
+      // First get all profiles with a left join to user_roles
+      const { data: profilesWithRoles, error } = await supabase
         .from('profiles')
-        .select('*');
+        .select(`
+          *,
+          user_roles!left (
+            role
+          )
+        `);
 
-      console.log('Profiles data:', profilesData);
-      console.log('Profiles error:', profilesError);
+      console.log('Profiles with roles data:', profilesWithRoles);
+      console.log('Query error:', error);
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        if (profilesError.code === '42501' || profilesError.message?.includes('permission')) {
+      if (error) {
+        console.error('Error fetching profiles with roles:', error);
+        if (error.code === '42501' || error.message?.includes('permission')) {
           toast({
             title: "Access Denied",
             description: "You don't have admin permissions to view users.",
@@ -69,7 +74,7 @@ export function useUserManagement() {
         } else {
           toast({
             title: "Error",
-            description: "Failed to fetch users: " + profilesError.message,
+            description: "Failed to fetch users: " + error.message,
             variant: "destructive"
           });
         }
@@ -77,28 +82,22 @@ export function useUserManagement() {
         return;
       }
 
-      // Then get all user roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*');
-
-      console.log('Roles data:', rolesData);
-      console.log('Roles error:', rolesError);
-
-      if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
-      }
-
-      // Combine the data
-      const transformedUsers = profilesData?.map(profile => {
-        const userRole = rolesData?.find(role => role.user_id === profile.id);
+      // Transform the data to match our User interface
+      const transformedUsers = profilesWithRoles?.map(profile => {
+        // Get the role from the joined user_roles data
+        const userRoleData = Array.isArray(profile.user_roles) 
+          ? profile.user_roles[0] 
+          : profile.user_roles;
+        
+        const role = userRoleData?.role || 'user';
+        
         return {
           id: profile.id,
           email: profile.email || '',
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
           phone: profile.phone || '',
-          role: (userRole?.role || 'user') as "admin" | "user",
+          role: role as "admin" | "user",
           created_at: profile.created_at,
           is_active: profile.is_active ?? true
         };
@@ -137,6 +136,7 @@ export function useUserManagement() {
     try {
       console.log('Updating user:', editingUser.id, userForm);
       
+      // Update profile information
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -149,7 +149,9 @@ export function useUserManagement() {
 
       if (profileError) throw profileError;
 
+      // Handle role change if necessary
       if (userForm.role !== editingUser.role) {
+        // First, delete existing role
         const { error: deleteError } = await supabase
           .from('user_roles')
           .delete()
@@ -157,6 +159,7 @@ export function useUserManagement() {
 
         if (deleteError) throw deleteError;
 
+        // Then insert new role
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
