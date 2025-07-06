@@ -12,6 +12,7 @@ interface User {
   role: "admin" | "user";
   created_at: string;
   is_active?: boolean;
+  roles?: string[];
 }
 
 interface UserForm {
@@ -52,14 +53,21 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
     try {
       console.log('Updating user:', editingUser.id, userForm);
       
-      // Update profile information
+      // Prepare the roles array based on the selected role
+      let newRoles = ['user']; // Everyone has user role by default
+      if (userForm.role === 'admin') {
+        newRoles.push('admin');
+      }
+      
+      // Update profile information including roles
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           first_name: userForm.first_name,
           last_name: userForm.last_name,
           phone: userForm.phone,
-          email: userForm.email
+          email: userForm.email,
+          roles: newRoles
         })
         .eq('id', editingUser.id);
 
@@ -68,41 +76,7 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
         throw profileError;
       }
 
-      // Handle role change if necessary
-      if (userForm.role !== editingUser.role) {
-        console.log('Role change detected:', editingUser.role, '->', userForm.role);
-        
-        // If changing FROM admin TO user, remove admin role
-        if (editingUser.role === 'admin' && userForm.role === 'user') {
-          const { error: deleteAdminError } = await supabase
-            .from('user_roles')
-            .delete()
-            .eq('user_id', editingUser.id)
-            .eq('role', 'admin');
-
-          if (deleteAdminError) {
-            console.error('Error removing admin role:', deleteAdminError);
-            throw deleteAdminError;
-          }
-          console.log('Removed admin role for user:', editingUser.id);
-        }
-        
-        // If changing FROM user TO admin, add admin role
-        if (editingUser.role === 'user' && userForm.role === 'admin') {
-          const { error: insertAdminError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: editingUser.id,
-              role: 'admin'
-            });
-
-          if (insertAdminError) {
-            console.error('Error adding admin role:', insertAdminError);
-            throw insertAdminError;
-          }
-          console.log('Added admin role for user:', editingUser.id);
-        }
-      }
+      console.log('Updated user roles to:', newRoles);
 
       toast({ 
         title: "Success",

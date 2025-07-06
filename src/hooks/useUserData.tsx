@@ -13,6 +13,7 @@ interface User {
   role: "admin" | "user";
   created_at: string;
   is_active?: boolean;
+  roles?: string[];
 }
 
 export function useUserData() {
@@ -32,7 +33,7 @@ export function useUserData() {
         return;
       }
 
-      // First get all profiles
+      // Get all profiles with their roles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -59,34 +60,13 @@ export function useUserData() {
         return;
       }
 
-      // Get all user roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      console.log('Roles data:', rolesData);
-
-      if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
-      }
-
-      // Create a set of users who have admin role
-      const adminUsers = new Set<string>();
-      rolesData?.forEach(roleRecord => {
-        if (roleRecord.role === 'admin') {
-          adminUsers.add(roleRecord.user_id);
-        }
-      });
-
-      console.log('Admin users:', Array.from(adminUsers));
-
-      // Combine the data with proper role assignment
+      // Transform the data with role information from the JSON roles column
       const transformedUsers = profilesData?.map(profile => {
-        // If user has admin role, they are admin, otherwise they are user
-        const userRole = adminUsers.has(profile.id) ? 'admin' : 'user';
+        const userRoles = profile.roles || ['user'];
+        const isAdmin = userRoles.includes('admin');
+        const primaryRole = isAdmin ? 'admin' : 'user';
         
-        console.log(`User ${profile.email}: role = ${userRole}`);
+        console.log(`User ${profile.email}: roles = ${JSON.stringify(userRoles)}, primary role = ${primaryRole}`);
         
         return {
           id: profile.id,
@@ -94,9 +74,10 @@ export function useUserData() {
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
           phone: profile.phone || '',
-          role: userRole as "admin" | "user",
+          role: primaryRole as "admin" | "user",
           created_at: profile.created_at,
-          is_active: profile.is_active ?? true
+          is_active: profile.is_active ?? true,
+          roles: userRoles
         };
       }) || [];
 

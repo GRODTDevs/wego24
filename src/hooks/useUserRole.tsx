@@ -21,9 +21,9 @@ export const useUserRole = () => {
         console.log('Fetching role for user:', user.id, user.email);
         
         const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
+          .from('profiles')
+          .select('roles')
+          .eq('id', user.id)
           .single();
 
         console.log('Role fetch result:', data, error);
@@ -32,9 +32,11 @@ export const useUserRole = () => {
           console.error('Error fetching user role:', error);
           setUserRole('user'); // Default to user role
         } else {
-          const role = data?.role || 'user';
-          console.log('User role determined:', role);
-          setUserRole(role);
+          const roles = data?.roles || ['user'];
+          const isAdmin = roles.includes('admin');
+          const primaryRole = isAdmin ? 'admin' : 'user';
+          console.log('User roles:', roles, 'primary role:', primaryRole);
+          setUserRole(primaryRole);
         }
       } catch (err) {
         console.error('Error in fetchUserRole:', err);

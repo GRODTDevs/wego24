@@ -415,6 +415,7 @@ export type Database = {
           phone_verified: boolean | null
           postal_code: string | null
           preferred_language: string | null
+          roles: Json
           sms_notifications: boolean | null
           updated_at: string
         }
@@ -439,6 +440,7 @@ export type Database = {
           phone_verified?: boolean | null
           postal_code?: string | null
           preferred_language?: string | null
+          roles?: Json
           sms_notifications?: boolean | null
           updated_at?: string
         }
@@ -463,6 +465,7 @@ export type Database = {
           phone_verified?: boolean | null
           postal_code?: string | null
           preferred_language?: string | null
+          roles?: Json
           sms_notifications?: boolean | null
           updated_at?: string
         }
@@ -738,6 +741,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_role: {
+        Args: { _user_id: string; _role: string }
+        Returns: undefined
+      }
       create_restaurant_from_application: {
         Args: { application_id: string }
         Returns: string
@@ -752,6 +759,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      remove_user_role: {
+        Args: { _user_id: string; _role: string }
+        Returns: undefined
       }
     }
     Enums: {
