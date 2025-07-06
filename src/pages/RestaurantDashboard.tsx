@@ -46,6 +46,9 @@ const demoOrders = [
 export default function RestaurantDashboard() {
   const [activeTab, setActiveTab] = useState<"orders" | "menu" | "profile" | "staff" | "payments" | "reviews">("orders");
   const [orders, setOrders] = useState(demoOrders);
+  
+  // TODO: Get this from user's business context or auth
+  const businessId = "demo-business-id";
 
   const handleOrderStatusChange = (orderId: string, newStatus: string) => {
     setOrders(orders.map(order => 
@@ -123,16 +126,16 @@ export default function RestaurantDashboard() {
 
           {/* Tab Content */}
           {activeTab === "orders" && (
-            <OrderManagement orders={orders} onOrderStatusChange={handleOrderStatusChange} />
+            <OrderManagement businessId={businessId} />
           )}
           {activeTab === "menu" && (
-            <MenuManagement />
+            <MenuManagement businessId={businessId} />
           )}
           {activeTab === "payments" && (
-            <PaymentManagement />
+            <PaymentManagement businessId={businessId} />
           )}
           {activeTab === "reviews" && (
-            <ReviewManagement />
+            <ReviewManagement businessId={businessId} />
           )}
           {activeTab === "profile" && (
             <ProfileManagement />

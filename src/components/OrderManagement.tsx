@@ -7,22 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Clock, MapPin, User, Phone, Euro, Package } from "lucide-react";
+import { Clock, MapPin, Phone, CreditCard, Package } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface Order {
   id: string;
+  business_id: string;
+  customer_id: string;
   order_number: string;
   status: string;
   total_amount: number;
-  payment_status: string;
+  subtotal: number;
+  delivery_address: any;
+  delivery_instructions?: string;
+  payment_method?: string;
+  payment_status?: string;
   created_at: string;
   estimated_delivery_time?: string;
-  delivery_address?: any;
-  delivery_instructions?: string;
-  customer_id: string;
-  driver_id?: string;
-  notes?: string;
 }
 
 interface OrderManagementProps {
@@ -32,33 +33,22 @@ interface OrderManagementProps {
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
-  preparing: "bg-purple-100 text-purple-800",
+  preparing: "bg-orange-100 text-orange-800",
   ready: "bg-green-100 text-green-800",
-  out_for_delivery: "bg-indigo-100 text-indigo-800",
+  out_for_delivery: "bg-purple-100 text-purple-800",
   delivered: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800"
 };
-
-const statusOptions = [
-  { value: "pending", label: "Pending" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "preparing", label: "Preparing" },
-  { value: "ready", label: "Ready" },
-  { value: "out_for_delivery", label: "Out for Delivery" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" }
-];
 
 export function OrderManagement({ businessId }: OrderManagementProps) {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (businessId) {
       fetchOrders();
-      setupRealtimeSubscription();
     }
   }, [businessId]);
 
@@ -80,36 +70,11 @@ export function OrderManagement({ businessId }: OrderManagementProps) {
     }
   };
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('order-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `business_id=eq.${businessId}`
-        },
-        () => {
-          fetchOrders();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from("orders")
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
+        .update({ status: newStatus })
         .eq("id", orderId);
 
       if (error) throw error;
@@ -122,7 +87,7 @@ export function OrderManagement({ businessId }: OrderManagementProps) {
   };
 
   const filteredOrders = orders.filter(order => 
-    filterStatus === "all" || order.status === filterStatus
+    statusFilter === "all" || order.status === statusFilter
   );
 
   if (loading) {
@@ -136,100 +101,125 @@ export function OrderManagement({ businessId }: OrderManagementProps) {
           <Package className="w-5 h-5" />
           <h2 className="text-xl font-semibold">Order Management</h2>
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue />
+            <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Orders</SelectItem>
-            {statusOptions.map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {status.label}
-              </SelectItem>
-            ))}
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="preparing">Preparing</SelectItem>
+            <SelectItem value="ready">Ready</SelectItem>
+            <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
+            <SelectItem value="delivered">Delivered</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="grid gap-4">
         {filteredOrders.map((order) => (
-          <Card key={order.id} className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CardTitle className="text-lg">#{order.order_number}</CardTitle>
-                  <Badge className={statusColors[order.status as keyof typeof statusColors]}>
-                    {order.status.replace('_', ' ')}
-                  </Badge>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">€{order.total_amount}</p>
-                  <p className="text-sm text-gray-500">
-                    {formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4" />
-                    <span>Customer ID: {order.customer_id}</span>
+          <Card key={order.id}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Order #{order.order_number}</h3>
+                    <Badge className={statusColors[order.status as keyof typeof statusColors]}>
+                      {order.status.replace('_', ' ')}
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Euro className="w-4 h-4" />
-                    <span>Payment: {order.payment_status}</span>
-                  </div>
-                  {order.delivery_address && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="w-4 h-4 mt-0.5" />
-                      <div>
-                        <p>{order.delivery_address.street}</p>
-                        <p>{order.delivery_address.city}, {order.delivery_address.postal_code}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  {order.estimated_delivery_time && (
-                    <div className="flex items-center gap-2 text-sm">
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      <span>
-                        Est. delivery: {new Date(order.estimated_delivery_time).toLocaleString()}
-                      </span>
+                      <span>{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
                     </div>
-                  )}
-                  {order.delivery_instructions && (
-                    <div className="text-sm">
-                      <strong>Instructions:</strong> {order.delivery_instructions}
-                    </div>
-                  )}
-                  {order.notes && (
-                    <div className="text-sm">
-                      <strong>Notes:</strong> {order.notes}
+                    
+                    {order.delivery_address && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        <span>{order.delivery_address.street || 'Address provided'}</span>
+                      </div>
+                    )}
+                    
+                    {order.payment_method && (
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-4 h-4" />
+                        <span>{order.payment_method} • {order.payment_status}</span>
+                      </div>
+                    )}
+                    
+                    {order.delivery_instructions && (
+                      <div className="text-gray-500">
+                        <strong>Instructions:</strong> {order.delivery_instructions}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-xl font-bold mb-2">€{order.total_amount.toFixed(2)}</div>
+                  
+                  {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                    <div className="space-y-2">
+                      {order.status === 'pending' && (
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateOrderStatus(order.id, 'confirmed')}
+                          >
+                            Accept Order
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                          >
+                            Decline
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {order.status === 'confirmed' && (
+                        <Button
+                          size="sm"
+                          onClick={() => updateOrderStatus(order.id, 'preparing')}
+                        >
+                          Start Preparing
+                        </Button>
+                      )}
+                      
+                      {order.status === 'preparing' && (
+                        <Button
+                          size="sm"
+                          onClick={() => updateOrderStatus(order.id, 'ready')}
+                        >
+                          Mark Ready
+                        </Button>
+                      )}
+                      
+                      {order.status === 'ready' && (
+                        <Button
+                          size="sm"
+                          onClick={() => updateOrderStatus(order.id, 'out_for_delivery')}
+                        >
+                          Out for Delivery
+                        </Button>
+                      )}
+                      
+                      {order.status === 'out_for_delivery' && (
+                        <Button
+                          size="sm"
+                          onClick={() => updateOrderStatus(order.id, 'delivered')}
+                        >
+                          Mark Delivered
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-4 border-t">
-                <span className="text-sm font-medium">Update Status:</span>
-                <Select
-                  value={order.status}
-                  onValueChange={(newStatus) => updateOrderStatus(order.id, newStatus)}
-                >
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
           </Card>
@@ -242,9 +232,9 @@ export function OrderManagement({ businessId }: OrderManagementProps) {
             <Package className="w-12 h-12 mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold mb-2">No orders found</h3>
             <p className="text-gray-600">
-              {filterStatus === "all" 
-                ? "You haven't received any orders yet" 
-                : `No orders with status "${filterStatus}"`
+              {orders.length === 0 
+                ? "No orders have been placed yet" 
+                : "No orders match the current filter"
               }
             </p>
           </CardContent>

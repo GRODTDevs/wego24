@@ -52,7 +52,7 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
     category_id: "",
     image_url: "",
     preparation_time: "15",
-    status: "available" as const,
+    status: "available" as 'available' | 'unavailable' | 'out_of_stock',
     is_featured: false
   });
 
@@ -265,7 +265,7 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
                 </div>
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                  <Select value={formData.status} onValueChange={(value: 'available' | 'unavailable' | 'out_of_stock') => setFormData({ ...formData, status: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
