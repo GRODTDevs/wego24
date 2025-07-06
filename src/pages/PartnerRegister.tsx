@@ -72,19 +72,25 @@ export default function PartnerRegister() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <main className="flex-1 bg-gray-50 py-12">
-        <div className="max-w-2xl mx-auto px-4">
+      <main 
+        className="flex-1 py-12 relative bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('/lovable-uploads/363cf1fe-e5d2-4476-ade0-61691f9e5f58.png')` }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        
+        <div className="max-w-2xl mx-auto px-4 relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('partner.register.title')}</h1>
-            <p className="text-gray-600">
+            <h1 className="text-4xl font-bold text-white mb-4">{t('partner.register.title')}</h1>
+            <p className="text-white text-lg">
               {t('partner.register.subtitle')}
             </p>
           </div>
 
-          <Card>
+          <Card className="bg-white bg-opacity-90 backdrop-blur-sm border-0 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-gray-900 text-xl">
+                <Building2 className="w-6 h-6" />
                 {t('partner.register.form.title')}
               </CardTitle>
             </CardHeader>
@@ -92,24 +98,25 @@ export default function PartnerRegister() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="businessName">{t('partner.register.businessName')} {t('partner.register.required')}</Label>
+                    <Label htmlFor="businessName" className="text-gray-900 text-base font-medium">{t('partner.register.businessName')} {t('partner.register.required')}</Label>
                     <Input
                       id="businessName"
                       value={formData.businessName}
                       onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                       required
                       placeholder={t('partner.register.businessNamePlaceholder')}
+                      className="text-base"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="businessType">{t('partner.register.businessType')} {t('partner.register.required')}</Label>
+                    <Label htmlFor="businessType" className="text-gray-900 text-base font-medium">{t('partner.register.businessType')} {t('partner.register.required')}</Label>
                     <Select
                       value={formData.businessType}
                       onValueChange={(value) => setFormData({ ...formData, businessType: value })}
                       required
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-base">
                         <SelectValue placeholder={t('partner.register.selectBusinessType')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -128,7 +135,7 @@ export default function PartnerRegister() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
+                    <Label htmlFor="email" className="flex items-center gap-2 text-gray-900 text-base font-medium">
                       <Mail className="w-4 h-4" />
                       {t('partner.register.contactEmail')} {t('partner.register.required')}
                     </Label>
@@ -139,11 +146,12 @@ export default function PartnerRegister() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
                       placeholder={t('partner.register.contactEmailPlaceholder')}
+                      className="text-base"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="flex items-center gap-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2 text-gray-900 text-base font-medium">
                       <Phone className="w-4 h-4" />
                       {t('partner.register.phoneNumber')}
                     </Label>
@@ -153,12 +161,13 @@ export default function PartnerRegister() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+34"
+                      className="text-base"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address" className="flex items-center gap-2">
+                  <Label htmlFor="address" className="flex items-center gap-2 text-gray-900 text-base font-medium">
                     <MapPin className="w-4 h-4" />
                     {t('partner.register.businessAddress')} {t('partner.register.required')}
                   </Label>
@@ -168,34 +177,37 @@ export default function PartnerRegister() {
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     required
                     placeholder={t('partner.register.businessAddressPlaceholder')}
+                    className="text-base"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">{t('partner.register.city')} {t('partner.register.required')}</Label>
+                    <Label htmlFor="city" className="text-gray-900 text-base font-medium">{t('partner.register.city')} {t('partner.register.required')}</Label>
                     <Input
                       id="city"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       required
                       placeholder={t('partner.register.cityPlaceholder')}
+                      className="text-base"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode">{t('partner.register.postalCode')}</Label>
+                    <Label htmlFor="postalCode" className="text-gray-900 text-base font-medium">{t('partner.register.postalCode')}</Label>
                     <Input
                       id="postalCode"
                       value={formData.postalCode}
                       onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                       placeholder={t('partner.register.postalCodePlaceholder')}
+                      className="text-base"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="flex items-center gap-2">
+                  <Label htmlFor="description" className="flex items-center gap-2 text-gray-900 text-base font-medium">
                     <FileText className="w-4 h-4" />
                     {t('partner.register.businessDescription')}
                   </Label>
@@ -205,11 +217,12 @@ export default function PartnerRegister() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder={t('partner.register.businessDescriptionPlaceholder')}
                     rows={4}
+                    className="text-base"
                   />
                 </div>
 
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-blue-900 mb-2">{t('partner.register.nextSteps')}</h3>
+                  <h3 className="font-semibold text-blue-900 mb-2 text-base">{t('partner.register.nextSteps')}</h3>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>{t('partner.register.step1')}</li>
                     <li>{t('partner.register.step2')}</li>
@@ -220,7 +233,7 @@ export default function PartnerRegister() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500"
+                  className="w-full bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-base py-3"
                   disabled={loading}
                 >
                   {loading ? t('partner.register.submitting') : t('partner.register.submit')}
