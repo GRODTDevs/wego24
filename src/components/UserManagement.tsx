@@ -11,7 +11,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function UserManagement() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const {
     users,
@@ -29,8 +29,8 @@ export function UserManagement() {
     fetchUsers
   } = useUserManagement();
 
-  // Show loading while checking role
-  if (roleLoading) {
+  // Show loading while checking auth or role - this prevents ALL flashing
+  if (authLoading || roleLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -42,7 +42,7 @@ export function UserManagement() {
     );
   }
 
-  // Show admin setup if user is not admin (only after role loading is complete)
+  // Only after everything is loaded, check admin status
   if (!isAdmin) {
     return (
       <div className="space-y-6">

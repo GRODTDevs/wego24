@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
-  // Show loading while checking authentication or role - this prevents any flashing
+  // Always show loading first - this completely prevents any content flashing
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,12 +21,12 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  // Redirect to auth if no user
+  // Only after loading is complete, check authentication
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check admin access - only show this after loading is completely done
+  // Only after loading is complete, check admin access
   if (requireAdmin && !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -39,6 +39,6 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  // Only render children when everything is loaded and verified
+  // Only render children when everything is completely loaded and verified
   return <>{children}</>;
 };
