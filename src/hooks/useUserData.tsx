@@ -70,9 +70,19 @@ export function useUserData() {
         console.error('Error fetching roles:', rolesError);
       }
 
+      // Create a map of user_id to role for faster lookup
+      const roleMap = new Map();
+      rolesData?.forEach(roleRecord => {
+        roleMap.set(roleRecord.user_id, roleRecord.role);
+      });
+
+      console.log('Role map:', roleMap);
+
       // Combine the data manually
       const transformedUsers = profilesData?.map(profile => {
-        const userRole = rolesData?.find(role => role.user_id === profile.id);
+        const userRole = roleMap.get(profile.id) || 'user';
+        
+        console.log(`User ${profile.email}: role from map = ${userRole}`);
         
         return {
           id: profile.id,
@@ -80,13 +90,13 @@ export function useUserData() {
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
           phone: profile.phone || '',
-          role: (userRole?.role || 'user') as "admin" | "user",
+          role: userRole as "admin" | "user",
           created_at: profile.created_at,
           is_active: profile.is_active ?? true
         };
       }) || [];
 
-      console.log('Transformed users:', transformedUsers);
+      console.log('Final transformed users:', transformedUsers);
       setUsers(transformedUsers);
     } catch (error) {
       console.error('Error in fetchUsers:', error);
