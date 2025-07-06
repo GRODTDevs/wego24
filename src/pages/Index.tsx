@@ -165,7 +165,7 @@ const Index = () => {
             </p>
             <Link to="/courier-request">
               <Button
-                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
+                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
                 type="button"
               >
                 <Truck className="w-5 h-5" />
@@ -187,7 +187,7 @@ const Index = () => {
             </p>
             <Link to="/partner-register">
               <Button
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
+                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
                 type="button"
               >
                 <Building2 className="w-5 h-5" />
