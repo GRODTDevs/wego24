@@ -59,7 +59,7 @@ export function useUserData() {
         return;
       }
 
-      // Get all user roles - get the most recent role for each user
+      // Get all user roles
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
@@ -71,22 +71,22 @@ export function useUserData() {
         console.error('Error fetching roles:', rolesError);
       }
 
-      // Create a map of user_id to their most recent role
-      const roleMap = new Map<string, string>();
+      // Create a set of users who have admin role
+      const adminUsers = new Set<string>();
       rolesData?.forEach(roleRecord => {
-        // Only set if we haven't seen this user yet (since we ordered by created_at desc)
-        if (!roleMap.has(roleRecord.user_id)) {
-          roleMap.set(roleRecord.user_id, roleRecord.role);
+        if (roleRecord.role === 'admin') {
+          adminUsers.add(roleRecord.user_id);
         }
       });
 
-      console.log('Role map:', Object.fromEntries(roleMap));
+      console.log('Admin users:', Array.from(adminUsers));
 
       // Combine the data with proper role assignment
       const transformedUsers = profilesData?.map(profile => {
-        const userRole = roleMap.get(profile.id) || 'user';
+        // If user has admin role, they are admin, otherwise they are user
+        const userRole = adminUsers.has(profile.id) ? 'admin' : 'user';
         
-        console.log(`User ${profile.email}: role from map = ${userRole}`);
+        console.log(`User ${profile.email}: role = ${userRole}`);
         
         return {
           id: profile.id,

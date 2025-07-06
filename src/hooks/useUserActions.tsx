@@ -72,33 +72,36 @@ export function useUserActions(onUserUpdated: () => Promise<void>) {
       if (userForm.role !== editingUser.role) {
         console.log('Role change detected:', editingUser.role, '->', userForm.role);
         
-        // First, delete ALL existing roles for this user
-        const { error: deleteError } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', editingUser.id);
+        // If changing FROM admin TO user, remove admin role
+        if (editingUser.role === 'admin' && userForm.role === 'user') {
+          const { error: deleteAdminError } = await supabase
+            .from('user_roles')
+            .delete()
+            .eq('user_id', editingUser.id)
+            .eq('role', 'admin');
 
-        if (deleteError) {
-          console.error('Role delete error:', deleteError);
-          throw deleteError;
+          if (deleteAdminError) {
+            console.error('Error removing admin role:', deleteAdminError);
+            throw deleteAdminError;
+          }
+          console.log('Removed admin role for user:', editingUser.id);
         }
+        
+        // If changing FROM user TO admin, add admin role
+        if (editingUser.role === 'user' && userForm.role === 'admin') {
+          const { error: insertAdminError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: editingUser.id,
+              role: 'admin'
+            });
 
-        console.log('Deleted existing roles for user:', editingUser.id);
-
-        // Then insert the new role
-        const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: editingUser.id,
-            role: userForm.role
-          });
-
-        if (insertError) {
-          console.error('Role insert error:', insertError);
-          throw insertError;
+          if (insertAdminError) {
+            console.error('Error adding admin role:', insertAdminError);
+            throw insertAdminError;
+          }
+          console.log('Added admin role for user:', editingUser.id);
         }
-
-        console.log('Inserted new role:', userForm.role, 'for user:', editingUser.id);
       }
 
       toast({ 
