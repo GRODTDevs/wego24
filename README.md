@@ -27,7 +27,7 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
   - Real-time subscriptions
   - Authentication & authorization
   - Edge functions for custom logic
-  - File storage capabilities
+  - **File storage capabilities with multiple buckets**
 
 ## Key Features
 
@@ -37,12 +37,16 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - Request courier services
 - Multi-language support (EN/ES/DE)
 - User authentication and profiles
+- **Profile picture uploads and document management**
 
 ### For Partners (Restaurants/Businesses)
 - Partner application system with approval workflow
 - Restaurant dashboard and management
-- Menu and product management
+- **Complete menu and product management with image uploads**
+- **Enhanced menu item CRUD operations with bulk management**
+- **Restaurant image gallery and banner management**
 - Order processing
+- **Document storage and management**
 - Settings and configuration
 
 ### For Administrators
@@ -56,13 +60,14 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 ## Database Schema
 
 ### Core Tables
-- **restaurants** - Restaurant/business information with status tracking
+- **restaurants** - Restaurant/business information with status tracking and image URLs
 - **partner_applications** - Partner registration applications with approval workflow
 - **restaurant_users** - Restaurant staff and ownership relationships
 - **restaurant_settings** - Restaurant-specific configuration and settings
-- **menu_categories** - Menu organization and categorization
-- **menu_items** - Products and services with pricing and availability
-- **profiles** - User profile information with preferences and settings (using JSONB roles field)
+- **menu_categories** - Menu organization and categorization with sort ordering
+- **menu_items** - Products and services with pricing, availability, and image support
+- **menu_item_variants** - Item variations (sizes, options) with price modifiers
+- **profiles** - User profile information with preferences, settings, and avatar URLs (using JSONB roles field)
 - **user_roles** - Legacy role-based access control table (being migrated to profiles.roles)
 - **orders** - Order management and tracking with status updates
 - **order_items** - Individual items within orders
@@ -70,12 +75,20 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - **drivers** - Delivery driver information and availability
 - **reviews** - Rating and review system for businesses and drivers
 
+### **File Storage System**
+- **Multiple Storage Buckets**:
+  - `menu-images` - Menu item images with 5MB limit
+  - `restaurant-images` - Restaurant photos, banners, and galleries
+  - `avatars` - User profile pictures with 2MB limit
+  - `documents` - Business documents and user files with 10MB limit
+
 ### Security Features
-- Row Level Security (RLS) policies on all tables
+- Row Level Security (RLS) policies on all tables and storage buckets
 - Role-based access control using JSONB roles in profiles table
 - Restaurant-specific data isolation
 - Secure authentication with Supabase Auth
 - Admin policies for complete system oversight
+- **Secure file upload policies with size and type restrictions**
 - Optimized role checking with session storage caching
 
 ## Partner Registration Process
@@ -85,6 +98,7 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 1. **Application Submission**
    - Partners visit `/partner-register` (requires login)
    - Fill out comprehensive business information form
+   - **Upload business documents and images**
    - Submit application with business details, contact info, and description
 
 2. **Application Review**
@@ -101,15 +115,19 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 4. **Partner Dashboard Access**
    - Approved partners get access to `/partner/dashboard`
-   - Can manage restaurant information
-   - Access to menu management with categories and items
+   - Can manage restaurant information and upload images
+   - **Complete menu management with image uploads and bulk operations**
+   - **Category management with drag-and-drop ordering**
+   - **Menu item variants support (sizes, options)**
    - Order processing capabilities
+   - **Document management for business files**
 
 ### Application Requirements
 - Business name and type
 - Contact email and phone
 - Complete business address
 - Business description (optional)
+- **Business documentation upload capability**
 - Valid user account (must be logged in)
 
 ## Authentication System
@@ -129,9 +147,9 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 ### Access Levels
 - **Public**: Home page, location browsing, authentication pages
-- **Authenticated**: User profile, partner registration, courier requests
+- **Authenticated**: User profile, partner registration, courier requests, file uploads
 - **Admin**: Complete dashboard access, user management, partner approvals
-- **Partner**: Restaurant dashboard and management tools
+- **Partner**: Restaurant dashboard and management tools, menu management, file uploads
 
 ## Admin System
 
@@ -157,9 +175,50 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - Active drivers count
 - Total users registered
 
+## **File Storage & Upload System ✅**
+
+### **Complete Implementation**
+- **Multi-bucket Storage Architecture**: Separate buckets for different file types
+- **Universal File Upload Component**: Reusable FileUpload component with validation
+- **Image Management**: Restaurant images, menu item photos, user avatars
+- **Document Management**: Business documents, user files with preview and download
+- **Gallery System**: Multi-image galleries for restaurants and menu items
+- **Progress Tracking**: Upload progress indicators and status feedback
+
+### **Storage Buckets**
+- **menu-images**: Menu item photos (5MB limit, image formats)
+- **restaurant-images**: Restaurant photos, banners, galleries (10MB limit)
+- **avatars**: User profile pictures (2MB limit, optimized for profiles)
+- **documents**: Business and user documents (10MB limit, multiple formats)
+
+### **Upload Features**
+- **File Validation**: Size limits, type restrictions, format validation
+- **Progress Indicators**: Real-time upload progress tracking
+- **Image Previews**: Immediate preview for image uploads
+- **Document Management**: Organized document storage with metadata
+- **Bulk Upload Support**: Multiple file uploads with progress tracking
+- **Secure Deletion**: Automatic cleanup of replaced files
+
+### **Integration Points**
+- **Menu Management**: Image uploads for menu items and categories
+- **Restaurant Profiles**: Main images, banners, and photo galleries
+- **User Profiles**: Avatar uploads with automatic resizing
+- **Document Storage**: Business documents and user file management
+- **Admin Dashboard**: File management and storage analytics
+
 ## Current System Status
 
 ### Recently Implemented ✅
+- **Complete File Storage System**: Multi-bucket architecture with secure upload/download
+- **Enhanced Menu Management**: Full CRUD operations with image uploads and bulk operations
+- **Category Management**: Drag-and-drop ordering and bulk category operations
+- **Menu Item Variants**: Support for sizes, options, and price modifiers
+- **Image Gallery System**: Multi-image support for restaurants and menu items
+- **Document Management**: Business document storage with preview and download
+- **Profile Picture System**: Avatar uploads with automatic optimization
+- **Universal Upload Components**: Reusable file upload components across the system
+
+### Previously Implemented ✅
 - **Optimized Authentication Flow**: Eliminated UI flicker with cascaded loading states
 - **Session Storage Caching**: Reduced database calls for role checking
 - **Enhanced Admin Dashboard**: Real-time statistics and improved user management
@@ -173,6 +232,8 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - Partner registration system with approval workflow
 - Real-time admin dashboard with live statistics
 - Partner dashboard with restaurant management
+- **Complete menu management with image uploads and bulk operations**
+- **File storage and upload system with multiple bucket support**
 - Responsive design for mobile and desktop
 - Location browsing and search functionality
 - Courier request system
@@ -187,61 +248,45 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - `add_user_role()` - Add roles to user profiles
 - `remove_user_role()` - Remove roles with user fallback
 
-## Known Areas for Improvement
-
-### Code Organization
-- Several large files that could benefit from refactoring:
-  - `src/pages/PartnerDashboard.tsx` (354+ lines)
-  - `src/components/PartnerApplications.tsx` (334+ lines)
-  - `src/pages/PartnerRegister.tsx` (250+ lines)
-  - `src/pages/Index.tsx` (210+ lines)
-
-### Missing Features
-- Advanced menu item management for partners
-- Real-time order tracking system
-- Payment integration completion
-- Push notifications system
-- Advanced review and rating system
-- File storage/upload functionality
-
 ## Next Development Steps
 
 ### High Priority
-1. **Menu Management Enhancement**
-   - Complete menu item CRUD operations
-   - Image upload for menu items
-   - Category management improvements
-   - Bulk operations for menu management
-
-2. **Order System Completion**
+1. **Order System Completion**
    - Real-time order status updates
    - Order assignment to drivers
    - Customer order tracking interface
    - Restaurant order management dashboard
 
-3. **Code Refactoring**
-   - Break down large page components
-   - Create focused, reusable components
-   - Implement proper error boundaries
-
-### Medium Priority
-1. **Payment Integration**
+2. **Payment Integration**
    - Complete Stripe integration
    - Payment method management
    - Refund processing
    - Financial reporting
 
-2. **File Storage & Upload**
-   - Supabase Storage integration
-   - Image upload for restaurants and menu items
-   - Profile picture uploads
-   - Document management
+3. **Real-time Features**
+   - Live order tracking
+   - Real-time notifications
+   - Driver location tracking
+   - Chat system for support
 
-3. **Driver Management System**
+### Medium Priority
+1. **Advanced Analytics**
+   - Restaurant performance metrics
+   - Sales analytics and reporting
+   - Customer behavior insights
+   - Revenue optimization tools
+
+2. **Driver Management System**
    - Driver registration and onboarding
    - Vehicle and license verification
    - Route optimization
    - Real-time location tracking
+
+3. **Customer Experience**
+   - Advanced search and filtering
+   - Recommendation engine
+   - Loyalty program integration
+   - Review and rating system
 
 ## Development Setup
 
@@ -269,6 +314,7 @@ npm run dev
 - **Project ID**: c2a3f942-179e-4365-9b6b-198efba40e49
 - **Database**: PostgreSQL with comprehensive RLS policies
 - **Authentication**: Email/password with role-based access and session caching
+- **Storage**: Multiple buckets with secure upload policies
 - **Secrets**: Stripe integration configured
 
 ## Deployment
@@ -290,15 +336,31 @@ npm run dev
 src/
 ├── components/           # Reusable UI components
 │   ├── ui/              # shadcn/ui components
+│   ├── upload/          # File upload components
+│   ├── menu/            # Menu management components
 │   ├── user-management/ # User management components
 │   └── ...
 ├── contexts/            # React contexts (Auth, Translation)
-├── hooks/               # Custom React hooks
+├── hooks/               # Custom React hooks (including file upload)
 ├── integrations/        # External service integrations
 │   └── supabase/       # Supabase client and types
 ├── lib/                 # Utility functions
 ├── pages/               # Route components
 └── utils/               # Helper utilities
+```
+
+## File Upload Architecture
+
+```
+src/components/upload/
+├── FileUpload.tsx           # Universal file upload component
+├── ProfilePictureUpload.tsx # Avatar upload specialization
+├── RestaurantImageUpload.tsx # Restaurant image management
+├── DocumentUpload.tsx       # Document management system
+└── ImageGallery.tsx         # Multi-image gallery component
+
+src/hooks/
+└── useFileUpload.tsx        # File upload hook with validation
 ```
 
 ## Contributing
@@ -310,10 +372,13 @@ src/
 - Keep components small and focused (under 200 lines)
 - Use Tailwind CSS for styling
 - Follow shadcn/ui component patterns
+- **Create focused upload components for specific use cases**
+- **Implement proper file validation and error handling**
 
 ### Database Changes
 - All changes through SQL migrations
 - Use Row Level Security (RLS) for data protection
+- **Include storage bucket policies for file access**
 - Test policies thoroughly before deployment
 - Document schema changes in this README
 
@@ -321,12 +386,15 @@ src/
 - Implement session storage caching for frequently accessed data
 - Use cascaded loading states to prevent UI flicker
 - Optimize database queries and RLS policies
+- **Implement file compression and optimization**
+- **Use appropriate image formats and sizes**
 - Follow React best practices for state management
 
 ## Support & Documentation
 
 - [Lovable Documentation](https://docs.lovable.dev/)
 - [Supabase Documentation](https://supabase.com/docs)
+- [Supabase Storage Guide](https://supabase.com/docs/guides/storage)
 - [Project Discord](https://discord.com/channels/1119885301872070706/1280461670979993613)
 
 ## License
