@@ -2,13 +2,18 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Package } from "lucide-react";
-import { MenuItemForm } from "./menu/MenuItemForm";
-import { MenuItemCard } from "./menu/MenuItemCard";
+import { Plus, Package, Search, Filter } from "lucide-react";
+import { EnhancedMenuItemForm } from "./menu/EnhancedMenuItemForm";
+import { EnhancedMenuItemCard } from "./menu/EnhancedMenuItemCard";
+import { CategoryManager } from "./menu/CategoryManager";
+import { BulkOperations } from "./menu/BulkOperations";
 import { EmptyMenuState } from "./menu/EmptyMenuState";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MenuItem {
   id: string;
@@ -20,6 +25,9 @@ interface MenuItem {
   image_url: string;
   is_featured: boolean;
   preparation_time: number;
+  allergens: string[];
+  dietary_info: string[];
+  calories: number;
 }
 
 interface MenuCategory {
@@ -27,6 +35,7 @@ interface MenuCategory {
   name: string;
   description: string;
   display_order: number;
+  sort_order: number;
   is_active: boolean;
 }
 
@@ -41,6 +50,10 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
   const [loading, setLoading] = useState(true);
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     if (businessId) {
@@ -112,6 +125,24 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
     }
   };
 
+  const handleSelectionChange = (itemId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedItems([...selectedItems, itemId]);
+    } else {
+      setSelectedItems(selectedItems.filter(id => id !== itemId));
+    }
+  };
+
+  const filteredItems = menuItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === "all" || item.category_id === filterCategory || 
+                           (filterCategory === "uncategorized" && !item.category_id);
+    const matchesStatus = filterStatus === "all" || item.status === filterStatus;
+    
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
   if (loading) {
     return <div className="flex items-center justify-center p-8">Loading menu...</div>;
   }
@@ -133,13 +164,13 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
               Add Menu Item
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle>
                 {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
               </DialogTitle>
             </DialogHeader>
-            <MenuItemForm
+            <EnhancedMenuItemForm
               businessId={businessId}
               categories={categories}
               editingItem={editingItem}
@@ -150,20 +181,93 @@ export function MenuManagement({ businessId }: MenuManagementProps) {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {menuItems.map((item) => (
-          <MenuItemCard
-            key={item.id}
-            item={item}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      <Tabs defaultValue="items" className="w-full">
+        <TabsList>
+          <TabsTrigger value="items">Menu Items</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+        </TabsList>
 
-      {menuItems.length === 0 && (
-        <EmptyMenuState onAddItem={() => setIsAddingItem(true)} />
-      )}
+        <TabsContent value="items" className="space-y-4">
+          {/* Filters and Search */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search menu items..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="unavailable">Unavailable</SelectItem>
+                <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Bulk Operations */}
+          <BulkOperations
+            menuItems={filteredItems}
+            categories={categories}
+            selectedItems={selectedItems}
+            onItemsUpdated={fetchMenuData}
+            onSelectionChange={setSelectedItems}
+          />
+
+          {/* Menu Items Grid */}
+          <div className="grid gap-4">
+            {filteredItems.map((item) => (
+              <EnhancedMenuItemCard
+                key={item.id}
+                item={item}
+                isSelected={selectedItems.includes(item.id)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onSelectionChange={handleSelectionChange}
+              />
+            ))}
+          </div>
+
+          {filteredItems.length === 0 && menuItems.length === 0 && (
+            <EmptyMenuState onAddItem={() => setIsAddingItem(true)} />
+          )}
+
+          {filteredItems.length === 0 && menuItems.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No items match your current filters.</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="categories">
+          <CategoryManager
+            businessId={businessId}
+            categories={categories}
+            onCategoriesChange={fetchMenuData}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

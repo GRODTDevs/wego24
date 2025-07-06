@@ -63,6 +63,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           restaurant_id: string
+          sort_order: number | null
           updated_at: string | null
         }
         Insert: {
@@ -73,6 +74,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           restaurant_id: string
+          sort_order?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -83,6 +85,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           restaurant_id?: string
+          sort_order?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -91,6 +94,41 @@ export type Database = {
             columns: ["restaurant_id"]
             isOneToOne: false
             referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_item_variants: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          menu_item_id: string | null
+          name: string
+          price_modifier: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          menu_item_id?: string | null
+          name: string
+          price_modifier?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          menu_item_id?: string | null
+          name?: string
+          price_modifier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_variants_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
             referencedColumns: ["id"]
           },
         ]
