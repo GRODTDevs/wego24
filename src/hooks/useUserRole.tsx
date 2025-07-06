@@ -17,6 +17,15 @@ export const useUserRole = () => {
         return;
       }
 
+      // Check session storage first to avoid database calls
+      const cachedRole = sessionStorage.getItem(`user_role_${user.id}`);
+      if (cachedRole) {
+        console.log('Using cached role:', cachedRole);
+        setUserRole(cachedRole);
+        setLoading(false);
+        return;
+      }
+
       try {
         console.log('Fetching role for user:', user.id, user.email);
         
@@ -31,6 +40,7 @@ export const useUserRole = () => {
         if (error) {
           console.error('Error fetching user role:', error);
           setUserRole('user'); // Default to user role
+          sessionStorage.setItem(`user_role_${user.id}`, 'user');
         } else {
           // Safely handle the roles JSON data
           let roles: string[] = ['user']; // Default
@@ -48,17 +58,34 @@ export const useUserRole = () => {
           const isAdmin = roles.includes('admin');
           const primaryRole = isAdmin ? 'admin' : 'user';
           console.log('User roles:', roles, 'primary role:', primaryRole);
+          
           setUserRole(primaryRole);
+          // Cache the role in session storage
+          sessionStorage.setItem(`user_role_${user.id}`, primaryRole);
         }
       } catch (err) {
         console.error('Error in fetchUserRole:', err);
         setUserRole('user');
+        sessionStorage.setItem(`user_role_${user.id}`, 'user');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserRole();
+  }, [user]);
+
+  // Clear cache when user changes
+  useEffect(() => {
+    if (!user) {
+      // Clear all cached roles when user logs out
+      const keys = Object.keys(sessionStorage);
+      keys.forEach(key => {
+        if (key.startsWith('user_role_')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    }
   }, [user]);
 
   const isAdmin = userRole === 'admin';

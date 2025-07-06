@@ -12,24 +12,29 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
-  // Always show loading first - this completely prevents any content flashing
-  if (authLoading || roleLoading) {
+  // Single loading state for all checks - prevents any content flashing
+  const isLoading = authLoading || (user && roleLoading);
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  // Only after loading is complete, check authentication
+  // Only check authentication after loading is complete
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Only after loading is complete, check admin access
+  // Only check admin access after all loading is complete
   if (requireAdmin && !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-4">You need administrator privileges to access this page.</p>
