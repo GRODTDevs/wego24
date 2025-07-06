@@ -17,6 +17,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import PartnerRegister from "./pages/PartnerRegister";
 import PartnerDashboard from "./pages/PartnerDashboard";
+import PartnerInfo from "./pages/PartnerInfo";
 import LocationPage from "./pages/LocationPage";
 import CourierRequest from "./pages/CourierRequest";
 import CourierSuccess from "./pages/CourierSuccess";
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/courier-request" element={<CourierRequest />} />
                 <Route path="/courier-success" element={<CourierSuccess />} />
+                <Route path="/partner-info" element={<PartnerInfo />} />
                 <Route path="/partner-register" element={<PartnerRegister />} />
                 <Route path="/partner/dashboard" element={<PartnerDashboard />} />
                 <Route path="/restaurant/login" element={<RestaurantLogin />} />

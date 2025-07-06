@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { User, LogIn, LogOut, Truck, Building2, Search } from "lucide-react";
+import { User, LogIn, LogOut, Truck, Building2, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 
 type Location = Tables<"restaurants">;
@@ -185,15 +185,27 @@ const Index = () => {
             <p className="text-gray-600 text-lg mb-8 max-w-2xl">
               {t('home.partner.description')}
             </p>
-            <Link to="/partner-register">
-              <Button
-                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
-                type="button"
-              >
-                <Building2 className="w-5 h-5" />
-                {t('home.partner.button')}
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/partner-info">
+                <Button
+                  variant="outline"
+                  className="h-14 px-8 shadow-lg flex items-center gap-3 text-lg font-semibold"
+                  type="button"
+                >
+                  <Info className="w-5 h-5" />
+                  Learn More
+                </Button>
+              </Link>
+              <Link to="/partner-register">
+                <Button
+                  className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
+                  type="button"
+                >
+                  <Building2 className="w-5 h-5" />
+                  {t('home.partner.button')}
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
 
