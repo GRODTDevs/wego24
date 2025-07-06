@@ -75,6 +75,39 @@ const translations = {
         button: "Become a Partner"
       }
     },
+    dashboard: {
+      title: "Admin Dashboard",
+      stats: {
+        totalOrders: "Total Orders",
+        totalRevenue: "Total Revenue",
+        activeLocations: "Active Locations",
+        activeDrivers: "Active Drivers",
+        totalUsers: "Total Users",
+        fromLastMonth: "from last month",
+        newThisMonth: "new this month"
+      },
+      chart: {
+        title: "Monthly Revenue & Orders",
+        revenue: "Revenue",
+        orders: "Orders"
+      },
+      tabs: {
+        users: "Users",
+        locations: "Locations",
+        drivers: "Drivers",
+        commissions: "Commissions",
+        analytics: "Analytics",
+        admin: "Admin"
+      },
+      analytics: {
+        title: "Analytics Dashboard",
+        comingSoon: "Advanced analytics features are coming soon. Stay tuned for detailed insights and reports."
+      },
+      admin: {
+        title: "Admin Management",
+        description: "Create superuser accounts and manage admin privileges for your platform."
+      }
+    },
     partner: {
       register: {
         title: "Become a Partner",
@@ -222,6 +255,39 @@ const translations = {
         title: "Haz crecer tu negocio con nosotros",
         description: "Únete a nuestra plataforma y llega a más clientes. Aumenta tus ventas con nuestra red de entrega y haz crecer tu negocio hoy.",
         button: "Convertirse en Socio"
+      }
+    },
+    dashboard: {
+      title: "Panel de Administrador",
+      stats: {
+        totalOrders: "Pedidos Totales",
+        totalRevenue: "Ingresos Totales",
+        activeLocations: "Ubicaciones Activas",
+        activeDrivers: "Conductores Activos",
+        totalUsers: "Usuarios Totales",
+        fromLastMonth: "del mes pasado",
+        newThisMonth: "nuevos este mes"
+      },
+      chart: {
+        title: "Ingresos y Pedidos Mensuales",
+        revenue: "Ingresos",
+        orders: "Pedidos"
+      },
+      tabs: {
+        users: "Usuarios",
+        locations: "Ubicaciones",
+        drivers: "Conductores",
+        commissions: "Comisiones",
+        analytics: "Analytics",
+        admin: "Administrador"
+      },
+      analytics: {
+        title: "Panel de Analytics",
+        comingSoon: "Las funciones avanzadas de analytics estarán disponibles pronto. Mantente atento para obtener información detallada y reportes."
+      },
+      admin: {
+        title: "Gestión de Administrador",
+        description: "Crea cuentas de superusuario y gestiona privilegios de administrador para tu plataforma."
       }
     },
     partner: {
