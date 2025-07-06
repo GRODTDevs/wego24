@@ -16,7 +16,7 @@ const translations = {
   en: {
     nav: {
       home: "Home",
-      drivers: "Drivers",
+      drivers: "Drivers", 
       partners: "Partners",
       admin: "Admin",
     },
@@ -42,6 +42,9 @@ const translations = {
       emailVerification: "Email Verification",
       emailVerificationDescription: "We've sent a verification link to your email address. Please check your inbox and click on the link to verify your account.",
       emailVerificationButton: "Resend Verification Email",
+      registerSuccess: "Registration successful! Please check your email to verify your account.",
+      resetPasswordSuccess: "Password reset successful! You can now login with your new password.",
+      resetPasswordEmailSent: "Password reset email sent! Please check your inbox to reset your password.",
     },
     home: {
       welcome: "Welcome",
@@ -157,11 +160,6 @@ const translations = {
         welcome: "Welcome",
         signOut: "Sign Out",
       }
-    },
-    auth: {
-      registerSuccess: "Registration successful! Please check your email to verify your account.",
-      resetPasswordSuccess: "Password reset successful! You can now login with your new password.",
-      resetPasswordEmailSent: "Password reset email sent! Please check your inbox to reset your password.",
     }
   },
   es: {
@@ -175,7 +173,7 @@ const translations = {
       english: "Inglés",
       spanish: "Español",
     },
-     auth: {
+    auth: {
       login: "Iniciar Sesión",
       register: "Registrarse",
       logout: "Cerrar Sesión",
@@ -193,6 +191,9 @@ const translations = {
       emailVerification: "Verificación de Correo Electrónico",
       emailVerificationDescription: "Hemos enviado un enlace de verificación a tu dirección de correo electrónico. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta.",
       emailVerificationButton: "Reenviar Correo de Verificación",
+      registerSuccess: "¡Registro exitoso! Por favor, revisa tu correo electrónico para verificar tu cuenta.",
+      resetPasswordSuccess: "¡Contraseña restablecida con éxito! Ahora puedes iniciar sesión con tu nueva contraseña.",
+      resetPasswordEmailSent: "¡Correo electrónico de restablecimiento de contraseña enviado! Por favor, revisa tu bandeja de entrada para restablecer tu contraseña.",
     },
     home: {
       welcome: "Bienvenido",
@@ -308,11 +309,6 @@ const translations = {
         welcome: "Bienvenido",
         signOut: "Cerrar Sesión",
       }
-    },
-    auth: {
-      registerSuccess: "¡Registro exitoso! Por favor, revisa tu correo electrónico para verificar tu cuenta.",
-      resetPasswordSuccess: "¡Contraseña restablecida con éxito! Ahora puedes iniciar sesión con tu nueva contraseña.",
-      resetPasswordEmailSent: "¡Correo electrónico de restablecimiento de contraseña enviado! Por favor, revisa tu bandeja de entrada para restablecer tu contraseña.",
     }
   }
 };
