@@ -50,18 +50,20 @@ export function useUserManagement() {
         return;
       }
 
-      // First get all profiles
-      const { data: profilesData, error: profilesError } = await supabase
+      // Use a single query with joins to get accurate data in one go
+      const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          *,
+          user_roles!inner(role)
+        `)
         .order('created_at', { ascending: false });
 
-      console.log('Profiles data:', profilesData);
-      console.log('Profiles error:', profilesError);
+      console.log('Users query result:', usersData, usersError);
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        if (profilesError.code === '42501' || profilesError.message?.includes('permission')) {
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        if (usersError.code === '42501' || usersError.message?.includes('permission')) {
           toast({
             title: "Access Denied",
             description: "You don't have admin permissions to view users.",
@@ -70,7 +72,7 @@ export function useUserManagement() {
         } else {
           toast({
             title: "Error",
-            description: "Failed to fetch users: " + profilesError.message,
+            description: "Failed to fetch users: " + usersError.message,
             variant: "destructive"
           });
         }
@@ -78,33 +80,17 @@ export function useUserManagement() {
         return;
       }
 
-      // Then get all user roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*');
-
-      console.log('Roles data:', rolesData);
-      console.log('Roles error:', rolesError);
-
-      if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
-      }
-
-      // Combine the data manually
-      const transformedUsers = profilesData?.map(profile => {
-        const userRole = rolesData?.find(role => role.user_id === profile.id);
-        
-        return {
-          id: profile.id,
-          email: profile.email || '',
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
-          phone: profile.phone || '',
-          role: (userRole?.role || 'user') as "admin" | "user",
-          created_at: profile.created_at,
-          is_active: profile.is_active ?? true
-        };
-      }) || [];
+      // Transform the joined data
+      const transformedUsers = usersData?.map(user => ({
+        id: user.id,
+        email: user.email || '',
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        phone: user.phone || '',
+        role: (user.user_roles?.role || 'user') as "admin" | "user",
+        created_at: user.created_at,
+        is_active: user.is_active ?? true
+      })) || [];
 
       console.log('Transformed users:', transformedUsers);
       setUsers(transformedUsers);
@@ -194,10 +180,8 @@ export function useUserManagement() {
       setIsDialogOpen(false);
       setEditingUser(null);
       
-      // Wait a moment before refreshing to ensure database changes are committed
-      setTimeout(() => {
-        fetchUsers();
-      }, 500);
+      // Force a fresh fetch to ensure we get the latest data
+      await fetchUsers();
       
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -228,10 +212,8 @@ export function useUserManagement() {
         description: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
       });
       
-      // Wait a moment before refreshing
-      setTimeout(() => {
-        fetchUsers();
-      }, 300);
+      // Force a fresh fetch
+      await fetchUsers();
       
     } catch (error: any) {
       console.error('Error updating user status:', error);
