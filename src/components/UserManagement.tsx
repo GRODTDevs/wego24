@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function UserManagement() {
   const { user } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, loading: roleLoading, userRole } = useUserRole();
   const {
     users,
     loading,
@@ -28,6 +28,8 @@ export function UserManagement() {
     toggleUserStatus,
     fetchUsers
   } = useUserManagement();
+
+  console.log('UserManagement render - user:', user?.email, 'isAdmin:', isAdmin, 'userRole:', userRole, 'roleLoading:', roleLoading);
 
   if (roleLoading) {
     return (
@@ -55,6 +57,9 @@ export function UserManagement() {
               </p>
               <p className="text-sm text-gray-500">
                 Current user: {user?.email}
+              </p>
+              <p className="text-sm text-gray-500">
+                Current role: {userRole || 'none'}
               </p>
             </div>
           </CardContent>
