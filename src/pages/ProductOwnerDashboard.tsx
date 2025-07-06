@@ -1,9 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { UserManagement } from "@/components/UserManagement";
 import { LocationManagement } from "@/components/LocationManagement";
 import { DriverManagement } from "@/components/DriverManagement";
@@ -15,26 +14,78 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { formatCurrency } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
 
-const mockStats = {
-  totalOrders: 1245,
-  totalRevenue: 45670,
-  activeLocations: 28,
-  activeDrivers: 15,
-  totalUsers: 523
-};
-
-const mockOrderData = [
-  { month: "Jan", orders: 120, revenue: 3400 },
-  { month: "Feb", orders: 150, revenue: 4200 },
-  { month: "Mar", orders: 180, revenue: 5100 },
-  { month: "Apr", orders: 220, revenue: 6200 },
-  { month: "May", orders: 250, revenue: 7100 },
-  { month: "Jun", orders: 280, revenue: 8000 }
-];
+interface DashboardStats {
+  totalOrders: number;
+  totalRevenue: number;
+  activeLocations: number;
+  activeDrivers: number;
+  totalUsers: number;
+}
 
 export default function ProductOwnerDashboard() {
   const { t } = useTranslation();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalOrders: 0,
+    totalRevenue: 0,
+    activeLocations: 0,
+    activeDrivers: 0,
+    totalUsers: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch total orders
+        const { count: ordersCount } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true });
+
+        // Fetch total revenue
+        const { data: revenueData } = await supabase
+          .from('orders')
+          .select('total_amount')
+          .eq('payment_status', 'completed');
+
+        const totalRevenue = revenueData?.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0) || 0;
+
+        // Fetch active restaurants
+        const { count: restaurantsCount } = await supabase
+          .from('restaurants')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'active');
+
+        // Fetch active drivers
+        const { count: driversCount } = await supabase
+          .from('drivers')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+
+        // Fetch total users
+        const { count: usersCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+
+        setStats({
+          totalOrders: ordersCount || 0,
+          totalRevenue,
+          activeLocations: restaurantsCount || 0,
+          activeDrivers: driversCount || 0,
+          totalUsers: usersCount || 0
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -51,8 +102,11 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalOrders')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.totalOrders.toLocaleString()}</div>
-                  <Badge variant="secondary" className="mt-1">+12% {t('dashboard.stats.fromLastMonth')}</Badge>
+                  {loading ? (
+                    <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalOrders.toLocaleString()}</div>
+                  )}
                 </CardContent>
               </Card>
               
@@ -61,8 +115,11 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(mockStats.totalRevenue)}</div>
-                  <Badge variant="secondary" className="mt-1">+8% {t('dashboard.stats.fromLastMonth')}</Badge>
+                  {loading ? (
+                    <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
+                  ) : (
+                    <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+                  )}
                 </CardContent>
               </Card>
               
@@ -71,8 +128,11 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeLocations')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.activeLocations}</div>
-                  <Badge variant="secondary" className="mt-1">+3 {t('dashboard.stats.newThisMonth')}</Badge>
+                  {loading ? (
+                    <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.activeLocations}</div>
+                  )}
                 </CardContent>
               </Card>
               
@@ -81,8 +141,11 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeDrivers')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.activeDrivers}</div>
-                  <Badge variant="secondary" className="mt-1">+2 {t('dashboard.stats.newThisMonth')}</Badge>
+                  {loading ? (
+                    <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.activeDrivers}</div>
+                  )}
                 </CardContent>
               </Card>
               
@@ -91,35 +154,14 @@ export default function ProductOwnerDashboard() {
                   <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalUsers')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.totalUsers}</div>
-                  <Badge variant="secondary" className="mt-1">+45 {t('dashboard.stats.newThisMonth')}</Badge>
+                  {loading ? (
+                    <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-
-            {/* Revenue Chart */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>{t('dashboard.chart.title')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={mockOrderData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value, name) => [
-                        name === 'revenue' ? formatCurrency(Number(value)) : value,
-                        name === 'revenue' ? t('dashboard.chart.revenue') : t('dashboard.chart.orders')
-                      ]}
-                    />
-                    <Bar dataKey="revenue" fill="#8884d8" name={t('dashboard.chart.revenue')} />
-                    <Bar dataKey="orders" fill="#82ca9d" name={t('dashboard.chart.orders')} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
 
             {/* Management Tabs */}
             <Tabs defaultValue="users" className="space-y-6">

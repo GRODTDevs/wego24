@@ -31,7 +31,8 @@ export function UserManagement() {
 
   console.log('UserManagement render - user:', user?.email, 'isAdmin:', isAdmin, 'userRole:', userRole, 'roleLoading:', roleLoading);
 
-  if (roleLoading) {
+  // Show loading while checking authentication and role
+  if (roleLoading || !user) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -43,7 +44,7 @@ export function UserManagement() {
     );
   }
 
-  // Show admin setup if user is not admin
+  // Show admin setup if user is not admin (no flash of access denied)
   if (!isAdmin) {
     return (
       <div className="space-y-6">
@@ -69,6 +70,7 @@ export function UserManagement() {
     );
   }
 
+  // Show loading while fetching users
   if (loading) {
     return (
       <Card>
