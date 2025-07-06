@@ -19,18 +19,16 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
     );
   }
 
-  // Only redirect to auth if we're sure there's no user after loading is complete
-  if (!authLoading && !user) {
+  // Redirect to auth if no user
+  if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Only show access denied if we're sure the user exists but lacks admin privileges
-  // This check only happens after both auth and role loading are complete
-  if (!authLoading && !roleLoading && user && requireAdmin && !isAdmin) {
+  // Simple admin check - if admin required and user is not admin, show access denied
+  if (requireAdmin && !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
