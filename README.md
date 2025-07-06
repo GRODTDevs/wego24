@@ -5,7 +5,7 @@
 
 WeGo is a comprehensive delivery and service platform built with React, TypeScript, and Supabase. The platform connects customers, restaurant partners, and delivery drivers in a seamless ecosystem for food delivery and courier services.
 
-**Live URL**: https://lovable.dev/projects/c2a3f942-179e-4365-9b6b-198efba40e49
+**Live URL**: https://wego24.es
 
 ## System Architecture
 
