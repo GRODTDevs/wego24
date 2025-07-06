@@ -27,7 +27,7 @@ export function InfoModal() {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-red-700">
-            Welcome to the ToGoo Demo
+            Welcome to the WeGo Demo
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
