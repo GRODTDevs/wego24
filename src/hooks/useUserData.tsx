@@ -62,7 +62,19 @@ export function useUserData() {
 
       // Transform the data with role information from the JSON roles column
       const transformedUsers = profilesData?.map(profile => {
-        const userRoles = profile.roles || ['user'];
+        // Safely handle the roles JSON data
+        let userRoles: string[] = ['user']; // Default
+        try {
+          if (profile.roles && Array.isArray(profile.roles)) {
+            userRoles = profile.roles as string[];
+          } else if (typeof profile.roles === 'string') {
+            userRoles = JSON.parse(profile.roles);
+          }
+        } catch (error) {
+          console.warn('Error parsing roles for user:', profile.email, error);
+          userRoles = ['user'];
+        }
+        
         const isAdmin = userRoles.includes('admin');
         const primaryRole = isAdmin ? 'admin' : 'user';
         

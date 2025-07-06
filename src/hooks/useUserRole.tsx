@@ -32,7 +32,19 @@ export const useUserRole = () => {
           console.error('Error fetching user role:', error);
           setUserRole('user'); // Default to user role
         } else {
-          const roles = data?.roles || ['user'];
+          // Safely handle the roles JSON data
+          let roles: string[] = ['user']; // Default
+          try {
+            if (data?.roles && Array.isArray(data.roles)) {
+              roles = data.roles as string[];
+            } else if (typeof data?.roles === 'string') {
+              roles = JSON.parse(data.roles);
+            }
+          } catch (parseError) {
+            console.warn('Error parsing roles:', parseError);
+            roles = ['user'];
+          }
+          
           const isAdmin = roles.includes('admin');
           const primaryRole = isAdmin ? 'admin' : 'user';
           console.log('User roles:', roles, 'primary role:', primaryRole);
