@@ -65,7 +65,7 @@ export function UserManagement() {
             </div>
           </CardContent>
         </Card>
-        <AdminSetup />
+        <AdminSetup onUserUpdated={fetchUsers} />
       </div>
     );
   }

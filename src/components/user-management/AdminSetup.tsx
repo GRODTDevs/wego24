@@ -6,7 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-export function AdminSetup() {
+interface AdminSetupProps {
+  onUserUpdated?: () => void;
+}
+
+export function AdminSetup({ onUserUpdated }: AdminSetupProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -38,12 +42,21 @@ export function AdminSetup() {
         title: "Success",
         description: `User ${email} has been granted admin privileges`,
       });
+      
       setEmail("");
-    } catch (error) {
+      
+      // Trigger refresh of user list if callback provided
+      if (onUserUpdated) {
+        setTimeout(() => {
+          onUserUpdated();
+        }, 500);
+      }
+      
+    } catch (error: any) {
       console.error('Error in makeUserAdmin:', error);
       toast({
         title: "Error",
-        description: "Failed to grant admin privileges. Make sure the user exists.",
+        description: error.message || "Failed to grant admin privileges. Make sure the user exists.",
         variant: "destructive"
       });
     } finally {

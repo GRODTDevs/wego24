@@ -53,7 +53,8 @@ export function useUserManagement() {
       // First get all profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
 
       console.log('Profiles data:', profilesData);
       console.log('Profiles error:', profilesError);
@@ -149,37 +150,51 @@ export function useUserManagement() {
         })
         .eq('id', editingUser.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
 
       // Handle role change if necessary
       if (userForm.role !== editingUser.role) {
-        // First, delete existing role
-        const { error: deleteError } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', editingUser.id);
-
-        if (deleteError) throw deleteError;
-
-        // Then insert new role
+        console.log('Role change detected:', editingUser.role, '->', userForm.role);
+        
+        // Use upsert to handle role changes more reliably
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert({
+          .upsert({
             user_id: editingUser.id,
             role: userForm.role
+          }, {
+            onConflict: 'user_id'
           });
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error('Role update error:', roleError);
+          throw roleError;
+        }
+
+        console.log('Role updated successfully');
       }
 
-      toast({ title: "User updated successfully" });
+      toast({ 
+        title: "Success",
+        description: "User updated successfully" 
+      });
+      
       setIsDialogOpen(false);
-      fetchUsers();
-    } catch (error) {
+      setEditingUser(null);
+      
+      // Wait a moment before refreshing to ensure database changes are committed
+      setTimeout(() => {
+        fetchUsers();
+      }, 500);
+      
+    } catch (error: any) {
       console.error('Error updating user:', error);
       toast({
         title: "Error",
-        description: "Failed to update user",
+        description: error.message || "Failed to update user",
         variant: "destructive"
       });
     }
@@ -187,22 +202,33 @@ export function useUserManagement() {
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
+      console.log('Toggling user status:', userId, currentStatus);
+      
       const { error } = await supabase
         .from('profiles')
         .update({ is_active: !currentStatus })
         .eq('id', userId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Status update error:', error);
+        throw error;
+      }
 
       toast({ 
-        title: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
+        title: "Success",
+        description: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully` 
       });
-      fetchUsers();
-    } catch (error) {
+      
+      // Wait a moment before refreshing
+      setTimeout(() => {
+        fetchUsers();
+      }, 300);
+      
+    } catch (error: any) {
       console.error('Error updating user status:', error);
       toast({
         title: "Error",
-        description: "Failed to update user status",
+        description: error.message || "Failed to update user status",
         variant: "destructive"
       });
     }
