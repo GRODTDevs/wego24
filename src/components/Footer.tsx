@@ -10,8 +10,8 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img 
-              src="/lovable-uploads/873dc4b0-6899-44a9-bba8-9a323fa0550d.png" 
-              alt="ToGoo Logo" 
+              src="/lovable-uploads/999acc8c-4528-415a-85a4-1de255e2fce5.png" 
+              alt="WeGo Logo" 
               className="h-8 w-auto"
             />
             <span className="text-xs font-semibold text-red-500 italic tracking-widest uppercase bg-red-50 px-2 py-1 rounded">Beta</span>

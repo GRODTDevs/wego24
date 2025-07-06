@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
@@ -178,11 +177,40 @@ const translations = {
     'courierSuccess.bookAnother': 'Book Another Courier',
     
     // Footer
-    'footer.rights': '© 2024 ToGoo. All rights reserved.',
+    'footer.rights': '© 2024 WeGo. All rights reserved.',
     
     // Language Switcher
     'language.english': 'English',
     'language.spanish': 'Español',
+    
+    // Partner Registration
+    'partner.register.title': 'Become a Partner',
+    'partner.register.subtitle': 'Join our platform and start growing your business with us. Fill out the application below and we\'ll review it within 2-3 business days.',
+    'partner.register.form.title': 'Partner Application',
+    'partner.register.businessName': 'Business Name',
+    'partner.register.businessNamePlaceholder': 'Your business name',
+    'partner.register.businessType': 'Business Type',
+    'partner.register.selectBusinessType': 'Select business type',
+    'partner.register.contactEmail': 'Contact Email',
+    'partner.register.contactEmailPlaceholder': 'contact@business.com',
+    'partner.register.phoneNumber': 'Phone Number',
+    'partner.register.phoneNumberPlaceholder': '+1 (555) 123-4567',
+    'partner.register.businessAddress': 'Business Address',
+    'partner.register.businessAddressPlaceholder': '123 Main Street',
+    'partner.register.city': 'City',
+    'partner.register.cityPlaceholder': 'City name',
+    'partner.register.postalCode': 'Postal Code',
+    'partner.register.postalCodePlaceholder': '12345',
+    'partner.register.businessDescription': 'Business Description',
+    'partner.register.businessDescriptionPlaceholder': 'Tell us about your business, what you offer, and why you\'d like to partner with us...',
+    'partner.register.nextSteps': 'What happens next?',
+    'partner.register.step1': '• Our team will review your application within 2-3 business days',
+    'partner.register.step2': '• If approved, you\'ll receive access to your partner dashboard',
+    'partner.register.step3': '• You can then add products, set prices, and manage your business',
+    'partner.register.step4': '• We\'ll help you get started with onboarding support',
+    'partner.register.submit': 'Submit Partner Application',
+    'partner.register.submitting': 'Submitting Application...',
+    'partner.register.required': '*',
   },
   es: {
     // Header
@@ -350,11 +378,40 @@ const translations = {
     'courierSuccess.bookAnother': 'Reservar Otro Mensajero',
     
     // Footer
-    'footer.rights': '© 2024 ToGoo. Todos los derechos reservados.',
+    'footer.rights': '© 2024 WeGo. Todos los derechos reservados.',
     
     // Language Switcher
     'language.english': 'English',
     'language.spanish': 'Español',
+    
+    // Partner Registration Spanish
+    'partner.register.title': 'Conviértete en Socio',
+    'partner.register.subtitle': 'Únete a nuestra plataforma y comienza a hacer crecer tu negocio con nosotros. Completa la aplicación a continuación y la revisaremos en 2-3 días hábiles.',
+    'partner.register.form.title': 'Aplicación de Socio',
+    'partner.register.businessName': 'Nombre del Negocio',
+    'partner.register.businessNamePlaceholder': 'El nombre de tu negocio',
+    'partner.register.businessType': 'Tipo de Negocio',
+    'partner.register.selectBusinessType': 'Seleccionar tipo de negocio',
+    'partner.register.contactEmail': 'Correo de Contacto',
+    'partner.register.contactEmailPlaceholder': 'contacto@negocio.com',
+    'partner.register.phoneNumber': 'Número de Teléfono',
+    'partner.register.phoneNumberPlaceholder': '+34 (555) 123-4567',
+    'partner.register.businessAddress': 'Dirección del Negocio',
+    'partner.register.businessAddressPlaceholder': 'Calle Principal 123',
+    'partner.register.city': 'Ciudad',
+    'partner.register.cityPlaceholder': 'Nombre de la ciudad',
+    'partner.register.postalCode': 'Código Postal',
+    'partner.register.postalCodePlaceholder': '12345',
+    'partner.register.businessDescription': 'Descripción del Negocio',
+    'partner.register.businessDescriptionPlaceholder': 'Cuéntanos sobre tu negocio, qué ofreces y por qué te gustaría asociarte con nosotros...',
+    'partner.register.nextSteps': '¿Qué sigue?',
+    'partner.register.step1': '• Nuestro equipo revisará tu aplicación en 2-3 días hábiles',
+    'partner.register.step2': '• Si es aprobada, recibirás acceso a tu panel de socio',
+    'partner.register.step3': '• Entonces podrás agregar productos, establecer precios y gestionar tu negocio',
+    'partner.register.step4': '• Te ayudaremos a comenzar con soporte de incorporación',
+    'partner.register.submit': 'Enviar Aplicación de Socio',
+    'partner.register.submitting': 'Enviando Aplicación...',
+    'partner.register.required': '*',
   }
 };
 
