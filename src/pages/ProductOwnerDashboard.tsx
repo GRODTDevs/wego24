@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +9,7 @@ import { LocationManagement } from "@/components/LocationManagement";
 import { DriverManagement } from "@/components/DriverManagement";
 import { CommissionManagement } from "@/components/CommissionManagement";
 import { SuperuserCreation } from "@/components/SuperuserCreation";
+import { PartnerApplications } from "@/components/PartnerApplications";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -121,9 +123,10 @@ export default function ProductOwnerDashboard() {
 
             {/* Management Tabs */}
             <Tabs defaultValue="users" className="space-y-6">
-              <TabsList className="grid grid-cols-6 w-full">
+              <TabsList className="grid grid-cols-7 w-full">
                 <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
                 <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
+                <TabsTrigger value="partners">Partners</TabsTrigger>
                 <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
                 <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
                 <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
@@ -136,6 +139,10 @@ export default function ProductOwnerDashboard() {
 
               <TabsContent value="locations">
                 <LocationManagement />
+              </TabsContent>
+
+              <TabsContent value="partners">
+                <PartnerApplications />
               </TabsContent>
 
               <TabsContent value="drivers">

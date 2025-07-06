@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LocationCard } from "@/components/LocationCard";
@@ -10,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { User, LogIn, LogOut, Truck } from "lucide-react";
+import { User, LogIn, LogOut, Truck, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Location = Tables<"restaurants">;
@@ -122,7 +123,7 @@ const Index = () => {
                 {t('home.searchButton')}
               </Button>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Link to="/courier-request">
                 <Button
                   className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
@@ -130,6 +131,15 @@ const Index = () => {
                 >
                   <Truck className="w-4 h-4" />
                   {t('home.getCourier')}
+                </Button>
+              </Link>
+              <Link to="/partner-register">
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
+                  type="button"
+                >
+                  <Building2 className="w-4 h-4" />
+                  Become a Partner
                 </Button>
               </Link>
             </div>

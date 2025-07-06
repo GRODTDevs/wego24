@@ -122,6 +122,63 @@ export type Database = {
           },
         ]
       }
+      partner_applications: {
+        Row: {
+          address: string
+          business_name: string
+          business_type: string
+          city: string
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          phone: string | null
+          postal_code: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          business_name: string
+          business_type: string
+          city: string
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          phone?: string | null
+          postal_code?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          business_name?: string
+          business_type?: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          phone?: string | null
+          postal_code?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -285,6 +342,7 @@ export type Database = {
       restaurants: {
         Row: {
           address: string
+          application_id: string | null
           banner_url: string | null
           city: string
           commission_rate: number | null
@@ -312,6 +370,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          application_id?: string | null
           banner_url?: string | null
           city: string
           commission_rate?: number | null
@@ -339,6 +398,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          application_id?: string | null
           banner_url?: string | null
           city?: string
           commission_rate?: number | null
@@ -364,7 +424,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["restaurant_status"] | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "partner_applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -392,6 +460,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_restaurant_from_application: {
+        Args: { application_id: string }
+        Returns: string
+      }
       create_superuser: {
         Args: { user_email: string }
         Returns: undefined

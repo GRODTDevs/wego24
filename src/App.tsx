@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,8 @@ import RestaurantDashboard from "./pages/RestaurantDashboard";
 import DriverLogin from "./pages/DriverLogin";
 import DriverDashboard from "./pages/DriverDashboard";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
+import PartnerRegister from "./pages/PartnerRegister";
+import PartnerDashboard from "./pages/PartnerDashboard";
 import LocationPage from "./pages/LocationPage";
 import CourierRequest from "./pages/CourierRequest";
 import CourierSuccess from "./pages/CourierSuccess";
@@ -41,6 +44,8 @@ function App() {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/courier-request" element={<CourierRequest />} />
                 <Route path="/courier-success" element={<CourierSuccess />} />
+                <Route path="/partner-register" element={<PartnerRegister />} />
+                <Route path="/partner/dashboard" element={<PartnerDashboard />} />
                 <Route path="/restaurant/login" element={<RestaurantLogin />} />
                 <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
                 <Route path="/location/:name" element={<LocationPage />} />
