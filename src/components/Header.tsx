@@ -13,7 +13,7 @@ export function Header() {
           <img 
             src="/lovable-uploads/999acc8c-4528-415a-85a4-1de255e2fce5.png" 
             alt="WeGo Logo" 
-            className="h-10 w-auto"
+            className="h-10 w-auto rounded-lg"
           />
         </div>
         <nav className="hidden md:flex items-center gap-6">
