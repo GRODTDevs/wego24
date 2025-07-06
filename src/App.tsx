@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { TranslationProvider } from "@/contexts/TranslationContext";
+import { DeveloperProtectedRoute } from "@/components/DeveloperProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -21,6 +22,7 @@ import PartnerInfo from "./pages/PartnerInfo";
 import LocationPage from "./pages/LocationPage";
 import CourierRequest from "./pages/CourierRequest";
 import CourierSuccess from "./pages/CourierSuccess";
+import DeveloperLogin from "./pages/DeveloperLogin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,21 +43,78 @@ function App() {
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/courier-request" element={<CourierRequest />} />
-                <Route path="/courier-success" element={<CourierSuccess />} />
-                <Route path="/partner-info" element={<PartnerInfo />} />
-                <Route path="/partner-register" element={<PartnerRegister />} />
-                <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-                <Route path="/restaurant/login" element={<RestaurantLogin />} />
-                <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-                <Route path="/location/:name" element={<LocationPage />} />
-                <Route path="/driver/login" element={<DriverLogin />} />
-                <Route path="/driver/dashboard" element={<DriverDashboard />} />
-                <Route path="/admin/dashboard" element={<ProductOwnerDashboard />} />
+                <Route path="/dev-login" element={<DeveloperLogin />} />
+                <Route path="/" element={
+                  <DeveloperProtectedRoute>
+                    <Index />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/auth" element={
+                  <DeveloperProtectedRoute>
+                    <Auth />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/courier-request" element={
+                  <DeveloperProtectedRoute>
+                    <CourierRequest />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/courier-success" element={
+                  <DeveloperProtectedRoute>
+                    <CourierSuccess />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/partner-info" element={
+                  <DeveloperProtectedRoute>
+                    <PartnerInfo />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/partner-register" element={
+                  <DeveloperProtectedRoute>
+                    <PartnerRegister />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/partner/dashboard" element={
+                  <DeveloperProtectedRoute>
+                    <PartnerDashboard />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/restaurant/login" element={
+                  <DeveloperProtectedRoute>
+                    <RestaurantLogin />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/restaurant/dashboard" element={
+                  <DeveloperProtectedRoute>
+                    <RestaurantDashboard />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/location/:name" element={
+                  <DeveloperProtectedRoute>
+                    <LocationPage />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/driver/login" element={
+                  <DeveloperProtectedRoute>
+                    <DriverLogin />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/driver/dashboard" element={
+                  <DeveloperProtectedRoute>
+                    <DriverDashboard />
+                  </DeveloperProtectedRoute>
+                } />
+                <Route path="/admin/dashboard" element={
+                  <DeveloperProtectedRoute>
+                    <ProductOwnerDashboard />
+                  </DeveloperProtectedRoute>
+                } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+                <Route path="*" element={
+                  <DeveloperProtectedRoute>
+                    <NotFound />
+                  </DeveloperProtectedRoute>
+                } />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
