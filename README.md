@@ -7,6 +7,162 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 **Live URL**: https://wego24.es
 
+## Business Plan Scope
+
+### Executive Summary
+WeGo is a next-generation delivery platform tailored for under-served communities in Andalusia, Spain, starting with Frigiliana and Torrox. Unlike major competitors (Glovo, UberEats, Deliveroo) that focus on urban centers, WeGo is purpose-built to reach campo areas (rural countryside zones) where delivery infrastructure is nonexistent.
+
+### Dual Revenue Model
+1. **Food Delivery Service** - On-demand food ordering with €2.50 base fee + €0.99/km
+2. **Parcel Subscription Service** - Monthly plans (€15-€55) for regular parcel delivery to campo areas
+
+### Key Business Metrics (Phase 1: 150 active clients)
+- **Target**: 50 orders/day × 30 days = 1,500 monthly orders
+- **Average Order Value**: €9.50
+- **Revenue per Order**: ~€7 (delivery fee + restaurant markup)
+- **Monthly Net Profit**: €6,900 (combined streams)
+- **Annual Projection**: €82,800
+
+### Market Positioning
+- **First-mover advantage** in campo delivery zones
+- **Underserved market**: Elderly residents, expats, remote workers
+- **Unique value proposition**: "You don't need to go. WeGo."
+- **Competition-free zones** in rural Andalusia
+
+### Growth Timeline
+- **Q3 2025**: Launch in Frigiliana + Torrox
+- **Q4 2025**: Expand to Nerja, Maro, Cómpeta
+- **2026**: Transition to Sociedad Limitada (SL) + scale driver network
+- **2027-2028**: 500+ subscribers, expand across Andalusia
+- **2029-2030**: Franchise model or acquisition opportunity
+
+## Technical Implementation Gaps & Required Features
+
+### Critical Missing Features
+
+#### 1. **Real-Time Order Management System**
+- **Status**: ❌ Not Implemented
+- **Required**: Live order status updates (pending → confirmed → preparing → out for delivery → delivered)
+- **Components Needed**: 
+  - Real-time order tracking dashboard
+  - Driver assignment system
+  - Customer notification system
+  - Restaurant order management interface
+
+#### 2. **Advanced Payment Integration**
+- **Status**: ⚠️ Partially Implemented
+- **Required**: 
+  - Stripe payment processing with Spanish banking support
+  - Subscription billing automation for parcel services
+  - Refund and chargeback handling
+  - Multi-currency support (EUR primary)
+- **Missing**: Payment method management, recurring billing
+
+#### 3. **Geolocation & Route Optimization**
+- **Status**: ❌ Not Implemented
+- **Required**:
+  - GPS tracking for drivers in campo areas
+  - Route optimization for rural delivery zones
+  - Distance calculation for dynamic pricing (€0.99/km)
+  - Offline map support for poor connectivity areas
+
+#### 4. **Driver Management System**
+- **Status**: ⚠️ Basic Implementation
+- **Required**:
+  - Driver onboarding and verification
+  - Commission tracking and payout system
+  - Performance analytics and ratings
+  - Vehicle registration and insurance tracking
+  - Real-time availability management
+
+#### 5. **Subscription Management Platform**
+- **Status**: ❌ Not Implemented
+- **Required**:
+  - Parcel subscription tiers (Basic €15, Standard €22, Extended €35, Unlimited €55)
+  - Automated billing cycles
+  - Delivery quota tracking
+  - Subscription pause/resume functionality
+  - Customer self-service portal
+
+#### 6. **Multi-Language Support Enhancement**
+- **Status**: ✅ Basic Implementation
+- **Required Enhancement**:
+  - Spanish/English/Romanian support for diverse customer base
+  - Dynamic language switching
+  - Localized content management
+  - Cultural adaptation for rural Spanish communities
+
+#### 7. **Rural-Specific Features**
+- **Status**: ❌ Not Implemented
+- **Required**:
+  - Campo address validation and mapping
+  - Custom delivery instructions for rural properties
+  - Offline-first mobile app for poor connectivity
+  - SMS notifications as backup to app notifications
+  - Paper-based order confirmation system
+
+#### 8. **Business Intelligence & Analytics**
+- **Status**: ⚠️ Basic Implementation
+- **Required**:
+  - Revenue tracking by service type
+  - Customer lifetime value analysis
+  - Route efficiency analytics
+  - Seasonal demand forecasting
+  - Expansion opportunity identification
+
+#### 9. **Restaurant Partner Management**
+- **Status**: ⚠️ Basic Implementation
+- **Required Enhancement**:
+  - 20% markup system integration
+  - Restaurant dashboard for order management
+  - Menu synchronization tools
+  - Commission-free onboarding process
+  - Performance analytics for partners
+
+#### 10. **Legal & Compliance System**
+- **Status**: ❌ Not Implemented
+- **Required**:
+  - GDPR compliance for Spanish market
+  - Spanish tax system integration (IVA/VAT)
+  - Autónomo to SL transition support
+  - Driver contract management
+  - Insurance and liability tracking
+
+### Technical Architecture Requirements
+
+#### Database Enhancements Needed
+```sql
+-- Additional tables required for business plan implementation
+- subscription_plans (pricing tiers, features)
+- delivery_routes (campo-specific routing)
+- payment_subscriptions (recurring billing)
+- driver_commissions (payout tracking)
+- business_metrics (KPI tracking)
+- rural_addresses (campo address validation)
+```
+
+#### API Integrations Required
+- **Spanish Payment Providers** (Redsys, BBVA, Santander)
+- **Mapping Services** (Google Maps with rural Spain focus)
+- **SMS Gateway** (for rural connectivity backup)
+- **Spanish Tax System** (AEAT integration for invoicing)
+- **Weather Services** (for delivery planning in rural areas)
+
+#### Performance Considerations
+- **Offline Capability** for areas with poor internet
+- **Mobile-First Design** for campo residents
+- **Low-Bandwidth Optimization** for rural connections
+- **Multi-Device Sync** for shared family accounts
+
+### Deployment & Infrastructure
+
+#### Production Requirements
+- **CDN Setup** for Spanish market
+- **Spanish Data Residency** compliance
+- **Backup Systems** for rural service reliability
+- **Monitoring & Alerting** for campo delivery zones
+- **Scalability Planning** for Andalusia expansion
+
 ## System Architecture
 
 ### Frontend Technologies
@@ -250,43 +406,70 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 
 ## Next Development Steps
 
-### High Priority
-1. **Order System Completion**
-   - Real-time order status updates
-   - Order assignment to drivers
-   - Customer order tracking interface
-   - Restaurant order management dashboard
+### High Priority - Business Plan Critical Features
+1. **Real-Time Order Management System**
+   - Live order status tracking (pending → confirmed → preparing → delivered)
+   - Driver assignment and dispatch system
+   - Customer notification system (SMS + Push)
+   - Restaurant order processing dashboard
 
-2. **Payment Integration**
-   - Complete Stripe integration
-   - Payment method management
-   - Refund processing
-   - Financial reporting
+2. **Subscription Billing System**
+   - Parcel delivery subscription tiers (€15-€55/month)
+   - Automated recurring billing with Stripe
+   - Usage tracking and quota management
+   - Customer self-service subscription portal
 
-3. **Real-time Features**
-   - Live order tracking
-   - Real-time notifications
-   - Driver location tracking
-   - Chat system for support
+3. **Campo-Specific Features**
+   - Rural address validation and mapping
+   - Offline-capable mobile app for poor connectivity
+   - Distance-based pricing calculation (€0.99/km)
+   - Custom delivery instructions for rural properties
+
+4. **Driver Commission System**
+   - Commission tracking (€1.00 + €0.30/km)
+   - Automated payout calculations
+   - Performance analytics and ratings
+   - Real-time availability management
 
 ### Medium Priority
-1. **Advanced Analytics**
-   - Restaurant performance metrics
-   - Sales analytics and reporting
-   - Customer behavior insights
-   - Revenue optimization tools
+1. **Payment Integration Enhancement**
+   - Spanish payment providers (Redsys, Spanish banks)
+   - Multi-currency support with EUR focus
+   - Refund and chargeback processing
+   - Spanish tax system integration (IVA)
 
-2. **Driver Management System**
-   - Driver registration and onboarding
-   - Vehicle and license verification
-   - Route optimization
-   - Real-time location tracking
+2. **Advanced Analytics Dashboard**
+   - Business KPI tracking (€6,900/month target)
+   - Route efficiency optimization
+   - Customer lifetime value analysis
+   - Expansion opportunity identification
 
-3. **Customer Experience**
-   - Advanced search and filtering
-   - Recommendation engine
-   - Loyalty program integration
-   - Review and rating system
+3. **Spanish Market Compliance**
+   - GDPR compliance for Spanish operations
+   - Autónomo to SL business transition support
+   - Spanish invoicing and tax integration
+   - Legal document management system
+
+## Business Model Integration
+
+### Revenue Streams Implementation Status
+1. **Food Delivery** (€3,450/month target)
+   - ✅ Basic order system
+   - ❌ Dynamic pricing (€2.50 + €0.99/km)
+   - ❌ Restaurant 20% markup system
+   - ❌ Driver commission tracking
+
+2. **Parcel Subscriptions** (€3,450/month target)
+   - ❌ Subscription tier management
+   - ❌ Automated billing system
+   - ❌ Delivery quota tracking
+   - ❌ Campo route optimization
+
+### Target Market Features
+- **Rural Delivery**: Campo-specific routing and addressing
+- **Multi-Language**: Spanish/English for expat community
+- **Elderly-Friendly**: Simple interface, SMS backup notifications
+- **Tourist Support**: Temporary subscriptions, holiday rental integration
 
 ## Development Setup
 
