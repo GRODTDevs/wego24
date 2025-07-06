@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface User {
   id: string;
@@ -24,6 +25,7 @@ interface UserForm {
 
 export function useUserManagement() {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,8 +42,29 @@ export function useUserManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      console.log('Fetching users...');
+      console.log('Fetching users as admin user:', currentUser?.id);
       
+      // First, check if current user is admin
+      const { data: userRoleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', currentUser?.id)
+        .single();
+
+      console.log('Current user role:', userRoleData?.role, 'Error:', roleError);
+
+      if (roleError || userRoleData?.role !== 'admin') {
+        console.error('User is not admin or role check failed:', roleError);
+        toast({
+          title: "Access Denied",
+          description: "You don't have admin permissions to view users.",
+          variant: "destructive"
+        });
+        setUsers([]);
+        return;
+      }
+
+      // If user is admin, fetch all profiles
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
         .select(`
@@ -56,6 +79,8 @@ export function useUserManagement() {
             role
           )
         `);
+
+      console.log('Fetched users data:', usersData, 'Error:', usersError);
 
       if (usersError) {
         console.error('Error fetching users:', usersError);
@@ -73,14 +98,16 @@ export function useUserManagement() {
         is_active: user.is_active ?? true
       })) || [];
 
+      console.log('Transformed users:', transformedUsers);
       setUsers(transformedUsers);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error in fetchUsers:', error);
       toast({
         title: "Error",
         description: "Failed to fetch users. Please check your admin permissions.",
         variant: "destructive"
       });
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -177,8 +204,10 @@ export function useUserManagement() {
   );
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (currentUser) {
+      fetchUsers();
+    }
+  }, [currentUser]);
 
   return {
     users: filteredUsers,
