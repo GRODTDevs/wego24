@@ -55,17 +55,19 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 ## Database Schema
 
 ### Core Tables
-- **restaurants** - Restaurant/business information
-- **partner_applications** - Partner registration applications
+- **restaurants** - Restaurant/business information with status tracking
+- **partner_applications** - Partner registration applications with approval workflow
 - **restaurant_users** - Restaurant staff and ownership relationships
-- **menu_categories** - Menu organization
-- **menu_items** - Products and services
-- **profiles** - User profile information
-- **user_roles** - Role-based access control
-- **orders** - Order management and tracking
+- **restaurant_settings** - Restaurant-specific configuration and settings
+- **menu_categories** - Menu organization and categorization
+- **menu_items** - Products and services with pricing and availability
+- **profiles** - User profile information with preferences and settings
+- **user_roles** - Role-based access control (admin, user)
+- **orders** - Order management and tracking with status updates
+- **order_items** - Individual items within orders
 - **payments** - Payment processing and history
-- **drivers** - Delivery driver information
-- **reviews** - Rating and review system
+- **drivers** - Delivery driver information and availability
+- **reviews** - Rating and review system for businesses and drivers
 
 ### Security Features
 - Row Level Security (RLS) policies on all tables
@@ -73,6 +75,7 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 - Restaurant-specific data isolation
 - Secure authentication with Supabase Auth
 - Admin policies for complete system oversight
+- Developer authentication system for initial access
 
 ## Partner Registration Process
 
@@ -92,13 +95,13 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
    - Upon approval, system automatically:
      - Creates restaurant record in `restaurants` table
      - Links restaurant to partner user via `restaurant_users` table
-     - Sets up default restaurant settings
+     - Sets up default restaurant settings via `restaurant_settings`
      - Updates application status to "approved"
 
 4. **Partner Dashboard Access**
    - Approved partners get access to `/partner/dashboard`
    - Can manage restaurant information
-   - Access to menu management
+   - Access to menu management with categories and items
    - Order processing capabilities
 
 ### Application Requirements
@@ -111,43 +114,70 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
 ## Admin System
 
 ### Features ✅
-- **User Management**: Complete CRUD operations for user profiles
+- **User Management**: Complete CRUD operations for user profiles with role assignment
 - **Role Management**: Admin/user role assignment and management
 - **Partner Applications**: Review, approve, and reject partner applications
 - **Analytics Dashboard**: Real-time statistics and performance metrics
 - **System Monitoring**: Comprehensive oversight of platform operations
+- **Admin Setup**: Self-service admin role assignment for initial setup
 
 ### Access Control
 - Developer authentication system for initial access
 - Role-based permissions with RLS policies
 - Secure admin operations with audit trails
+- Admin setup component for granting initial admin privileges
+
+### Admin Dashboard Features
+- Real-time statistics display (orders, revenue, locations, drivers, users)
+- User management with search and filtering
+- Partner application processing
+- Driver management interface
+- Commission management
+- SuperUser creation tools
 
 ## Current System Status
 
 ### Recently Implemented ✅
-- Complete admin dashboard with user management
-- Enhanced RLS policies for admin access
+- Complete admin dashboard with real-time statistics
+- Enhanced user management with role assignment
+- Improved RLS policies for admin access
 - Multi-language translation system improvements
-- User role management with proper permissions
 - Developer authentication system
 - Analytics and reporting features
+- Admin setup for initial role assignment
+- Real-time dashboard statistics from database
 
 ### Core Features ✅
 - User authentication and authorization
 - Multi-language support (EN/ES/DE)
-- Partner registration system
+- Partner registration system with approval workflow
 - Admin dashboard for application review
 - Partner dashboard with restaurant management
 - Responsive design for mobile and desktop
 - Location browsing and search
 - Courier request system
 - User management with role assignment
+- Real-time order and revenue tracking
+
+### Authentication & Authorization ✅
+- Supabase Auth integration
+- Role-based access control (admin/user)
+- Row Level Security (RLS) policies
+- Protected routes for admin and partner areas
+- Developer login for initial setup
+- Admin setup component for role assignment
+
+### Database Functions ✅
+- `create_superuser()` - Grant admin privileges to users
+- `handle_new_user()` - Auto-create profiles on user signup
+- `handle_new_restaurant()` - Auto-create restaurant settings
+- `has_role()` - Check user roles for RLS policies
+- `create_restaurant_from_application()` - Convert approved applications to restaurants
 
 ### Known Issues & Limitations ⚠️
 
 1. **File Management**
    - Several files are getting large and should be refactored:
-     - `src/components/UserManagement.tsx` (382+ lines)
      - `src/pages/Index.tsx` (210+ lines)
      - `src/pages/PartnerRegister.tsx` (250+ lines)
      - `src/pages/PartnerDashboard.tsx` (354+ lines)
@@ -160,13 +190,13 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
    - Driver/courier management interface
    - Push notifications
    - Advanced review and rating system
+   - File storage/upload functionality
 
 ### Immediate Next Steps 🚀
 
 #### High Priority
 1. **Code Refactoring**
-   - Break down `UserManagement.tsx` into smaller components
-   - Refactor large page components into focused modules
+   - Break down large page components into focused modules
    - Create reusable admin components
    - Implement proper error boundaries
 
@@ -195,7 +225,13 @@ WeGo is a comprehensive delivery and service platform built with React, TypeScri
    - Refund processing
    - Financial reporting
 
-3. **Notification System**
+3. **File Storage & Upload**
+   - Supabase Storage integration
+   - Image upload for restaurants and menu items
+   - Profile picture uploads
+   - Document management for applications
+
+4. **Notification System**
    - Email notifications for order updates
    - SMS notifications for critical events
    - In-app notifications
@@ -250,6 +286,14 @@ The project is connected to Supabase with the following configuration:
 - **Edge Functions**: Custom server-side logic
 - **Secrets**: Stripe integration configured
 
+### Environment Variables
+The project uses Supabase secrets for sensitive configuration:
+- `STRIPE_SECRET_KEY` - Stripe payment processing
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+- `SUPABASE_DB_URL` - Database connection string
+
 ## Deployment
 
 ### Quick Deploy
@@ -285,6 +329,23 @@ The project is connected to Supabase with the following configuration:
 - Use developer authentication for initial access
 - Implement proper error handling for admin operations
 - Follow security best practices for sensitive operations
+
+## Project Structure
+
+```
+src/
+├── components/           # Reusable UI components
+│   ├── ui/              # shadcn/ui components
+│   ├── user-management/ # User management components
+│   └── ...
+├── contexts/            # React contexts (Auth, Translation)
+├── hooks/               # Custom React hooks
+├── integrations/        # External service integrations
+│   └── supabase/       # Supabase client and types
+├── lib/                 # Utility functions
+├── pages/               # Route components
+└── utils/               # Helper utilities
+```
 
 ## Support & Documentation
 
