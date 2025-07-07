@@ -6,8 +6,6 @@ import { useTranslation } from "../contexts/TranslationContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
-import { useUserRole } from "../hooks/useUserRole";
-import { User } from "lucide-react";
 
 export function Header() {
   const { user, signOut } = useAuth();

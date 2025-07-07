@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Loading } from "@/components/ui/loading";
 import { 
   Car, 
   Star, 
@@ -46,11 +47,14 @@ export function DriverDashboard() {
   useEffect(() => {
     if (user) {
       fetchDriverData();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
   const fetchDriverData = async () => {
     try {
+      console.log('Fetching driver data for user:', user?.id);
       const { data, error } = await supabase
         .from("drivers")
         .select("*")
@@ -58,15 +62,18 @@ export function DriverDashboard() {
         .single();
 
       if (error) {
+        console.error('Driver data fetch error:', error);
         if (error.code === 'PGRST116') {
-          toast.error("Driver profile not found. Please complete registration first.");
-          return;
+          console.log('No driver profile found');
+          setDriverData(null);
+        } else {
+          throw error;
         }
-        throw error;
+      } else {
+        console.log('Driver data fetched:', data);
+        setDriverData(data);
+        setIsOnline(data.is_available);
       }
-
-      setDriverData(data);
-      setIsOnline(data.is_available);
     } catch (error) {
       console.error("Error fetching driver data:", error);
       toast.error("Failed to load driver profile");
@@ -97,10 +104,22 @@ export function DriverDashboard() {
 
   if (loading) {
     return (
+      <div className="min-h-screen bg-gray-50">
+        <Loading text="Loading dashboard..." />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+        <div className="text-center max-w-md px-4">
+          <Car className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Please Sign In</h2>
+          <p className="text-gray-600 mb-4">You need to sign in to access the driver dashboard</p>
+          <Button onClick={() => window.location.href = '/auth'}>
+            Sign In
+          </Button>
         </div>
       </div>
     );

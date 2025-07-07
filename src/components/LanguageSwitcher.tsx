@@ -12,20 +12,32 @@ import {
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useTranslation();
 
+  const getLanguageDisplay = (lang: string) => {
+    switch (lang) {
+      case 'en': return 'EN';
+      case 'es': return 'ES';
+      case 'fr': return 'FR';
+      default: return 'EN';
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 hover:bg-gray-100">
           <Globe className="h-4 w-4 mr-2" />
-          {language === 'en' ? 'EN' : 'ES'}
+          {getLanguageDisplay(language)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setLanguage('en')}>
-          {t('language.english')}
+          English
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage('es')}>
-          {t('language.spanish')}
+          Español
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setLanguage('fr')}>
+          Français
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
