@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 export function InfoModal() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <Dialog>
@@ -27,23 +28,23 @@ export function InfoModal() {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-red-700">
-            Welcome to the WeGo Demo
+            {t('modal.welcomeTitle')}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-gray-700">
-            This is the main customer/home page. Here users can search and select restaurants to view their menu and place demo orders.
+            {t('modal.welcomeDescription')}
           </p>
           <div>
-            <h3 className="font-medium text-red-600 mb-2">Product Owner Steps:</h3>
+            <h3 className="font-medium text-red-600 mb-2">{t('modal.productOwnerStepsTitle')}</h3>
             <ul className="list-disc pl-6 text-gray-600 space-y-1">
-              <li>Try searching or browsing restaurants.</li>
-              <li>Click a restaurant to view its menu.</li>
-              <li>Use the Restaurant or Driver login to review order and delivery flows.</li>
+              <li>{t('modal.step.searchRestaurants')}</li>
+              <li>{t('modal.step.viewMenu')}</li>
+              <li>{t('modal.step.reviewFlows')}</li>
               <li>
                 {user 
-                  ? "You are now logged in! Try exploring the features." 
-                  : "Click 'Login / Sign Up' to create an account and access full features."
+                  ? t('modal.step.loggedIn')
+                  : t('modal.step.loginPrompt')
                 }
               </li>
             </ul>

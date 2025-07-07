@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'en' | 'es' | 'fr';
@@ -40,6 +39,8 @@ const translations = {
     'home.partner.title': 'Partner with us',
     'home.partner.description': 'Join our network of restaurants and grow your business',
     'home.partner.button': 'Become a Partner',
+    'home.partner.buttonInfo': 'Learn More',
+    'home.partner.buttonRegister': 'Become a Partner',
     
     // Language
     'language.english': 'English',
@@ -68,7 +69,17 @@ const translations = {
     'dashboard.tabs.analytics': 'Analytics',
     'dashboard.tabs.admin': 'Admin',
     'dashboard.admin.title': 'Admin Tools',
-    'dashboard.admin.description': 'Manage system settings and create superusers'
+    'dashboard.admin.description': 'Manage system settings and create superusers',
+
+    // Modal/InfoModal
+    'modal.welcomeTitle': 'Welcome to WeGo!',
+    'modal.welcomeDescription': 'Order from your favorite local restaurants, get fast courier service, or partner with us to grow your business.',
+    'modal.productOwnerStepsTitle': 'How to use WeGo:',
+    'modal.step.searchRestaurants': 'Search for restaurants or stores.',
+    'modal.step.viewMenu': 'View menus and place orders.',
+    'modal.step.reviewFlows': 'Track your order and review delivery.',
+    'modal.step.loggedIn': 'You are logged in and can access your dashboard.',
+    'modal.step.loginPrompt': 'Sign in to access more features.'
   },
   es: {
     // Common
@@ -100,6 +111,8 @@ const translations = {
     'home.partner.title': 'Asóciate con nosotros',
     'home.partner.description': 'Únete a nuestra red de restaurantes y haz crecer tu negocio',
     'home.partner.button': 'Convertirse en Socio',
+    'home.partner.buttonInfo': 'Más información',
+    'home.partner.buttonRegister': 'Convertirse en Socio',
     
     // Language
     'language.english': 'Inglés',
@@ -128,7 +141,17 @@ const translations = {
     'dashboard.tabs.analytics': 'Análisis',
     'dashboard.tabs.admin': 'Admin',
     'dashboard.admin.title': 'Herramientas de Admin',
-    'dashboard.admin.description': 'Gestionar configuraciones del sistema y crear superusuarios'
+    'dashboard.admin.description': 'Gestionar configuraciones del sistema y crear superusuarios',
+
+    // Modal/InfoModal
+    'modal.welcomeTitle': '¡Bienvenido a WeGo!',
+    'modal.welcomeDescription': 'Pide de tus restaurantes locales favoritos, recibe mensajería rápida o hazte socio para hacer crecer tu negocio.',
+    'modal.productOwnerStepsTitle': 'Cómo usar WeGo:',
+    'modal.step.searchRestaurants': 'Busca restaurantes o tiendas.',
+    'modal.step.viewMenu': 'Consulta menús y haz pedidos.',
+    'modal.step.reviewFlows': 'Sigue tu pedido y deja una reseña.',
+    'modal.step.loggedIn': 'Has iniciado sesión y puedes acceder a tu panel.',
+    'modal.step.loginPrompt': 'Inicia sesión para acceder a más funciones.'
   },
   fr: {
     // Common
@@ -160,6 +183,8 @@ const translations = {
     'home.partner.title': 'Partenaire avec nous',
     'home.partner.description': 'Rejoignez notre réseau de restaurants et développez votre entreprise',
     'home.partner.button': 'Devenir Partenaire',
+    'home.partner.buttonInfo': 'En savoir plus',
+    'home.partner.buttonRegister': 'Devenir Partenaire',
     
     // Language
     'language.english': 'Anglais',
@@ -188,7 +213,17 @@ const translations = {
     'dashboard.tabs.analytics': 'Analytique',
     'dashboard.tabs.admin': 'Admin',
     'dashboard.admin.title': 'Outils Admin',
-    'dashboard.admin.description': 'Gérer les paramètres système et créer des superutilisateurs'
+    'dashboard.admin.description': 'Gérer les paramètres système et créer des superutilisateurs',
+
+    // Modal/InfoModal
+    'modal.welcomeTitle': 'Bienvenue sur WeGo!',
+    'modal.welcomeDescription': 'Commandez dans vos restaurants locaux préférés, bénéficiez d’un service de messagerie rapide ou devenez partenaire pour développer votre entreprise.',
+    'modal.productOwnerStepsTitle': 'Comment utiliser WeGo :',
+    'modal.step.searchRestaurants': 'Recherchez des restaurants ou des magasins.',
+    'modal.step.viewMenu': 'Consultez les menus et passez des commandes.',
+    'modal.step.reviewFlows': 'Suivez votre commande et laissez un avis.',
+    'modal.step.loggedIn': 'Vous êtes connecté et pouvez accéder à votre tableau de bord.',
+    'modal.step.loginPrompt': 'Connectez-vous pour accéder à plus de fonctionnalités.'
   }
 };
 
