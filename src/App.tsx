@@ -5,10 +5,8 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import { Index as Home } from "./pages/Index";
-import { Auth as SignIn } from "./pages/Auth";
-import { Auth as SignUp } from "./pages/Auth";
-import { Auth as ForgotPassword } from "./pages/Auth";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import { UserProfile as Profile } from "./components/UserProfile";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
@@ -30,10 +28,10 @@ function App() {
         <TranslationProvider>
           <Router>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/signin" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/forgot-password" element={<Auth />} />
               <Route
                 path="/profile"
                 element={

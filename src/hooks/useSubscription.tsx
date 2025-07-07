@@ -60,10 +60,20 @@ export function useSubscription() {
       if (error) throw error;
       
       // Transform the data to match our interface, handling the Json type properly
-      const transformedPlans = data?.map(plan => ({
-        ...plan,
-        features: Array.isArray(plan.features) ? plan.features : 
-                 typeof plan.features === 'string' ? [plan.features] : []
+      const transformedPlans: SubscriptionPlan[] = data?.map(plan => ({
+        id: plan.id,
+        name: plan.name,
+        description: plan.description || '',
+        price_monthly: plan.price_monthly,
+        max_orders_per_month: plan.max_orders_per_month || 0,
+        max_restaurants: plan.max_restaurants || 0,
+        max_drivers: plan.max_drivers || 0,
+        is_active: plan.is_active || false,
+        features: Array.isArray(plan.features) 
+          ? (plan.features as string[])
+          : typeof plan.features === 'string' 
+            ? [plan.features] 
+            : []
       })) || [];
       
       setPlans(transformedPlans);
@@ -116,15 +126,28 @@ export function useSubscription() {
         console.error('Error fetching subscription details:', subError);
       } else if (subData) {
         // Transform the subscription plan data
-        const transformedSubscription = {
-          ...subData,
+        const transformedSubscription: UserSubscription = {
+          id: subData.id,
+          subscribed: subData.subscribed,
+          subscription_plan_id: subData.subscription_plan_id,
+          current_period_end: subData.current_period_end,
+          subscription_status: subData.subscription_status,
+          cancel_at_period_end: subData.cancel_at_period_end,
           plan: subData.subscription_plans ? {
-            ...subData.subscription_plans,
-            features: Array.isArray(subData.subscription_plans.features) ? 
-                     subData.subscription_plans.features : 
-                     typeof subData.subscription_plans.features === 'string' ? 
-                     [subData.subscription_plans.features] : []
-          } as SubscriptionPlan : undefined
+            id: subData.subscription_plans.id,
+            name: subData.subscription_plans.name,
+            description: subData.subscription_plans.description || '',
+            price_monthly: subData.subscription_plans.price_monthly,
+            max_orders_per_month: subData.subscription_plans.max_orders_per_month || 0,
+            max_restaurants: subData.subscription_plans.max_restaurants || 0,
+            max_drivers: subData.subscription_plans.max_drivers || 0,
+            is_active: subData.subscription_plans.is_active || false,
+            features: Array.isArray(subData.subscription_plans.features) 
+              ? (subData.subscription_plans.features as string[])
+              : typeof subData.subscription_plans.features === 'string' 
+                ? [subData.subscription_plans.features] 
+                : []
+          } : undefined
         };
         
         setSubscription(transformedSubscription);
