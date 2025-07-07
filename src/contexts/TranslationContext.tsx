@@ -16,6 +16,12 @@ const translations = {
     'common.courierRequest': 'Request Courier',
     'common.partnerInfo': 'Partner Info',
     
+    // Navigation
+    'nav.home': 'Home',
+    'nav.drivers': 'Drivers',
+    'nav.partners': 'Partners',
+    'nav.admin': 'Admin',
+    
     // Home page
     'home.welcome': 'Welcome',
     'home.signOut': 'Sign Out',
@@ -65,9 +71,18 @@ const translations = {
     'dashboard.admin.description': 'Manage system settings and create superusers'
   },
   es: {
+    // Common
     'common.home': 'Inicio',
     'common.courierRequest': 'Solicitar Mensajero',
     'common.partnerInfo': 'Información del Socio',
+    
+    // Navigation
+    'nav.home': 'Inicio',
+    'nav.drivers': 'Conductores',
+    'nav.partners': 'Socios',
+    'nav.admin': 'Admin',
+    
+    // Home page
     'home.welcome': 'Bienvenido',
     'home.signOut': 'Cerrar Sesión',
     'home.loginButton': 'Iniciar Sesión',
@@ -85,12 +100,28 @@ const translations = {
     'home.partner.title': 'Asóciate con nosotros',
     'home.partner.description': 'Únete a nuestra red de restaurantes y haz crecer tu negocio',
     'home.partner.button': 'Convertirse en Socio',
-    'auth.signIn': 'Iniciar Sesión',
-    'auth.signOut': 'Cerrar Sesión',
-    'driver.become': 'Ser Conductor',
+    
+    // Language
     'language.english': 'Inglés',
     'language.spanish': 'Español',
     'language.french': 'Francés',
+    
+    // Auth
+    'auth.signIn': 'Iniciar Sesión',
+    'auth.signOut': 'Cerrar Sesión',
+    
+    // Driver
+    'driver.become': 'Ser Conductor',
+    'driver.registration.title': 'Registro de Conductor',
+    'driver.registration.subtitle': 'Únete a nuestra red de entrega',
+    'driver.profile.title': 'Perfil del Conductor',
+    'driver.dashboard.title': 'Panel del Conductor',
+    'driver.performance.title': 'Métricas de Rendimiento',
+    'driver.earnings.title': 'Ganancias',
+    'driver.documents.title': 'Documentos',
+    'driver.location.title': 'Seguimiento de Ubicación',
+    
+    // Dashboard
     'dashboard.tabs.users': 'Usuarios',
     'dashboard.tabs.locations': 'Ubicaciones',
     'dashboard.tabs.drivers': 'Conductores',
@@ -100,9 +131,18 @@ const translations = {
     'dashboard.admin.description': 'Gestionar configuraciones del sistema y crear superusuarios'
   },
   fr: {
+    // Common
     'common.home': 'Accueil',
     'common.courierRequest': 'Demander un Coursier',
     'common.partnerInfo': 'Informations Partenaire',
+    
+    // Navigation
+    'nav.home': 'Accueil',
+    'nav.drivers': 'Chauffeurs',
+    'nav.partners': 'Partenaires',
+    'nav.admin': 'Admin',
+    
+    // Home page
     'home.welcome': 'Bienvenue',
     'home.signOut': 'Se Déconnecter',
     'home.loginButton': 'Se Connecter',
@@ -120,12 +160,28 @@ const translations = {
     'home.partner.title': 'Partenaire avec nous',
     'home.partner.description': 'Rejoignez notre réseau de restaurants et développez votre entreprise',
     'home.partner.button': 'Devenir Partenaire',
-    'auth.signIn': 'Se Connecter',
-    'auth.signOut': 'Se Déconnecter',
-    'driver.become': 'Devenir Chauffeur',
+    
+    // Language
     'language.english': 'Anglais',
     'language.spanish': 'Espagnol',
     'language.french': 'Français',
+    
+    // Auth
+    'auth.signIn': 'Se Connecter',
+    'auth.signOut': 'Se Déconnecter',
+    
+    // Driver
+    'driver.become': 'Devenir Chauffeur',
+    'driver.registration.title': 'Inscription Chauffeur',
+    'driver.registration.subtitle': 'Rejoignez notre réseau de livraison',
+    'driver.profile.title': 'Profil du Chauffeur',
+    'driver.dashboard.title': 'Tableau de Bord Chauffeur',
+    'driver.performance.title': 'Métriques de Performance',
+    'driver.earnings.title': 'Revenus',
+    'driver.documents.title': 'Documents',
+    'driver.location.title': 'Suivi de Localisation',
+    
+    // Dashboard
     'dashboard.tabs.users': 'Utilisateurs',
     'dashboard.tabs.locations': 'Emplacements',
     'dashboard.tabs.drivers': 'Chauffeurs',

@@ -13,9 +13,9 @@ export function MobileNav() {
 
   const navLinks = [
     { to: "/", label: t('nav.home') },
-    { to: "/driver/login", label: t('nav.drivers') },
-    { to: "/restaurant/login", label: t('nav.partners') },
-    { to: "/admin/dashboard", label: t('nav.admin') }
+    { to: "/driver-registration", label: t('nav.drivers') },
+    { to: "/partner-info", label: t('nav.partners') },
+    { to: "/operations", label: t('nav.admin') }
   ];
 
   return (
@@ -27,14 +27,14 @@ export function MobileNav() {
         aria-label="Open menu"
         onClick={() => setOpen(true)}
       >
-        <Menu className="h-6 w-6 text-white" />
+        <Menu className="h-6 w-6 text-gray-600" />
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 w-64 bg-gradient-to-b from-red-600 to-red-700">
           <div className="flex items-center justify-between px-6 py-6">
             <div className="flex items-center gap-3">
               <img 
-                src="/lovable-uploads/999acc8c-4528-415a-85a4-1de255e2fce5.png" 
+                src="/lovable-uploads/e9f1fc70-186e-4f21-bbb4-bdaed5b5a6f4.png" 
                 alt="WeGo Logo" 
                 className="h-8 w-auto"
               />
