@@ -82,7 +82,7 @@ export function Header() {
                 {/* Robust admin check: handle string, array, or JSON string from userProfile */}
                 {(() => {
                   let isAdmin = false;
-                  const roles = user.roles;
+                  const {roles} = user;
                   if (roles) {
                     if (Array.isArray(roles)) {
                       isAdmin = roles.includes("admin");
