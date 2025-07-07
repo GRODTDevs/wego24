@@ -15,10 +15,10 @@ export function Header() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      errorLogger.log(error instanceof Error ? error : 'Sign out failed');
-      console.error('Sign out error:', error);
+      errorLogger.log(error instanceof Error ? error : "Sign out failed");
+      console.error("Sign out error:", error);
     }
   };
 
@@ -27,25 +27,37 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/e9f1fc70-186e-4f21-bbb4-bdaed5b5a6f4.png" 
-              alt="WeGo Logo" 
+            <img
+              src="/lovable-uploads/e9f1fc70-186e-4f21-bbb4-bdaed5b5a6f4.png"
+              alt="WeGo Logo"
               className="h-8 w-auto"
             />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('nav.home')}
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {t("nav.home")}
             </Link>
-            <Link to="/courier-request" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('nav.courierRequest')}
+            <Link
+              to="/courier-request"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {t("nav.courierRequest")}
             </Link>
-            <Link to="/partner-info" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('nav.partnerInfo')}
+            <Link
+              to="/partner-info"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {t("nav.partnerInfo")}
             </Link>
-            <Link to="/driver-registration" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('nav.become')}
+            <Link
+              to="/driver-registration"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {t("nav.become")}
             </Link>
           </nav>
 
@@ -54,27 +66,52 @@ export function Header() {
             {user ? (
               <div className="flex items-center space-x-4">
                 <NotificationCenter />
-                <Link 
-                  to="/operations" 
+                <Link
+                  to="/operations"
                   className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
-                  {t('dashboard.dashboard')}
+                  {t("dashboard.dashboard")}
                 </Link>
-                <Button variant="ghost" onClick={handleSignOut} className="text-gray-600">
-                  {t('auth.signOut')}
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  className="text-gray-600"
+                >
+                  {t("auth.signOut")}
                 </Button>
-                {user.roles?.includes('admin') && (
-                  <Link 
-                    to="/admin/demo-data" 
-                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
-                  >
-                    Demo Content
-                  </Link>
-                )}
+                {/* Robust admin check: handle string, array, or JSON string from userProfile */}
+                {(() => {
+                  let isAdmin = false;
+                  const roles = user.roles;
+                  if (roles) {
+                    if (Array.isArray(roles)) {
+                      isAdmin = roles.includes("admin");
+                    } else if (typeof roles === "string") {
+                      try {
+                        const parsed = JSON.parse(roles);
+                        if (Array.isArray(parsed)) {
+                          isAdmin = parsed.includes("admin");
+                        } else if (typeof parsed === "string") {
+                          isAdmin = parsed === "admin";
+                        }
+                      } catch {
+                        isAdmin = roles === "admin";
+                      }
+                    }
+                  }
+                  return isAdmin ? (
+                    <Link
+                      to="/admin/demo-data"
+                      className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                    >
+                      Demo Content
+                    </Link>
+                  ) : null;
+                })()}
               </div>
             ) : (
-              <Button onClick={() => navigate('/auth')} variant="outline">
-                {t('nav.signIn')}
+              <Button onClick={() => navigate("/auth")} variant="outline">
+                {t("nav.signIn")}
               </Button>
             )}
             <MobileNav />

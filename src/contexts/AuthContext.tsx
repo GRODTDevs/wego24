@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  userProfile: any | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -58,6 +59,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    // Fetch profile when user changes
+    if (user) {
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (isMounted) setUserProfile(data);
+        });
+    } else {
+      setUserProfile(null);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   const signOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
@@ -68,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     loading,
     signOut,
+    userProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

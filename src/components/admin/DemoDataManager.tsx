@@ -30,13 +30,17 @@ export function DemoDataManager() {
         .from("drivers")
         .insert(demoDrivers)
         .select();
-      if (driverErr) throw driverErr;
+      if (driverErr) {
+        throw driverErr;
+      }
       // Insert demo restaurants
       const { data: restaurants, error: restErr } = await supabase
         .from("restaurants")
         .insert(demoRestaurants)
         .select();
-      if (restErr) throw restErr;
+      if (restErr) {
+        throw restErr;
+      }
       // Insert menu items for first restaurant
       if (restaurants && restaurants[0]) {
         const menuItems = demoMenuItems.map(item => ({
@@ -44,7 +48,9 @@ export function DemoDataManager() {
           restaurant_id: restaurants[0].id,
         }));
         const { error: menuErr } = await supabase.from("menu_items").insert(menuItems);
-        if (menuErr) throw menuErr;
+        if (menuErr) {
+          throw menuErr;
+        }
       }
       // Insert a demo order for first driver and restaurant
       if (drivers && drivers[0] && restaurants && restaurants[0]) {
@@ -59,7 +65,9 @@ export function DemoDataManager() {
             is_demo: true,
           })
           .select();
-        if (orderErr) throw orderErr;
+        if (orderErr) {
+          throw orderErr;
+        }
       }
       setResult("Demo data inserted successfully.");
     } catch (err: any) {
