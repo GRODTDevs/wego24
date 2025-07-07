@@ -41,22 +41,6 @@ export function DemoDataManager() {
           rating: 4.8,
           total_deliveries: 42
         },
-        {
-          user_id: demoProfileId,
-          first_name: "Demo",
-          last_name: "Driver 2",
-          email: "demo.driver2@wego24.com",
-          phone: "+34000000002",
-          is_demo: true,
-          vehicle_type: "car",
-          city: "Demo City",
-          is_active: true,
-          is_available: false,
-          registration_status: "pending",
-          background_check_status: "pending",
-          rating: 4.2,
-          total_deliveries: 17
-        },
       ];
       // Create demo partner application
       const demoPartnerApplicationId = "b1b2c3d4-e5f6-7890-abcd-ef1234567890";
@@ -106,18 +90,36 @@ export function DemoDataManager() {
           city: "Demo City",
           application_id: demoPartnerApplicationId
         },
-        {
-          name: "Demo Restaurant 2",
-          email: "demo.rest2@wego24.com",
-          is_demo: true,
-          address: "456 Example Ave",
-          city: "Demo City",
-          application_id: demoPartnerApplicationId
-        },
       ];
       const demoMenuItems = [
-        { name: "Demo Pizza", price: 10.99, is_demo: true },
-        { name: "Demo Burger", price: 8.99, is_demo: true },
+        {
+          name: "Demo Pizza",
+          description: "A delicious cheese and tomato pizza.",
+          price: 10.99,
+          image_url: "https://source.unsplash.com/400x300/?pizza",
+          status: "available",
+          is_featured: true,
+          preparation_time: 20,
+          calories: 900,
+          allergens: ["gluten", "dairy"],
+          dietary_info: ["vegetarian"],
+          display_order: 1,
+          is_demo: true
+        },
+        {
+          name: "Demo Burger",
+          description: "A juicy beef burger with lettuce and tomato.",
+          price: 8.99,
+          image_url: "https://source.unsplash.com/400x300/?burger",
+          status: "available",
+          is_featured: false,
+          preparation_time: 15,
+          calories: 750,
+          allergens: ["gluten", "egg"],
+          dietary_info: ["contains beef"],
+          display_order: 2,
+          is_demo: true
+        },
       ];
       const { data: profileData, error: profileErr } = await supabase
         .from("profiles")

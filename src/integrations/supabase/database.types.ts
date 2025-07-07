@@ -50,6 +50,7 @@ export type Database = {
           date_of_birth?: string;
           address?: string;
           city?: string;
+          phone?: string;
           postal_code?: string;
           emergency_contact_name?: string;
           emergency_contact_phone?: string;
