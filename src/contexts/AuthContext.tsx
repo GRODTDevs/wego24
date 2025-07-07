@@ -70,7 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq("id", user.id)
         .single()
         .then(({ data }) => {
-          if (isMounted) setUserProfile(data);
+          if (isMounted) {
+            setUserProfile(data);
+          }
         });
     } else {
       setUserProfile(null);
