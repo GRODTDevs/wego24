@@ -9,7 +9,7 @@ import { InfoModal } from "@/components/InfoModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { User, LogIn, LogOut, Truck, Building2, Search, Info } from "lucide-react";
+import { Truck, Building2, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 
 type Location = Tables<"restaurants">;
@@ -18,22 +18,17 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, signOut, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Safe translation function with fallbacks
   const t = (key: string): string => {
     try {
-      // Try to import useTranslation dynamically
       const { useTranslation } = require("@/contexts/TranslationContext");
       const translation = useTranslation();
       return translation.t(key);
     } catch (error) {
       console.warn('Translation context not available, using fallback for:', key);
-      // Return a reasonable fallback based on the key
       const fallbacks: Record<string, string> = {
-        'home.welcome': 'Welcome',
-        'home.signOut': 'Sign Out',
-        'home.loginButton': 'Sign In',
         'home.delivery.badge': 'FAST DELIVERY',
         'home.delivery.title': 'Get your favorite food',
         'home.delivery.titleHighlight': 'delivered fast',
@@ -83,60 +78,11 @@ const Index = () => {
         location.city.toLowerCase().includes(search.toLowerCase())
       );
 
-  const handleSignOut = async () => {
-    try {
-      console.log('Starting sign out process...');
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-        toast.error("Failed to sign out: " + error.message);
-      } else {
-        console.log('Sign out successful');
-        toast.success("Signed out successfully");
-      }
-    } catch (error) {
-      console.error('Unexpected sign out error:', error);
-      toast.error("An unexpected error occurred during sign out");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
       
       <main className="flex-1">
-        {/* Auth section */}
-        <div className="absolute top-20 right-4 z-20">
-          {authLoading ? (
-            <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-          ) : user ? (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-md">
-                <User className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {t('home.welcome')} {user.user_metadata?.first_name || "User"}!
-                </span>
-              </div>
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                {t('home.signOut')}
-              </Button>
-            </div>
-          ) : (
-            <Link to="/auth">
-              <Button className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white flex items-center gap-2">
-                <LogIn className="w-4 h-4" />
-                {t('home.loginButton')}
-              </Button>
-            </Link>
-          )}
-        </div>
-
         {/* Section 1: Local Delivery Search */}
         <section className="relative py-20 px-4">
           {/* Subtle radial gradient background */}
@@ -196,7 +142,6 @@ const Index = () => {
           className="relative py-20 px-4 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('/lovable-uploads/eea68027-6b2e-4c4c-97ff-8f21f0181a9b.png')` }}
         >
-          {/* Dark overlay for better text readability */}
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
           
           <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto text-center">
@@ -253,7 +198,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Info Modal */}
         <InfoModal />
       </main>
 

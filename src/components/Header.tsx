@@ -56,7 +56,7 @@ export function Header() {
               <div className="flex items-center space-x-4">
                 <NotificationCenter />
                 <Link 
-                  to="/driver-dashboard" 
+                  to="/operations" 
                   className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
                   Dashboard
