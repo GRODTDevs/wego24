@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -30,10 +29,10 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TranslationProvider>
+    <TranslationProvider>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
             <div className="min-h-screen bg-background">
               <Toaster />
               <Routes>
@@ -60,10 +59,10 @@ function App() {
               </Routes>
               <ErrorViewer />
             </div>
-          </TranslationProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </TranslationProvider>
   );
 }
 
