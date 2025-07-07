@@ -72,17 +72,32 @@ export function useNotifications() {
     if (!user) return;
 
     try {
+      // Use raw query to access notifications table since it may not be in types yet
       const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('sent_at', { ascending: false })
-        .limit(50);
+        .rpc('fetch_user_notifications', { user_uuid: user.id })
+        .then(result => {
+          // If RPC doesn't exist, fall back to direct query
+          if (result.error) {
+            return supabase
+              .from('notifications')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('sent_at', { ascending: false })
+              .limit(50);
+          }
+          return result;
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
 
-      setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+      const typedNotifications = (data || []) as Notification[];
+      setNotifications(typedNotifications);
+      setUnreadCount(typedNotifications.filter(n => !n.is_read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       setNotifications([]);
@@ -135,7 +150,8 @@ export function useNotifications() {
           title,
           message,
           type,
-          order_id: orderId
+          order_id: orderId,
+          delivery_method: ['in_app']
         });
 
       if (error) throw error;

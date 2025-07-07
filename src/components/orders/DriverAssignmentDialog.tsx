@@ -16,7 +16,7 @@ interface Driver {
     first_name: string;
     last_name: string;
     phone: string;
-  };
+  } | null;
 }
 
 interface DriverAssignmentDialogProps {
@@ -62,6 +62,22 @@ export function DriverAssignmentDialog({
     } catch (error) {
       console.error('Error fetching drivers:', error);
       toast.error('Failed to load available drivers');
+      // Fallback - get drivers without profile info
+      try {
+        const { data: fallbackData } = await supabase
+          .from('drivers')
+          .select('id, user_id, vehicle_type, is_available, rating')
+          .eq('is_active', true)
+          .eq('is_available', true);
+        
+        const driversWithEmptyProfiles = (fallbackData || []).map(driver => ({
+          ...driver,
+          profiles: null
+        }));
+        setDrivers(driversWithEmptyProfiles);
+      } catch (fallbackError) {
+        console.error('Fallback query failed:', fallbackError);
+      }
     }
   };
 
@@ -113,7 +129,10 @@ export function DriverAssignmentDialog({
                   <SelectItem key={driver.id} value={driver.id}>
                     <div className="flex items-center justify-between w-full">
                       <span>
-                        {driver.profiles?.first_name} {driver.profiles?.last_name}
+                        {driver.profiles?.first_name && driver.profiles?.last_name 
+                          ? `${driver.profiles.first_name} ${driver.profiles.last_name}`
+                          : `Driver ${driver.id.slice(0, 8)}`
+                        }
                       </span>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>{driver.vehicle_type}</span>
