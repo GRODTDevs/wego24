@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      business_metrics_history: {
+        Row: {
+          active_drivers: number
+          active_partners: number
+          created_at: string
+          id: string
+          metric_date: string
+          total_orders: number
+          total_revenue: number
+          total_users: number
+        }
+        Insert: {
+          active_drivers?: number
+          active_partners?: number
+          created_at?: string
+          id?: string
+          metric_date: string
+          total_orders?: number
+          total_revenue?: number
+          total_users?: number
+        }
+        Update: {
+          active_drivers?: number
+          active_partners?: number
+          created_at?: string
+          id?: string
+          metric_date?: string
+          total_orders?: number
+          total_revenue?: number
+          total_users?: number
+        }
+        Relationships: []
+      }
       drivers: {
         Row: {
           created_at: string | null
@@ -961,6 +994,10 @@ export type Database = {
     Functions: {
       add_user_role: {
         Args: { _user_id: string; _role: string }
+        Returns: undefined
+      }
+      capture_daily_metrics: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       create_restaurant_from_application: {

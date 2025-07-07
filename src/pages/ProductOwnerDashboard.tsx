@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/UserManagement";
@@ -46,12 +45,16 @@ export default function ProductOwnerDashboard() {
     activeDrivers: 0,
     totalUsers: 0
   });
+  
+  const [previousStats, setPreviousStats] = useState<DashboardStats | undefined>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
+        
+        // Fetch current stats
         
         // Fetch total orders
         const { count: ordersCount } = await supabase
@@ -66,8 +69,8 @@ export default function ProductOwnerDashboard() {
 
         const totalRevenue = revenueData?.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0) || 0;
 
-        // Fetch active restaurants
-        const { count: restaurantsCount } = await supabase
+        // Fetch active partners (restaurants)
+        const { count: partnersCount } = await supabase
           .from('restaurants')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'active');
@@ -83,13 +86,37 @@ export default function ProductOwnerDashboard() {
           .from('profiles')
           .select('*', { count: 'exact', head: true });
 
-        setStats({
+        const currentStats = {
           totalOrders: ordersCount || 0,
           totalRevenue,
-          activeLocations: restaurantsCount || 0,
+          activeLocations: partnersCount || 0,
           activeDrivers: driversCount || 0,
           totalUsers: usersCount || 0
-        });
+        };
+
+        // Fetch historical data for percentage calculations
+        const { data: historicalData } = await supabase
+          .from('business_metrics_history')
+          .select('*')
+          .order('metric_date', { ascending: false })
+          .limit(2);
+
+        if (historicalData && historicalData.length > 1) {
+          const previousData = historicalData[1];
+          setPreviousStats({
+            totalOrders: previousData.total_orders,
+            totalRevenue: Number(previousData.total_revenue),
+            activeLocations: previousData.active_partners,
+            activeDrivers: previousData.active_drivers,
+            totalUsers: previousData.total_users
+          });
+        }
+
+        setStats(currentStats);
+
+        // Capture today's metrics
+        await supabase.rpc('capture_daily_metrics');
+        
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
       } finally {
@@ -107,9 +134,13 @@ export default function ProductOwnerDashboard() {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
           
-          {/* Enhanced Business Metrics */}
+          {/* Enhanced Business Metrics with real percentages */}
           <div className="mb-8">
-            <BusinessMetrics stats={stats} loading={loading} />
+            <BusinessMetrics 
+              stats={stats} 
+              previousStats={previousStats}
+              loading={loading} 
+            />
           </div>
 
           {/* Revenue Progress & System Health */}
