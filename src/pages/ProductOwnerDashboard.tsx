@@ -1,8 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { UserManagement } from "@/components/UserManagement";
 import { LocationManagement } from "@/components/LocationManagement";
 import { DriverManagement } from "@/components/DriverManagement";
@@ -13,9 +11,13 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SubscriptionStatus } from "@/components/subscription/SubscriptionStatus";
 import { UsageChart } from "@/components/subscription/UsageChart";
+import { BusinessMetrics } from "@/components/dashboard/BusinessMetrics";
+import { SystemHealth } from "@/components/dashboard/SystemHealth";
+import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
+import { CriticalAlerts } from "@/components/dashboard/CriticalAlerts";
+import { RealTimeOrderDashboard } from "@/components/orders/RealTimeOrderDashboard";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useSubscription } from "@/hooks/useSubscription";
-import { formatCurrency } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardStats {
@@ -105,120 +107,55 @@ export default function ProductOwnerDashboard() {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
           
-          {/* Subscription Status Banner */}
-          {!subscriptionLoading && (
-            <div className="mb-8">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <h3 className="font-semibold">Subscription Status</h3>
-                        <div className="flex items-center gap-2">
-                          {subscription?.subscribed ? (
-                            <>
-                              <Badge className="bg-green-500">Active</Badge>
-                              <span className="text-sm text-gray-600">
-                                {subscription.plan?.name} - {formatCurrency(subscription.plan?.price_monthly || 0)}/month
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <Badge variant="outline">No Active Subscription</Badge>
-                              <span className="text-sm text-gray-600">
-                                Subscribe to access all features
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Enhanced Business Metrics */}
+          <div className="mb-8">
+            <BusinessMetrics stats={stats} loading={loading} />
+          </div>
+
+          {/* Revenue Progress & System Health */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2">
+              <RevenueProgress currentRevenue={stats.totalRevenue} />
             </div>
-          )}
-          
-          {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalOrders')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
-                ) : (
-                  <div className="text-2xl font-bold">{stats.totalOrders.toLocaleString()}</div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalRevenue')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
-                ) : (
-                  <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeLocations')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
-                ) : (
-                  <div className="text-2xl font-bold">{stats.activeLocations}</div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.activeDrivers')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="w-12 h-8 bg-gray-200 animate-pulse rounded"></div>
-                ) : (
-                  <div className="text-2xl font-bold">{stats.activeDrivers}</div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.stats.totalUsers')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
-                ) : (
-                  <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                )}
-              </CardContent>
-            </Card>
+            <div>
+              <SystemHealth />
+            </div>
+          </div>
+
+          {/* Critical Alerts */}
+          <div className="mb-8">
+            <CriticalAlerts />
           </div>
 
           {/* Management Tabs */}
-          <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid grid-cols-8 w-full">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid grid-cols-9 w-full">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="orders">Orders</TabsTrigger>
               <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
               <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
               <TabsTrigger value="partners">Partners</TabsTrigger>
               <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
-              <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
               <TabsTrigger value="admin">{t('dashboard.tabs.admin')}</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="overview">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SubscriptionStatus
+                  subscription={subscription}
+                  refreshing={refreshing}
+                  onRefresh={checkSubscription}
+                  onManageSubscription={openCustomerPortal}
+                />
+                <UsageChart usage={usage} subscription={subscription} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="orders">
+              <RealTimeOrderDashboard userRole="admin" />
+            </TabsContent>
 
             <TabsContent value="users">
               <UserManagement />
@@ -236,10 +173,6 @@ export default function ProductOwnerDashboard() {
               <DriverManagement />
             </TabsContent>
 
-            <TabsContent value="commissions">
-              <CommissionManagement />
-            </TabsContent>
-
             <TabsContent value="subscription">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SubscriptionStatus
@@ -253,27 +186,22 @@ export default function ProductOwnerDashboard() {
             </TabsContent>
 
             <TabsContent value="analytics">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('dashboard.analytics.title')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">{t('dashboard.analytics.comingSoon')}</p>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RevenueProgress currentRevenue={stats.totalRevenue} />
+                <SystemHealth />
+              </div>
             </TabsContent>
 
             <TabsContent value="admin">
               <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t('dashboard.admin.title')}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg border">
+                    <h3 className="text-lg font-semibold mb-4">{t('dashboard.admin.title')}</h3>
                     <p className="text-gray-600 mb-6">{t('dashboard.admin.description')}</p>
                     <SuperuserCreation />
-                  </CardContent>
-                </Card>
+                  </div>
+                  <CriticalAlerts />
+                </div>
               </div>
             </TabsContent>
           </Tabs>
