@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 
 type Language = 'en' | 'es' | 'fr';
@@ -91,7 +92,18 @@ const translations = {
     'courierSuccess.referenceId': 'Reference ID:',
     'courierSuccess.keepRecord': 'Please keep this reference for your records',
     'courierSuccess.backToHome': 'Back to Home',
-    'courierSuccess.bookAnother': 'Book Another Delivery'
+    'courierSuccess.bookAnother': 'Book Another Delivery',
+
+    // Driver System
+    'driver.become': 'Become a Driver',
+    'driver.registration.title': 'Driver Registration',
+    'driver.registration.subtitle': 'Join our delivery network',
+    'driver.profile.title': 'Driver Profile',
+    'driver.dashboard.title': 'Driver Dashboard',
+    'driver.performance.title': 'Performance Metrics',
+    'driver.earnings.title': 'Earnings',
+    'driver.documents.title': 'Documents',
+    'driver.location.title': 'Location Tracking'
   },
   es: {
     // Add Spanish translations as needed

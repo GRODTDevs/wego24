@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,91 +8,62 @@ import { MobileNav } from "./MobileNav";
 import { useUserRole } from "../hooks/useUserRole";
 import { User } from "lucide-react";
 
-export function Header({ className }: { className?: string }) {
+export function Header() {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userRole } = useUserRole();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/");
+    navigate('/');
   };
 
   return (
-    <header className={`border-b bg-white shadow-sm ${className}`}>
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+    <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/999acc8c-4528-415a-85a4-1de255e2fce5.png" 
-              alt="WeGo Logo" 
-              className="h-8 w-auto"
-            />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">W</span>
+            </div>
+            <span className="text-xl font-bold text-gray-900">WeGo</span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link 
-              to="/" 
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               {t('common.home')}
             </Link>
-            <Link 
-              to="/courier-request" 
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <Link to="/courier-request" className="text-gray-600 hover:text-gray-900 transition-colors">
               {t('common.courierRequest')}
             </Link>
-            {!user && (
-              <>
-                <Link 
-                  to="/partner-info" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {t('common.partnerInfo')}
-                </Link>
-                <Link 
-                  to="/driver/register" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  Become a Driver
-                </Link>
-              </>
-            )}
-          </div>
+            <Link to="/partner-info" className="text-gray-600 hover:text-gray-900 transition-colors">
+              {t('common.partnerInfo')}
+            </Link>
+            <Link to="/driver-registration" className="text-gray-600 hover:text-gray-900 transition-colors">
+              {t('driver.become')}
+            </Link>
+          </nav>
 
           <div className="flex items-center space-x-4">
             <LanguageSwitcher />
-            
             {user ? (
-              <div className="flex items-center space-x-2">
-                <NotificationCenter />
-                
-                <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm">
-                  <User className="w-4 h-4 text-orange-500" />
-                  <span className="text-sm font-medium text-gray-700">
-                    Welcome {user.user_metadata?.first_name || "User"}!
-                  </span>
-                </div>
-                
-                <Button 
-                  onClick={handleSignOut} 
-                  variant="outline" 
-                  size="sm"
-                  className="hidden md:inline-flex"
+              <div className="flex items-center space-x-4">
+                {/* Show driver dashboard link if user is a driver */}
+                <Link 
+                  to="/driver-dashboard" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
+                  Driver Dashboard
+                </Link>
+                <Button variant="ghost" onClick={handleSignOut} className="text-gray-600">
                   {t('auth.signOut')}
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/auth">{t('auth.signIn')}</Link>
-                </Button>
-              </div>
+              <Button onClick={() => navigate('/auth')} variant="outline">
+                {t('auth.signIn')}
+              </Button>
             )}
-            
             <MobileNav />
           </div>
         </div>

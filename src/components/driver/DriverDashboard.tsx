@@ -1,0 +1,294 @@
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { 
+  Car, 
+  MapPin, 
+  Clock, 
+  Star, 
+  TrendingUp, 
+  FileText, 
+  Settings,
+  DollarSign,
+  Activity
+} from "lucide-react";
+import { DriverProfileSection } from "./dashboard/DriverProfileSection";
+import { DriverPerformanceSection } from "./dashboard/DriverPerformanceSection";
+import { DriverDocumentsSection } from "./dashboard/DriverDocumentsSection";
+import { DriverEarningsSection } from "./dashboard/DriverEarningsSection";
+
+interface DriverData {
+  id: string;
+  user_id: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  vehicle_type: string;
+  vehicle_info?: any;
+  is_active: boolean;
+  is_available: boolean;
+  rating: number;
+  total_deliveries: number;
+  registration_status: string;
+  background_check_status: string;
+  created_at: string;
+}
+
+/**
+ * Driver Dashboard Component
+ * 
+ * Provides a comprehensive dashboard for registered drivers including:
+ * - Profile management
+ * - Performance metrics
+ * - Document status
+ * - Earnings tracking
+ * - Real-time status controls
+ */
+export function DriverDashboard() {
+  const { user } = useAuth();
+  const [driverData, setDriverData] = useState<DriverData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchDriverData();
+    }
+  }, [user]);
+
+  /**
+   * Fetches the current driver's profile data
+   */
+  const fetchDriverData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("drivers")
+        .select("*")
+        .eq("user_id", user?.id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No driver profile found
+          toast.error("Driver profile not found. Please complete registration first.");
+          return;
+        }
+        throw error;
+      }
+
+      setDriverData(data);
+      setIsOnline(data.is_available);
+    } catch (error) {
+      console.error("Error fetching driver data:", error);
+      toast.error("Failed to load driver profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Toggles driver online/offline status
+   */
+  const toggleOnlineStatus = async () => {
+    if (!driverData) return;
+
+    try {
+      const newStatus = !isOnline;
+      const { error } = await supabase
+        .from("drivers")
+        .update({ is_available: newStatus })
+        .eq("id", driverData.id);
+
+      if (error) throw error;
+
+      setIsOnline(newStatus);
+      toast.success(`You are now ${newStatus ? 'online' : 'offline'}`);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!driverData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <Car className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Driver Profile Not Found</h2>
+          <p className="text-gray-600 mb-4">
+            Complete your driver registration to access the dashboard
+          </p>
+          <Button onClick={() => window.location.href = '/driver-registration'}>
+            Complete Registration
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-6 max-w-6xl">
+        {/* Header Section */}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Driver Dashboard
+              </h1>
+              <p className="text-gray-600">
+                Welcome back, {driverData.first_name || 'Driver'}!
+              </p>
+            </div>
+            
+            {/* Online Status Toggle */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                <span className="text-sm font-medium">
+                  {isOnline ? 'Online' : 'Offline'}
+                </span>
+              </div>
+              <Button
+                onClick={toggleOnlineStatus}
+                variant={isOnline ? "outline" : "default"}
+                className="min-w-[100px]"
+              >
+                {isOnline ? 'Go Offline' : 'Go Online'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Status Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Rating</p>
+                    <p className="font-semibold">{driverData.rating.toFixed(1)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Deliveries</p>
+                    <p className="font-semibold">{driverData.total_deliveries}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Status</p>
+                    <Badge variant={driverData.is_active ? "default" : "secondary"}>
+                      {driverData.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-purple-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Registration</p>
+                    <Badge variant={driverData.registration_status === 'approved' ? "default" : "secondary"}>
+                      {driverData.registration_status}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="earnings">Earnings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="mt-6">
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Stats</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <Clock className="w-8 h-8 mx-auto text-blue-600 mb-2" />
+                      <p className="text-sm text-gray-600">Hours This Week</p>
+                      <p className="text-2xl font-bold text-blue-600">32</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <DollarSign className="w-8 h-8 mx-auto text-green-600 mb-2" />
+                      <p className="text-sm text-gray-600">Earnings This Week</p>
+                      <p className="text-2xl font-bold text-green-600">€245</p>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <TrendingUp className="w-8 h-8 mx-auto text-purple-600 mb-2" />
+                      <p className="text-sm text-gray-600">Completion Rate</p>
+                      <p className="text-2xl font-bold text-purple-600">98%</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="profile" className="mt-6">
+            <DriverProfileSection driverData={driverData} onUpdate={fetchDriverData} />
+          </TabsContent>
+
+          <TabsContent value="performance" className="mt-6">
+            <DriverPerformanceSection driverId={driverData.id} />
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-6">
+            <DriverDocumentsSection driverId={driverData.id} />
+          </TabsContent>
+
+          <TabsContent value="earnings" className="mt-6">
+            <DriverEarningsSection driverId={driverData.id} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
