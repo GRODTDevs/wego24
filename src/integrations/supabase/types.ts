@@ -238,6 +238,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          delivery_method: string[]
+          id: string
+          is_read: boolean
+          message: string
+          order_id: string | null
+          sent_at: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          delivery_method?: string[]
+          id?: string
+          is_read?: boolean
+          message: string
+          order_id?: string | null
+          sent_at?: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          delivery_method?: string[]
+          id?: string
+          is_read?: boolean
+          message?: string
+          order_id?: string | null
+          sent_at?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
