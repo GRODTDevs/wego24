@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
@@ -48,12 +49,12 @@ export function Header() {
             <LanguageSwitcher />
             {user ? (
               <div className="flex items-center space-x-4">
-                {/* Show driver dashboard link if user is a driver */}
+                <NotificationCenter />
                 <Link 
                   to="/driver-dashboard" 
                   className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
-                  Driver Dashboard
+                  Dashboard
                 </Link>
                 <Button variant="ghost" onClick={handleSignOut} className="text-gray-600">
                   {t('auth.signOut')}

@@ -53,7 +53,7 @@ const CourierRequest = () => {
 
   const calculatePrice = async () => {
     if (!formData.pickupLocation || !formData.dropoffLocation) {
-      toast.error(t('courier.errors.bothAddresses'));
+      toast.error("Please enter both pickup and delivery addresses");
       return;
     }
 
@@ -65,7 +65,7 @@ const CourierRequest = () => {
       ]);
 
       if (!pickupCoords || !dropoffCoords) {
-        toast.error(t('courier.errors.addressNotFound'));
+        toast.error("Could not find one or both addresses");
         return;
       }
 
@@ -77,8 +77,8 @@ const CourierRequest = () => {
       );
 
       // Updated pricing structure
-      const baseFee = 8.50; // Increased base fee
-      const distanceFee = distance * 0.75; // Increased per km rate
+      const baseFee = 8.50;
+      const distanceFee = distance * 0.75;
       const totalPrice = baseFee + distanceFee;
 
       setPriceCalculation({
@@ -88,10 +88,10 @@ const CourierRequest = () => {
         distanceFee
       });
 
-      toast.success(`${t('courier.success.priceCalculated')} ${formatCurrency(totalPrice)}`);
+      toast.success(`Price calculated successfully: ${formatCurrency(totalPrice)}`);
     } catch (error) {
       console.error("Error calculating price:", error);
-      toast.error(t('courier.errors.priceCalculation'));
+      toast.error("Error calculating price. Please try again.");
     } finally {
       setCalculatingPrice(false);
     }
@@ -99,12 +99,12 @@ const CourierRequest = () => {
 
   const handlePayment = async () => {
     if (!user) {
-      toast.error(t('courier.signInRequired'));
+      toast.error("Please sign in to book a delivery");
       return;
     }
 
     if (!priceCalculation) {
-      toast.error(t('courier.errors.calculatePrice'));
+      toast.error("Please calculate the price first");
       return;
     }
 
@@ -116,7 +116,7 @@ const CourierRequest = () => {
       ]);
 
       if (!pickupCoords || !dropoffCoords) {
-        toast.error(t('courier.errors.addressNotFound'));
+        toast.error("Could not find one or both addresses");
         return;
       }
 
@@ -135,7 +135,7 @@ const CourierRequest = () => {
 
       if (error) {
         console.error("Payment error:", error);
-        toast.error(t('courier.errors.paymentSession'));
+        toast.error("Error creating payment session");
         return;
       }
 
@@ -143,7 +143,7 @@ const CourierRequest = () => {
       
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error(t('courier.errors.paymentProcessing'));
+      toast.error("Error processing payment");
     } finally {
       setLoading(false);
     }
@@ -153,12 +153,12 @@ const CourierRequest = () => {
     e.preventDefault();
     
     if (!formData.pickupLocation || !formData.dropoffLocation || !formData.itemDescription) {
-      toast.error(t('courier.errors.fillRequired'));
+      toast.error("Please fill in all required fields");
       return;
     }
 
     if (!priceCalculation) {
-      toast.error(t('courier.errors.calculateFirst'));
+      toast.error("Please calculate the price before booking");
       return;
     }
 
@@ -171,19 +171,16 @@ const CourierRequest = () => {
       
       <main className="flex-1 px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          {/* Mobile-optimized back button */}
           <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base">
             <ArrowLeft className="w-4 h-4" />
-            {t('courier.backToHome')}
+            Back to Home
           </Link>
 
-          {/* Mobile-optimized header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{t('courier.title')}</h1>
-            <p className="text-gray-600 text-sm sm:text-base px-2">{t('courier.description')}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Request Courier Service</h1>
+            <p className="text-gray-600 text-sm sm:text-base px-2">Fast and reliable delivery service for your packages</p>
           </div>
 
-          {/* Mobile-optimized form */}
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             <PickupSection 
               formData={formData} 
@@ -200,14 +197,13 @@ const CourierRequest = () => {
               onInputChange={handleInputChange} 
             />
 
-            {/* Special Instructions - Mobile optimized */}
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm">
               <Label htmlFor="specialInstructions" className="text-base sm:text-lg font-medium">
-                {t('courier.specialInstructions')}
+                Special Instructions
               </Label>
               <Textarea
                 id="specialInstructions"
-                placeholder={t('courier.specialInstructionsPlaceholder')}
+                placeholder="Any special delivery instructions..."
                 value={formData.specialInstructions}
                 onChange={(e) => handleInputChange("specialInstructions", e.target.value)}
                 className="mt-2 min-h-[80px] text-base"
@@ -221,7 +217,6 @@ const CourierRequest = () => {
               onCalculatePrice={calculatePrice}
             />
 
-            {/* Mobile-optimized submit button */}
             <div className="text-center pt-4">
               <Button
                 type="submit"
@@ -229,12 +224,12 @@ const CourierRequest = () => {
                 className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg flex items-center justify-center gap-2 min-h-[48px]"
               >
                 <CreditCard className="w-5 h-5" />
-                {loading ? t('courier.processing') : `${t('courier.pay')} ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} ${t('courier.book')}`}
+                {loading ? "Processing..." : `Pay ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} & Book Delivery`}
               </Button>
               
               {!user && (
                 <p className="text-sm text-gray-500 mt-3 px-4">
-                  {t('courier.signInRequired')} <Link to="/auth" className="text-blue-600 hover:underline">{t('courier.signInLink')}</Link>
+                  Please sign in to book a delivery <Link to="/auth" className="text-blue-600 hover:underline">Sign in here</Link>
                 </p>
               )}
             </div>
