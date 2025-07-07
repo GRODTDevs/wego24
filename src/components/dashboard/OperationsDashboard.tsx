@@ -8,6 +8,7 @@ import { DriverManagement } from "@/components/DriverManagement";
 import { SystemHealthMonitor } from "@/components/monitoring/SystemHealthMonitor";
 import { Header } from "@/components/Header";
 import { PartnerApplications } from "@/components/PartnerApplications";
+import { AdminDriverManagement } from "@/components/dashboard/AdminDriverManagement";
 
 export function OperationsDashboard() {
   const { t } = useTranslation();
@@ -73,7 +74,14 @@ export function OperationsDashboard() {
     fetchMetrics();
   }, []);
 
-  if (loading) return <div>{t('dashboard.loading')}</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full border-b-2 border-blue-600 h-12 w-12 mb-2"></div>
+        <span className="text-gray-600 text-lg">{t('dashboard.loading')}</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -147,6 +155,9 @@ export function OperationsDashboard() {
           </TabsContent>
           <TabsContent value="drivers">
             <DriverManagement />
+            <div className="mt-8">
+              <AdminDriverManagement />
+            </div>
           </TabsContent>
           <TabsContent value="users">
             <UserManagement />

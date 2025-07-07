@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,8 @@ import { DriverProfileSection } from "./dashboard/DriverProfileSection";
 import { DriverPerformanceSection } from "./dashboard/DriverPerformanceSection";
 import { DriverDocumentsSection } from "./dashboard/DriverDocumentsSection";
 import { DriverEarningsSection } from "./dashboard/DriverEarningsSection";
+import { DriverSchedulingSection } from "./dashboard/DriverSchedulingSection";
+import { DriverFeedbackSection } from "./dashboard/DriverFeedbackSection";
 
 interface DriverData {
   id: string;
@@ -232,12 +233,14 @@ export function DriverDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
+            <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
+            <TabsTrigger value="feedback">Feedback</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -280,6 +283,13 @@ export function DriverDashboard() {
 
           <TabsContent value="earnings" className="mt-6">
             <DriverEarningsSection driverId={driverData.id} />
+          </TabsContent>
+
+          <TabsContent value="scheduling" className="mt-6">
+            <DriverSchedulingSection driverId={driverData.id} />
+          </TabsContent>
+          <TabsContent value="feedback" className="mt-6">
+            <DriverFeedbackSection driverId={driverData.id} />
           </TabsContent>
         </Tabs>
       </div>
