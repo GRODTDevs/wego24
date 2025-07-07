@@ -1,5 +1,3 @@
-
-import { useTranslation } from '@/contexts/TranslationContext';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
 import {
@@ -8,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useTranslation();
@@ -16,7 +15,6 @@ export function LanguageSwitcher() {
     switch (lang) {
       case 'en': return 'EN';
       case 'es': return 'ES';
-      case 'fr': return 'FR';
       default: return 'EN';
     }
   };
@@ -31,13 +29,10 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setLanguage('en')}>
-          English
+          {t('lang.english')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage('es')}>
-          Español
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLanguage('fr')}>
-          Français
+          {t('lang.spanish')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

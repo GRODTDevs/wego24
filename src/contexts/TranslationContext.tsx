@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-type Language = 'en' | 'es' | 'fr';
+type Language = "en" | "es" | "fr";
 
 interface TranslationContextType {
   language: Language;
@@ -8,263 +8,347 @@ interface TranslationContextType {
   t: (key: string) => string;
 }
 
-const translations = {
+export const translations = {
   en: {
-    // Common
-    'common.home': 'Home',
-    'common.courierRequest': 'Request Courier',
-    'common.partnerInfo': 'Partner Info',
-    
-    // Navigation
-    'nav.home': 'Home',
-    'nav.drivers': 'Drivers',
-    'nav.partners': 'Partners',
-    'nav.admin': 'Admin',
-    
-    // Home page
-    'home.welcome': 'Welcome',
-    'home.signOut': 'Sign Out',
-    'home.loginButton': 'Sign In',
-    'home.delivery.badge': 'FAST DELIVERY',
-    'home.delivery.title': 'Get your favorite food',
-    'home.delivery.titleHighlight': 'delivered fast',
-    'home.delivery.description': 'Order from your favorite restaurants and get it delivered quickly',
-    'home.searchPlaceholder': 'Search restaurants, food...',
-    'home.searchButton': 'Search',
-    'home.courier.badge': 'COURIER SERVICE',
-    'home.courier.title': 'Need something delivered?',
-    'home.courier.description': 'Fast and reliable courier service for all your delivery needs',
-    'home.getCourier': 'Get a Courier',
-    'home.partner.badge': 'BECOME A PARTNER',
-    'home.partner.title': 'Partner with us',
-    'home.partner.description': 'Join our network of restaurants and grow your business',
-    'home.partner.button': 'Become a Partner',
-    'home.partner.buttonInfo': 'Learn More',
-    'home.partner.buttonRegister': 'Become a Partner',
-    
-    // Language
-    'language.english': 'English',
-    'language.spanish': 'Spanish',
-    'language.french': 'French',
-    
-    // Auth
-    'auth.signIn': 'Sign In',
-    'auth.signOut': 'Sign Out',
-    
-    // Driver
-    'driver.become': 'Become a Driver',
-    'driver.registration.title': 'Driver Registration',
-    'driver.registration.subtitle': 'Join our delivery network',
-    'driver.profile.title': 'Driver Profile',
-    'driver.dashboard.title': 'Driver Dashboard',
-    'driver.performance.title': 'Performance Metrics',
-    'driver.earnings.title': 'Earnings',
-    'driver.documents.title': 'Documents',
-    'driver.location.title': 'Location Tracking',
-    
-    // Dashboard
-    'dashboard.tabs.users': 'Users',
-    'dashboard.tabs.locations': 'Locations',
-    'dashboard.tabs.drivers': 'Drivers',
-    'dashboard.tabs.analytics': 'Analytics',
-    'dashboard.tabs.admin': 'Admin',
-    'dashboard.admin.title': 'Admin Tools',
-    'dashboard.admin.description': 'Manage system settings and create superusers',
-
-    // Modal/InfoModal
-    'modal.welcomeTitle': 'Welcome to WeGo!',
-    'modal.welcomeDescription': 'Order from your favorite local restaurants, get fast courier service, or partner with us to grow your business.',
-    'modal.productOwnerStepsTitle': 'How to use WeGo:',
-    'modal.step.searchRestaurants': 'Search for restaurants or stores.',
-    'modal.step.viewMenu': 'View menus and place orders.',
-    'modal.step.reviewFlows': 'Track your order and review delivery.',
-    'modal.step.loggedIn': 'You are logged in and can access your dashboard.',
-    'modal.step.loginPrompt': 'Sign in to access more features.'
+    nav: {
+      home: "Home",
+      courierRequest: "Courier Request",
+      partnerInfo: "Partner Info",
+      become: "Become a Partner",
+      signIn: "Sign In",
+    },
+    auth: {
+      signOut: "Sign Out",
+    },
+    footer: {
+      rights: "All rights reserved.",
+      beta: "BETA",
+    },
+    home: {
+      delivery: {
+        badge: "LOCAL DELIVERY",
+        title: "Order from your",
+        titleHighlight: "favorite places",
+        description:
+          "Discover amazing restaurants, cafes, and local shops in your area.",
+      },
+      searchPlaceholder: "Search restaurants, cafes, shops...",
+      searchButton: "Search",
+      courier: {
+        badge: "COURIER SERVICE",
+        title: "Need something delivered?",
+        description:
+          "Our professional couriers can pick up and deliver anything you need, anywhere in the city. Fast, reliable, and affordable.",
+      },
+      getCourier: "Get Courier",
+      partner: {
+        badge: "BUSINESS PARTNERSHIP",
+        title: "Grow your business with us",
+        description:
+          "Join our platform and reach more customers. Increase your sales with our delivery network and grow your business today.",
+        buttonInfo: "Learn More",
+        buttonRegister: "Become a Partner",
+      },
+    },
+    locations: {
+      businessTypes: {
+        restaurant: "Restaurant",
+        cafe: "Cafe",
+        shop: "Shop",
+      },
+    },
+    lang: {
+      english: "EN",
+      spanish: "ES",
+    },
+    modal: {
+      welcomeTitle: "Welcome to WeGo!",
+      welcomeDescription:
+        "Explore local restaurants, order food, and get anything delivered.",
+      productOwnerStepsTitle: "How it works:",
+      step: {
+        searchRestaurants: "Search for restaurants",
+        viewMenu: "View the menu",
+        reviewFlows: "Check delivery flows",
+        loggedIn: "You are logged in!",
+        loginPrompt: "Log in to place an order.",
+      },
+    },
+    courierRequest: {
+      title: "Courier Request",
+      description: "Book a courier to deliver your items quickly and safely.",
+      pickup: {
+        title: "Pickup Details",
+        locationLabel: "Location *",
+        locationPlaceholder: "Enter pickup address",
+        dateLabel: "Date",
+        datePlaceholder: "dd/mm/yyyy",
+        timeLabel: "Time",
+        timePlaceholder: "--:--",
+      },
+      item: {
+        title: "Item Details",
+        descriptionLabel: "Description *",
+        descriptionPlaceholder: "Describe the item to be delivered",
+        sizeLabel: "Size",
+        sizePlaceholder: "e.g. Medium box",
+        weightLabel: "Weight",
+        weightPlaceholder: "e.g. 2kg",
+      },
+      dropoff: {
+        title: "Dropoff Details",
+        locationLabel: "Location *",
+        locationPlaceholder: "Enter dropoff address",
+        dateLabel: "Date",
+        datePlaceholder: "dd/mm/yyyy",
+        timeLabel: "Time",
+        timePlaceholder: "--:--",
+      },
+      specialInstructions: "Special Instructions",
+      specialInstructionsPlaceholder: "Any additional info for the courier?",
+      priceCalculated: "Price calculated",
+      processing: "Processing...",
+      pay: "Pay",
+      andBookDelivery: "and book delivery",
+      signInPrompt: "Please sign in to book a courier.",
+      errors: {
+        enterAddresses: "Please enter both pickup and dropoff addresses.",
+        findAddresses: "Could not find one or both addresses.",
+        calculatingPrice: "Error calculating price.",
+        signIn: "You must be signed in to pay.",
+        calculatePrice: "Please calculate the price first.",
+        paymentSession: "Error creating payment session.",
+        processingPayment: "Error processing payment.",
+        fillFields: "Please fill in all required fields.",
+      },
+      calculation: {
+        title: "Price Calculation",
+        calculate: "Calculate",
+        calculating: "Calculating...",
+        baseFee: "Base Fee",
+        distanceFee: "Distance Fee",
+        total: "Total",
+      },
+    },
+    common: {
+      backToHome: "Back to Home",
+      signIn: "Sign In",
+    },
+    dashboard: {
+      dashboard: "Operations",
+      loading: "Loading dashboard...",
+      title: "Operations",
+      orders: "Orders",
+      revenue: "Revenue",
+      activeUsers: "Active Users",
+      partners: "Partners",
+      drivers: "Drivers",
+      recentOrders: "Recent Orders",
+      courierStatus: "Courier Status",
+      alerts: "Alerts",
+      failedOrder: "Failed Order",
+      partnerAnalytics: "Partner & Driver Analytics",
+      topPartners: "Top Partners",
+      topDrivers: "Top Drivers",
+      deliveries: "Deliveries",
+      recentActivity: "Recent Activity",
+    },
   },
   es: {
-    // Common
-    'common.home': 'Inicio',
-    'common.courierRequest': 'Solicitar Mensajero',
-    'common.partnerInfo': 'Información del Socio',
-    
-    // Navigation
-    'nav.home': 'Inicio',
-    'nav.drivers': 'Conductores',
-    'nav.partners': 'Socios',
-    'nav.admin': 'Admin',
-    
-    // Home page
-    'home.welcome': 'Bienvenido',
-    'home.signOut': 'Cerrar Sesión',
-    'home.loginButton': 'Iniciar Sesión',
-    'home.delivery.badge': 'ENTREGA RÁPIDA',
-    'home.delivery.title': 'Obtén tu comida favorita',
-    'home.delivery.titleHighlight': 'entregada rápido',
-    'home.delivery.description': 'Ordena de tus restaurantes favoritos y recíbelo rápidamente',
-    'home.searchPlaceholder': 'Buscar restaurantes, comida...',
-    'home.searchButton': 'Buscar',
-    'home.courier.badge': 'SERVICIO DE MENSAJERÍA',
-    'home.courier.title': '¿Necesitas algo entregado?',
-    'home.courier.description': 'Servicio de mensajería rápido y confiable para todas tus necesidades',
-    'home.getCourier': 'Obtener Mensajero',
-    'home.partner.badge': 'CONVIÉRTETE EN SOCIO',
-    'home.partner.title': 'Asóciate con nosotros',
-    'home.partner.description': 'Únete a nuestra red de restaurantes y haz crecer tu negocio',
-    'home.partner.button': 'Convertirse en Socio',
-    'home.partner.buttonInfo': 'Más información',
-    'home.partner.buttonRegister': 'Convertirse en Socio',
-    
-    // Language
-    'language.english': 'Inglés',
-    'language.spanish': 'Español',
-    'language.french': 'Francés',
-    
-    // Auth
-    'auth.signIn': 'Iniciar Sesión',
-    'auth.signOut': 'Cerrar Sesión',
-    
-    // Driver
-    'driver.become': 'Ser Conductor',
-    'driver.registration.title': 'Registro de Conductor',
-    'driver.registration.subtitle': 'Únete a nuestra red de entrega',
-    'driver.profile.title': 'Perfil del Conductor',
-    'driver.dashboard.title': 'Panel del Conductor',
-    'driver.performance.title': 'Métricas de Rendimiento',
-    'driver.earnings.title': 'Ganancias',
-    'driver.documents.title': 'Documentos',
-    'driver.location.title': 'Seguimiento de Ubicación',
-    
-    // Dashboard
-    'dashboard.tabs.users': 'Usuarios',
-    'dashboard.tabs.locations': 'Ubicaciones',
-    'dashboard.tabs.drivers': 'Conductores',
-    'dashboard.tabs.analytics': 'Análisis',
-    'dashboard.tabs.admin': 'Admin',
-    'dashboard.admin.title': 'Herramientas de Admin',
-    'dashboard.admin.description': 'Gestionar configuraciones del sistema y crear superusuarios',
-
-    // Modal/InfoModal
-    'modal.welcomeTitle': '¡Bienvenido a WeGo!',
-    'modal.welcomeDescription': 'Pide de tus restaurantes locales favoritos, recibe mensajería rápida o hazte socio para hacer crecer tu negocio.',
-    'modal.productOwnerStepsTitle': 'Cómo usar WeGo:',
-    'modal.step.searchRestaurants': 'Busca restaurantes o tiendas.',
-    'modal.step.viewMenu': 'Consulta menús y haz pedidos.',
-    'modal.step.reviewFlows': 'Sigue tu pedido y deja una reseña.',
-    'modal.step.loggedIn': 'Has iniciado sesión y puedes acceder a tu panel.',
-    'modal.step.loginPrompt': 'Inicia sesión para acceder a más funciones.'
+    nav: {
+      home: "Inicio",
+      courierRequest: "Mensajería",
+      partnerInfo: "Información Socio",
+      become: "Hazte Socio",
+      signIn: "Iniciar Sesión",
+    },
+    auth: {
+      signOut: "Cerrar Sesión",
+    },
+    footer: {
+      rights: "Todos los derechos reservados.",
+      beta: "BETA",
+    },
+    home: {
+      delivery: {
+        badge: "ENTREGA LOCAL",
+        title: "Pide de tus",
+        titleHighlight: "lugares favoritos",
+        description:
+          "Descubre increíbles restaurantes, cafeterías y tiendas locales en tu área.",
+      },
+      searchPlaceholder: "Buscar restaurantes, cafeterías, tiendas...",
+      searchButton: "Buscar",
+      courier: {
+        badge: "SERVICIO DE MENSAJERÍA",
+        title: "¿Necesitas algo entregado?",
+        description:
+          "Nuestros mensajeros profesionales pueden recoger y entregar cualquier cosa que necesites, en cualquier lugar de la ciudad. Rápido, confiable y económico.",
+      },
+      getCourier: "Obtener Mensajero",
+      partner: {
+        badge: "ASOCIACIÓN COMERCIAL",
+        title: "Haz crecer tu negocio con nosotros",
+        description:
+          "Únete a nuestra plataforma y llega a más clientes. Aumenta tus ventas con nuestra red de entrega y haz crecer tu negocio hoy.",
+        buttonInfo: "Más Información",
+        buttonRegister: "Convertirse en Socio",
+      },
+    },
+    locations: {
+      businessTypes: {
+        restaurant: "Restaurante",
+        cafe: "Cafetería",
+        shop: "Tienda",
+      },
+    },
+    lang: {
+      english: "EN",
+      spanish: "ES",
+    },
+    modal: {
+      welcomeTitle: "¡Bienvenido a WeGo!",
+      welcomeDescription:
+        "Explora restaurantes locales, pide comida y recibe cualquier cosa a domicilio.",
+      productOwnerStepsTitle: "Cómo funciona:",
+      step: {
+        searchRestaurants: "Busca restaurantes",
+        viewMenu: "Ver el menú",
+        reviewFlows: "Revisa los flujos de entrega",
+        loggedIn: "¡Has iniciado sesión!",
+        loginPrompt: "Inicia sesión para hacer un pedido.",
+      },
+    },
+    courierRequest: {
+      title: "Solicitud de Mensajero",
+      description:
+        "Reserva un mensajero para entregar tus artículos de forma rápida y segura.",
+      pickup: {
+        title: "Detalles de Recogida",
+        locationLabel: "Ubicación *",
+        locationPlaceholder: "Introduce la dirección de recogida",
+        dateLabel: "Fecha",
+        datePlaceholder: "dd/mm/aaaa",
+        timeLabel: "Hora",
+        timePlaceholder: "--:--",
+      },
+      item: {
+        title: "Detalles del Artículo",
+        descriptionLabel: "Descripción *",
+        descriptionPlaceholder: "Describe el artículo a entregar",
+        sizeLabel: "Tamaño",
+        sizePlaceholder: "ej. Caja mediana",
+        weightLabel: "Peso",
+        weightPlaceholder: "ej. 2kg",
+      },
+      dropoff: {
+        title: "Detalles de Entrega",
+        locationLabel: "Ubicación *",
+        locationPlaceholder: "Introduce la dirección de entrega",
+        dateLabel: "Fecha",
+        datePlaceholder: "dd/mm/aaaa",
+        timeLabel: "Hora",
+        timePlaceholder: "--:--",
+      },
+      specialInstructions: "Instrucciones Especiales",
+      specialInstructionsPlaceholder:
+        "¿Alguna información adicional para el mensajero?",
+      priceCalculated: "Precio calculado",
+      processing: "Procesando...",
+      pay: "Pagar",
+      andBookDelivery: "y reservar entrega",
+      signInPrompt: "Por favor, inicia sesión para reservar un mensajero.",
+      errors: {
+        enterAddresses:
+          "Por favor, introduce ambas direcciones de recogida y entrega.",
+        findAddresses: "No se pudo encontrar una o ambas direcciones.",
+        calculatingPrice: "Error al calcular el precio.",
+        signIn: "Debes iniciar sesión para pagar.",
+        calculatePrice: "Por favor, calcula el precio primero.",
+        paymentSession: "Error al crear la sesión de pago.",
+        processingPayment: "Error al procesar el pago.",
+        fillFields: "Por favor, completa todos los campos obligatorios.",
+      },
+      calculation: {
+        title: "Cálculo de Precio",
+        calculate: "Calcular",
+        calculating: "Calculando...",
+        baseFee: "Tarifa Base",
+        distanceFee: "Tarifa por Distancia",
+        total: "Total",
+      },
+    },
+    common: {
+      backToHome: "Volver al inicio",
+      signIn: "Iniciar Sesión",
+    },
+    dashboard: {
+      dashboard: "Operaciones",
+      loading: "Cargando panel...",
+      title: "Panel de Operaciones",
+      orders: "Pedidos",
+      revenue: "Ingresos",
+      activeUsers: "Usuarios Activos",
+      partners: "Socios",
+      drivers: "Repartidores",
+      recentOrders: "Pedidos Recientes",
+      courierStatus: "Estado de Mensajeros",
+      alerts: "Alertas",
+      failedOrder: "Pedido Fallido",
+      partnerAnalytics: "Analítica de Socios y Repartidores",
+      topPartners: "Socios Destacados",
+      topDrivers: "Repartidores Destacados",
+      deliveries: "Entregas",
+      recentActivity: "Actividad Reciente",
+    },
   },
-  fr: {
-    // Common
-    'common.home': 'Accueil',
-    'common.courierRequest': 'Demander un Coursier',
-    'common.partnerInfo': 'Informations Partenaire',
-    
-    // Navigation
-    'nav.home': 'Accueil',
-    'nav.drivers': 'Chauffeurs',
-    'nav.partners': 'Partenaires',
-    'nav.admin': 'Admin',
-    
-    // Home page
-    'home.welcome': 'Bienvenue',
-    'home.signOut': 'Se Déconnecter',
-    'home.loginButton': 'Se Connecter',
-    'home.delivery.badge': 'LIVRAISON RAPIDE',
-    'home.delivery.title': 'Obtenez votre nourriture préférée',
-    'home.delivery.titleHighlight': 'livrée rapidement',
-    'home.delivery.description': 'Commandez dans vos restaurants préférés et recevez-le rapidement',
-    'home.searchPlaceholder': 'Rechercher restaurants, nourriture...',
-    'home.searchButton': 'Rechercher',
-    'home.courier.badge': 'SERVICE DE COURSIER',
-    'home.courier.title': 'Besoin de quelque chose à livrer?',
-    'home.courier.description': 'Service de coursier rapide et fiable pour tous vos besoins',
-    'home.getCourier': 'Obtenir un Coursier',
-    'home.partner.badge': 'DEVENEZ PARTENAIRE',
-    'home.partner.title': 'Partenaire avec nous',
-    'home.partner.description': 'Rejoignez notre réseau de restaurants et développez votre entreprise',
-    'home.partner.button': 'Devenir Partenaire',
-    'home.partner.buttonInfo': 'En savoir plus',
-    'home.partner.buttonRegister': 'Devenir Partenaire',
-    
-    // Language
-    'language.english': 'Anglais',
-    'language.spanish': 'Espagnol',
-    'language.french': 'Français',
-    
-    // Auth
-    'auth.signIn': 'Se Connecter',
-    'auth.signOut': 'Se Déconnecter',
-    
-    // Driver
-    'driver.become': 'Devenir Chauffeur',
-    'driver.registration.title': 'Inscription Chauffeur',
-    'driver.registration.subtitle': 'Rejoignez notre réseau de livraison',
-    'driver.profile.title': 'Profil du Chauffeur',
-    'driver.dashboard.title': 'Tableau de Bord Chauffeur',
-    'driver.performance.title': 'Métriques de Performance',
-    'driver.earnings.title': 'Revenus',
-    'driver.documents.title': 'Documents',
-    'driver.location.title': 'Suivi de Localisation',
-    
-    // Dashboard
-    'dashboard.tabs.users': 'Utilisateurs',
-    'dashboard.tabs.locations': 'Emplacements',
-    'dashboard.tabs.drivers': 'Chauffeurs',
-    'dashboard.tabs.analytics': 'Analytique',
-    'dashboard.tabs.admin': 'Admin',
-    'dashboard.admin.title': 'Outils Admin',
-    'dashboard.admin.description': 'Gérer les paramètres système et créer des superutilisateurs',
-
-    // Modal/InfoModal
-    'modal.welcomeTitle': 'Bienvenue sur WeGo!',
-    'modal.welcomeDescription': 'Commandez dans vos restaurants locaux préférés, bénéficiez d’un service de messagerie rapide ou devenez partenaire pour développer votre entreprise.',
-    'modal.productOwnerStepsTitle': 'Comment utiliser WeGo :',
-    'modal.step.searchRestaurants': 'Recherchez des restaurants ou des magasins.',
-    'modal.step.viewMenu': 'Consultez les menus et passez des commandes.',
-    'modal.step.reviewFlows': 'Suivez votre commande et laissez un avis.',
-    'modal.step.loggedIn': 'Vous êtes connecté et pouvez accéder à votre tableau de bord.',
-    'modal.step.loginPrompt': 'Connectez-vous pour accéder à plus de fonctionnalités.'
-  }
 };
 
-const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
+const TranslationContext = createContext<TranslationContextType | undefined>(
+  undefined
+);
 
-export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [language, setLanguage] = useState<Language>("en");
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     // Initialize the context
     setIsInitialized(true);
-    console.log('TranslationProvider initialized with language:', language);
+    console.log("TranslationProvider initialized with language:", language);
   }, [language]);
 
   const t = (key: string): string => {
     try {
       if (!isInitialized) {
-        console.warn('Translation context not initialized, using fallback for:', key);
-        return key.split('.').pop() || key;
+        console.warn(
+          "Translation context not initialized, using fallback for:",
+          key
+        );
+        return key.split(".").pop() || key;
       }
 
-      console.log('Translation requested for key:', key, 'language:', language);
-      
-      const keys = key.split('.');
+      console.log("Translation requested for key:", key, "language:", language);
+
+      const keys = key.split(".");
       let value: any = translations[language];
-      
+
       for (const k of keys) {
-        if (value && typeof value === 'object') {
+        if (value && typeof value === "object") {
           value = value[k];
         } else {
           value = undefined;
           break;
         }
       }
-      
+
       // If translation not found, try English fallback
-      if (!value && language !== 'en') {
+      if (!value && language !== "en") {
         let fallback: any = translations.en;
         for (const k of keys) {
-          if (fallback && typeof fallback === 'object') {
+          if (fallback && typeof fallback === "object") {
             fallback = fallback[k];
           } else {
             fallback = undefined;
@@ -272,25 +356,25 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           }
         }
         if (fallback) {
-          console.log('Using English fallback for:', key, '=', fallback);
+          console.log("Using English fallback for:", key, "=", fallback);
           return fallback;
         }
       }
-      
+
       // Return the translation if found, otherwise return the last part of the key
-      const result = value || key.split('.').pop() || key;
-      console.log('Translation result for', key, '=', result);
+      const result = value || key.split(".").pop() || key;
+      console.log("Translation result for", key, "=", result);
       return result;
     } catch (error) {
-      console.error('Translation error:', error, 'for key:', key);
-      return key.split('.').pop() || key;
+      console.error("Translation error:", error, "for key:", key);
+      return key.split(".").pop() || key;
     }
   };
 
   const contextValue = {
     language,
     setLanguage,
-    t
+    t,
   };
 
   if (!isInitialized) {
@@ -306,11 +390,14 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 export const useTranslation = () => {
   const context = useContext(TranslationContext);
-  console.log('useTranslation called, context:', context ? 'available' : 'undefined');
-  
+  console.log(
+    "useTranslation called, context:",
+    context ? "available" : "undefined"
+  );
+
   if (context === undefined) {
-    console.error('useTranslation must be used within a TranslationProvider');
-    throw new Error('useTranslation must be used within a TranslationProvider');
+    console.error("useTranslation must be used within a TranslationProvider");
+    throw new Error("useTranslation must be used within a TranslationProvider");
   }
   return context;
 };

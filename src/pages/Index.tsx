@@ -56,7 +56,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      
       <main className="flex-1">
         {/* Section 1: Local Delivery Search */}
         <section className="relative py-20 px-4">
@@ -65,7 +64,6 @@ const Index = () => {
             <div className="w-[900px] h-[900px] bg-gradient-radial from-orange-100 via-white to-transparent rounded-full absolute left-1/2 -top-52 -translate-x-1/2 opacity-60"></div>
             <div className="w-[500px] h-[500px] bg-gradient-radial from-red-100 via-white to-transparent rounded-full absolute right-10 top-1/3 opacity-40"></div>
           </div>
-          
           <div className="relative z-10 flex flex-col items-center max-w-5xl mx-auto">
             <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">{t('home.delivery.badge')}</span>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
@@ -74,7 +72,6 @@ const Index = () => {
             <p className="text-gray-600 text-lg mb-8 text-center max-w-md">
               {t('home.delivery.description')}
             </p>
-            
             <div className="flex w-full max-w-md gap-2 mb-12">
               <input
                 className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"

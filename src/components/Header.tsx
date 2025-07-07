@@ -1,8 +1,7 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
-import { useTranslation } from "../contexts/TranslationContext";
+import { useTranslation } from "@/contexts/TranslationContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
@@ -37,16 +36,16 @@ export function Header() {
 
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('common.home')}
+              {t('nav.home')}
             </Link>
             <Link to="/courier-request" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('common.courierRequest')}
+              {t('nav.courierRequest')}
             </Link>
             <Link to="/partner-info" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('common.partnerInfo')}
+              {t('nav.partnerInfo')}
             </Link>
             <Link to="/driver-registration" className="text-gray-600 hover:text-gray-900 transition-colors">
-              {t('driver.become')}
+              {t('nav.become')}
             </Link>
           </nav>
 
@@ -59,7 +58,7 @@ export function Header() {
                   to="/operations" 
                   className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
-                  Dashboard
+                  {t('dashboard.dashboard')}
                 </Link>
                 <Button variant="ghost" onClick={handleSignOut} className="text-gray-600">
                   {t('auth.signOut')}
@@ -67,7 +66,7 @@ export function Header() {
               </div>
             ) : (
               <Button onClick={() => navigate('/auth')} variant="outline">
-                {t('auth.signIn')}
+                {t('nav.signIn')}
               </Button>
             )}
             <MobileNav />

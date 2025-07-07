@@ -1,5 +1,6 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface LocationCardProps {
   name: string;
@@ -20,6 +21,7 @@ export function LocationCard({
   highlightColor = "red",
 }: LocationCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const handleClick = () => {
     // Encode for URL safety, but keep readable demo name
@@ -43,7 +45,9 @@ export function LocationCard({
           <CardTitle className={`mb-1 font-semibold text-lg ${highlightColor === "red" ? "text-red-600" : "text-orange-600"}`}>
             {name}
           </CardTitle>
-          <div className="text-gray-500 text-sm mb-2">{businessType}</div>
+          <div className="text-gray-500 text-sm mb-2">
+            {t(`locations.businessTypes.${businessType}`)}
+          </div>
         </CardContent>
       </div>
     </button>

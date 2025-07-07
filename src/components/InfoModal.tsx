@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 export function InfoModal() {
   const { user } = useAuth();
