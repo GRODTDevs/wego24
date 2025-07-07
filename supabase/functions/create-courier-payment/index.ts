@@ -8,7 +8,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Calculate straight-line distance using Haversine formula
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -40,10 +39,10 @@ serve(async (req) => {
 
     console.log("Received payment request:", { pickupLat, pickupLng, dropoffLat, dropoffLng });
 
-    // Calculate distance and price
+    // Calculate distance and price with updated rates
     const distance = calculateDistance(pickupLat, pickupLng, dropoffLat, dropoffLng);
-    const baseFee = 6.50;
-    const distanceFee = distance * 0.50;
+    const baseFee = 8.50; // Updated base fee
+    const distanceFee = distance * 0.75; // Updated distance rate
     const totalPrice = baseFee + distanceFee;
     const totalPriceCents = Math.round(totalPrice * 100);
 
@@ -69,7 +68,7 @@ serve(async (req) => {
           price_data: {
             currency: "eur",
             product_data: { 
-              name: "Courier Delivery Service",
+              name: "WeGo Courier Delivery Service",
               description: `From: ${pickupLocation} to ${dropoffLocation} (${distance.toFixed(2)} km)`
             },
             unit_amount: totalPriceCents,
@@ -85,7 +84,8 @@ serve(async (req) => {
         dropoff_location: dropoffLocation,
         item_description: itemDescription,
         distance: distance.toString(),
-        user_email: userEmail
+        user_email: userEmail,
+        service_type: "courier_delivery"
       }
     });
 

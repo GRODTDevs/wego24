@@ -46,7 +46,6 @@ const CourierRequest = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Reset price calculation when addresses change
     if (field === 'pickupLocation' || field === 'dropoffLocation') {
       setPriceCalculation(null);
     }
@@ -60,7 +59,6 @@ const CourierRequest = () => {
 
     setCalculatingPrice(true);
     try {
-      // Geocode both addresses
       const [pickupCoords, dropoffCoords] = await Promise.all([
         geocodeAddress(formData.pickupLocation),
         geocodeAddress(formData.dropoffLocation)
@@ -71,7 +69,6 @@ const CourierRequest = () => {
         return;
       }
 
-      // Calculate distance
       const distance = calculateStraightLineDistance(
         pickupCoords.lat, 
         pickupCoords.lng, 
@@ -79,8 +76,9 @@ const CourierRequest = () => {
         dropoffCoords.lng
       );
 
-      const baseFee = 6.50;
-      const distanceFee = distance * 0.50;
+      // Updated pricing structure
+      const baseFee = 8.50; // Increased base fee
+      const distanceFee = distance * 0.75; // Increased per km rate
       const totalPrice = baseFee + distanceFee;
 
       setPriceCalculation({
@@ -112,7 +110,6 @@ const CourierRequest = () => {
 
     setLoading(true);
     try {
-      // Geocode addresses again for payment
       const [pickupCoords, dropoffCoords] = await Promise.all([
         geocodeAddress(formData.pickupLocation),
         geocodeAddress(formData.dropoffLocation)
@@ -142,7 +139,6 @@ const CourierRequest = () => {
         return;
       }
 
-      // Redirect to Stripe checkout
       window.open(data.url, '_blank');
       
     } catch (error) {
@@ -156,7 +152,6 @@ const CourierRequest = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.pickupLocation || !formData.dropoffLocation || !formData.itemDescription) {
       toast.error(t('courier.errors.fillRequired'));
       return;
@@ -171,25 +166,25 @@ const CourierRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       
-      <main className="flex-1 px-4 py-8">
+      <main className="flex-1 px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          {/* Back button */}
-          <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6">
+          {/* Mobile-optimized back button */}
+          <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base">
             <ArrowLeft className="w-4 h-4" />
             {t('courier.backToHome')}
           </Link>
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('courier.title')}</h1>
-            <p className="text-gray-600">{t('courier.description')}</p>
+          {/* Mobile-optimized header */}
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{t('courier.title')}</h1>
+            <p className="text-gray-600 text-sm sm:text-base px-2">{t('courier.description')}</p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Mobile-optimized form */}
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             <PickupSection 
               formData={formData} 
               onInputChange={handleInputChange} 
@@ -205,14 +200,17 @@ const CourierRequest = () => {
               onInputChange={handleInputChange} 
             />
 
-            {/* Special Instructions */}
-            <div>
-              <Label htmlFor="specialInstructions">{t('courier.specialInstructions')}</Label>
+            {/* Special Instructions - Mobile optimized */}
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm">
+              <Label htmlFor="specialInstructions" className="text-base sm:text-lg font-medium">
+                {t('courier.specialInstructions')}
+              </Label>
               <Textarea
                 id="specialInstructions"
                 placeholder={t('courier.specialInstructionsPlaceholder')}
                 value={formData.specialInstructions}
                 onChange={(e) => handleInputChange("specialInstructions", e.target.value)}
+                className="mt-2 min-h-[80px] text-base"
               />
             </div>
 
@@ -223,19 +221,19 @@ const CourierRequest = () => {
               onCalculatePrice={calculatePrice}
             />
 
-            {/* Submit Button */}
-            <div className="text-center">
+            {/* Mobile-optimized submit button */}
+            <div className="text-center pt-4">
               <Button
                 type="submit"
                 disabled={loading || !priceCalculation || !user}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-8 py-3 text-lg flex items-center gap-2"
+                className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg flex items-center justify-center gap-2 min-h-[48px]"
               >
                 <CreditCard className="w-5 h-5" />
                 {loading ? t('courier.processing') : `${t('courier.pay')} ${priceCalculation ? formatCurrency(priceCalculation.totalPrice) : ""} ${t('courier.book')}`}
               </Button>
               
               {!user && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 mt-3 px-4">
                   {t('courier.signInRequired')} <Link to="/auth" className="text-blue-600 hover:underline">{t('courier.signInLink')}</Link>
                 </p>
               )}
