@@ -15,7 +15,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-white hover:text-red-200 hover:bg-red-700">
+        <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 hover:bg-gray-100">
           <Globe className="h-4 w-4 mr-2" />
           {language === 'en' ? 'EN' : 'ES'}
         </Button>

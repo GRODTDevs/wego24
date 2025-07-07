@@ -63,24 +63,12 @@ export function useNotifications() {
     if (!user) return;
 
     try {
-      // Using raw SQL query since the notifications table might not be in the generated types yet
-      const { data, error } = await supabase.rpc('get_user_notifications', { user_id: user.id });
-      
-      if (error && error.code === '42883') {
-        // Function doesn't exist, try direct query
-        console.log('Notifications function not found, using direct query approach');
-        return;
-      }
-      
-      if (error) throw error;
-      
-      if (data) {
-        setNotifications(data);
-        setUnreadCount(data.filter((n: Notification) => !n.is_read).length);
-      }
+      // Since notifications table doesn't exist yet, just set empty arrays
+      console.log('Notifications table not available yet');
+      setNotifications([]);
+      setUnreadCount(0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
-      // For now, just set empty array to prevent errors
       setNotifications([]);
       setUnreadCount(0);
     }
@@ -88,17 +76,8 @@ export function useNotifications() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // Use raw update for now
-      const { error } = await supabase.rpc('mark_notification_read', { 
-        notification_id: notificationId 
-      });
-
-      if (error && error.code === '42883') {
-        console.log('Mark read function not found, feature not available yet');
-        return;
-      }
-
-      if (error) throw error;
+      // Placeholder for when notifications table exists
+      console.log('Mark notification as read not available yet');
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -108,16 +87,8 @@ export function useNotifications() {
     if (!user) return;
 
     try {
-      const { error } = await supabase.rpc('mark_all_notifications_read', { 
-        user_id: user.id 
-      });
-
-      if (error && error.code === '42883') {
-        console.log('Mark all read function not found, feature not available yet');
-        return;
-      }
-
-      if (error) throw error;
+      // Placeholder for when notifications table exists
+      console.log('Mark all notifications as read not available yet');
       setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -132,20 +103,8 @@ export function useNotifications() {
     orderId?: string
   ) => {
     try {
-      const { error } = await supabase.rpc('create_notification', {
-        user_id: userId,
-        order_id: orderId,
-        notification_type: type,
-        title: title,
-        message: message
-      });
-
-      if (error && error.code === '42883') {
-        console.log('Create notification function not found, feature not available yet');
-        return;
-      }
-
-      if (error) throw error;
+      // Placeholder for when notifications table exists
+      console.log('Create notification not available yet');
     } catch (error) {
       console.error('Error creating notification:', error);
     }

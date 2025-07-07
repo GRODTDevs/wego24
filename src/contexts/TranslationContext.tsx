@@ -14,9 +14,16 @@ interface TranslationProviderProps {
 
 const translations = {
   en: {
+    common: {
+      home: "Home",
+      courierRequest: "Courier Request", 
+      partnerInfo: "Partner Info",
+      adminDashboard: "Admin Dashboard",
+      partnerDashboard: "Partner Dashboard",
+    },
     nav: {
       home: "Home",
-      drivers: "Drivers", 
+      drivers: "Drivers",
       partners: "Partners",
       admin: "Admin",
     },
@@ -28,6 +35,8 @@ const translations = {
       login: "Login",
       register: "Register",
       logout: "Logout",
+      signIn: "Sign In",
+      signOut: "Sign Out",
       email: "Email",
       password: "Password",
       firstName: "First Name",
@@ -196,6 +205,13 @@ const translations = {
     }
   },
   es: {
+    common: {
+      home: "Inicio",
+      courierRequest: "Solicitud de Mensajero",
+      partnerInfo: "Información de Socio",
+      adminDashboard: "Panel de Administrador",
+      partnerDashboard: "Panel de Socio",
+    },
     nav: {
       home: "Inicio",
       drivers: "Conductores",
@@ -210,6 +226,8 @@ const translations = {
       login: "Iniciar Sesión",
       register: "Registrarse",
       logout: "Cerrar Sesión",
+      signIn: "Iniciar Sesión",
+      signOut: "Cerrar Sesión",
       email: "Correo Electrónico",
       password: "Contraseña",
       firstName: "Nombre",
