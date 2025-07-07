@@ -58,7 +58,15 @@ export function useSubscription() {
         .order('price_monthly');
 
       if (error) throw error;
-      setPlans(data || []);
+      
+      // Transform the data to match our interface, handling the Json type properly
+      const transformedPlans = data?.map(plan => ({
+        ...plan,
+        features: Array.isArray(plan.features) ? plan.features : 
+                 typeof plan.features === 'string' ? [plan.features] : []
+      })) || [];
+      
+      setPlans(transformedPlans);
     } catch (error) {
       console.error('Error fetching plans:', error);
       toast.error('Failed to load subscription plans');
@@ -107,10 +115,19 @@ export function useSubscription() {
       if (subError && subError.code !== 'PGRST116') {
         console.error('Error fetching subscription details:', subError);
       } else if (subData) {
-        setSubscription({
+        // Transform the subscription plan data
+        const transformedSubscription = {
           ...subData,
-          plan: subData.subscription_plans as SubscriptionPlan
-        });
+          plan: subData.subscription_plans ? {
+            ...subData.subscription_plans,
+            features: Array.isArray(subData.subscription_plans.features) ? 
+                     subData.subscription_plans.features : 
+                     typeof subData.subscription_plans.features === 'string' ? 
+                     [subData.subscription_plans.features] : []
+          } as SubscriptionPlan : undefined
+        };
+        
+        setSubscription(transformedSubscription);
       }
 
       if (showToast) {
