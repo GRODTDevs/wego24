@@ -28,10 +28,11 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">WeGo</span>
+            <img 
+              src="/lovable-uploads/e9f1fc70-186e-4f21-bbb4-bdaed5b5a6f4.png" 
+              alt="WeGo Logo" 
+              className="h-8 w-auto"
+            />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">

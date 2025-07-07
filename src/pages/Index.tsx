@@ -7,7 +7,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { InfoModal } from "@/components/InfoModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTranslation } from "@/contexts/TranslationContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { User, LogIn, LogOut, Truck, Building2, Search, Info } from "lucide-react";
@@ -20,20 +19,39 @@ const Index = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, signOut, loading: authLoading } = useAuth();
-  
-  // Add error boundary for translation context
-  let t: (key: string) => string;
-  try {
-    const translation = useTranslation();
-    t = translation.t;
-  } catch (error) {
-    console.error('Translation context error:', error);
-    // Fallback function
-    t = (key: string) => {
-      const parts = key.split('.');
-      return parts[parts.length - 1] || key;
-    };
-  }
+
+  // Safe translation function with fallbacks
+  const t = (key: string): string => {
+    try {
+      // Try to import useTranslation dynamically
+      const { useTranslation } = require("@/contexts/TranslationContext");
+      const translation = useTranslation();
+      return translation.t(key);
+    } catch (error) {
+      console.warn('Translation context not available, using fallback for:', key);
+      // Return a reasonable fallback based on the key
+      const fallbacks: Record<string, string> = {
+        'home.welcome': 'Welcome',
+        'home.signOut': 'Sign Out',
+        'home.loginButton': 'Sign In',
+        'home.delivery.badge': 'FAST DELIVERY',
+        'home.delivery.title': 'Get your favorite food',
+        'home.delivery.titleHighlight': 'delivered fast',
+        'home.delivery.description': 'Order from your favorite restaurants and get it delivered quickly',
+        'home.searchPlaceholder': 'Search restaurants, food...',
+        'home.searchButton': 'Search',
+        'home.courier.badge': 'COURIER SERVICE',
+        'home.courier.title': 'Need something delivered?',
+        'home.courier.description': 'Fast and reliable courier service for all your delivery needs',
+        'home.getCourier': 'Get a Courier',
+        'home.partner.badge': 'BECOME A PARTNER',
+        'home.partner.title': 'Partner with us',
+        'home.partner.description': 'Join our network of restaurants and grow your business',
+        'home.partner.button': 'Become a Partner'
+      };
+      return fallbacks[key] || key.split('.').pop() || key;
+    }
+  };
 
   useEffect(() => {
     fetchLocations();

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'en' | 'es' | 'fr';
 
@@ -140,9 +140,21 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 
 export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Initialize the context
+    setIsInitialized(true);
+    console.log('TranslationProvider initialized with language:', language);
+  }, [language]);
 
   const t = (key: string): string => {
     try {
+      if (!isInitialized) {
+        console.warn('Translation context not initialized, using fallback for:', key);
+        return key.split('.').pop() || key;
+      }
+
       console.log('Translation requested for key:', key, 'language:', language);
       
       const keys = key.split('.');
@@ -190,7 +202,9 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     t
   };
 
-  console.log('TranslationProvider rendering with language:', language);
+  if (!isInitialized) {
+    return <div>Loading translations...</div>;
+  }
 
   return (
     <TranslationContext.Provider value={contextValue}>
