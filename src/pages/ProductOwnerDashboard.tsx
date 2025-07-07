@@ -12,6 +12,23 @@ import { AdminSetup } from "@/components/user-management/AdminSetup";
 export default function ProductOwnerDashboard() {
   const { t } = useTranslation();
 
+  // Mock data for now - in a real app, this would come from an API
+  const mockStats = {
+    totalOrders: 1250,
+    totalRevenue: 45600,
+    activeLocations: 12,
+    activeDrivers: 8,
+    totalUsers: 2340
+  };
+
+  const mockPreviousStats = {
+    totalOrders: 1100,
+    totalRevenue: 42000,
+    activeLocations: 10,
+    activeDrivers: 6,
+    totalUsers: 2100
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -71,7 +88,11 @@ export default function ProductOwnerDashboard() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <BusinessMetrics />
+          <BusinessMetrics 
+            stats={mockStats}
+            previousStats={mockPreviousStats}
+            loading={false}
+          />
         </TabsContent>
 
         <TabsContent value="admin" className="space-y-6">
