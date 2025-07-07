@@ -6,6 +6,7 @@ WeGo is a next-generation delivery and logistics platform designed for rural and
 
 ### ✅ Core MVP Features
 - **User Authentication System** (Supabase integration)
+- **Developer Login & Route Protection** (all routes protected by developer authentication until launch)
 - **Courier Request Service** (real-time pricing, Stripe payments)
 - **Restaurant & Partner Management** (onboarding, approval, menu management; PartnerApplications present; admin dashboard supports approve/reject/create flows)
 - **Driver Registration & Dashboard** (multi-step registration, document upload, approval workflow, analytics, earnings tracking)
@@ -72,12 +73,42 @@ WeGo is a next-generation delivery and logistics platform designed for rural and
 
 ---
 
+## 📈 Business Projections & Technical KPIs
+
+- **Break-even for Subscription Service:** 54 clients at €15/month covers all fixed costs; client #55+ is profit.
+- **Food Delivery Break-even:** 60 paid orders/month covers costs; every order after is profit.
+- **LTV:CAC Ratio:** 17–18:1 (exceptional; industry target is 3:1+).
+- **Growth Targets:**
+  - Year 1: 700+ subscription clients, €10.5k/month sub revenue, €13k/month food revenue, €7k+ net profit/month.
+  - Year 3: 1,600+ subscribers, €24k/month sub revenue, €26k/month food revenue, €20k+ net profit/month.
+- **Investor ROI:** Projected 10–12× ROI in 3 years; DCF business valuation ~€324k.
+
+**How the Platform Supports These Goals:**
+- **Automated Order Assignment:** Maximizes driver utilization, reduces delivery times, and supports scaling by ensuring every order is matched to the best available driver in real time. This is critical for hitting break-even and profit targets, as it increases order throughput and reduces idle time/costs.
+- **Admin Override:** Admins can manually assign or reassign drivers, ensuring operational flexibility and reliability even if automation fails or special handling is needed.
+- **Real-time Metrics & Analytics:** Track orders, revenue, user growth, and driver/partner performance to optimize operations and marketing spend. These KPIs are directly mapped to business projections and are essential for monitoring LTV, CAC, and profit margins.
+- **System Health Monitoring:** Ensures uptime and reliability, critical for customer trust and retention, and for maintaining high net profit margins as projected.
+- **Subscription & Usage Tracking:** Enforces plan limits, supports upsell/cross-sell, and enables dynamic pricing, all of which are key to maximizing LTV and scaling profitably.
+- **Admin Dashboards:** Enable rapid response to operational issues, partner/driver management, and business decision-making, supporting the growth and scaling targets in the projections.
+- **Testing & QA:** Automated business logic and integration tests ensure pricing, payouts, and KPIs are always accurate, supporting investor confidence and operational excellence.
+
+**Order Automation & Tracking: The Technical Value**
+- Automated order assignment and tracking are the backbone of WeGo’s operational efficiency. By minimizing manual intervention, the platform can scale to hundreds or thousands of orders/month without a linear increase in admin or support staff.
+- Real-time driver and order tracking enables route optimization, clustered deliveries, and dynamic pricing, all of which directly improve profit margins and customer satisfaction.
+- The system’s ability to track every order, driver, and delivery in real time is what enables the business to hit and exceed the financial projections outlined above.
+
+**Summary:**
+The technical platform is designed to directly support WeGo’s business model, growth, and profitability. Every dashboard metric, automation, and alert is mapped to a real business KPI, ensuring that as the platform scales, so does the business value and investor appeal.
+
+---
+
 **Status:**
 - ✅ **Courier Service**: COMPLETE
 - ✅ **Driver Registration (Step 1)**: COMPLETE
 - ✅ **Driver Dashboard (Step 2)**: COMPLETE
 - ✅ **Driver System Steps 3-5**: COMPLETE (earnings, scheduling, feedback; driver UI and admin management complete)
-- 🔄 **Order Automation**: IN PROGRESS (auto-assign, admin override)
+- ✅ **Developer Login & Route Protection**: COMPLETE (all routes protected until launch)
+- 🔄 **Order Automation**: IN PROGRESS (auto-assign, admin override, real-time tracking)
 - 🔄 **Testing & Monitoring**: ENHANCED
 - ⚠️ **Partner Management, Analytics, Commission Tracking, and Order Processing:** Present in codebase; most flows are visible in the admin dashboard, but verify all UI integrations.
 
@@ -91,7 +122,7 @@ WeGo is a next-generation delivery and logistics platform designed for rural and
 - Multilingual, mobile-first, GDPR-compliant
 
 **Next Priorities:**
-- Finalize and test order automation (auto-assign, admin override)
+- Finalize and test order automation (auto-assign, admin override, fallback handling)
 - Expand and polish real-time monitoring and system alerts
 - Begin UI/UX refinement and visual polish across dashboard and user flows
 - Continue aligning features with business plan and add any extra codebase features

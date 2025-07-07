@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -65,7 +64,7 @@ export function useRealTimeOrders(businessId?: string) {
           schema: 'public',
           table: 'orders'
         },
-        (payload) => {
+        async (payload) => {
           console.log('Order change received:', payload);
           
           if (payload.eventType === 'INSERT') {
@@ -77,7 +76,6 @@ export function useRealTimeOrders(businessId?: string) {
               toast.success('New order received!', {
                 description: `Order ${newOrder.order_number} - €${newOrder.total_amount.toFixed(2)}`
               });
-              
               // Notify restaurant users
               notifyRestaurantUsers(newOrder);
             }
@@ -88,15 +86,20 @@ export function useRealTimeOrders(businessId?: string) {
                 order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order
               )
             );
-            
             // Handle status change notifications
             if (payload.old?.status !== updatedOrder.status) {
               handleStatusChangeNotification(updatedOrder, payload.old?.status);
             }
-
             // Handle driver assignment notifications
             if (payload.old?.driver_id !== updatedOrder.driver_id && updatedOrder.driver_id) {
               handleDriverAssignmentNotification(updatedOrder);
+            }
+            // Order automation: auto-assign driver when order is ready and no driver assigned
+            if (
+              updatedOrder.status === 'ready' &&
+              !updatedOrder.driver_id
+            ) {
+              await autoAssignDriver(updatedOrder.id);
             }
           } else if (payload.eventType === 'DELETE') {
             setOrders(current => current.filter(order => order.id !== payload.old.id));
@@ -265,6 +268,42 @@ export function useRealTimeOrders(businessId?: string) {
         });
     } catch (error) {
       console.error('Error creating driver assignment notification:', error);
+    }
+  };
+
+  // Auto-assign driver to order when ready
+  const autoAssignDriver = async (orderId: string) => {
+    try {
+      // Find available driver
+      const { data: drivers, error } = await supabase
+        .from('drivers')
+        .select('id')
+        .eq('is_active', true)
+        .eq('is_available', true)
+        .order('updated_at', { ascending: true }) // Prefer least recently assigned
+        .limit(1);
+      if (error) throw error;
+      if (drivers && drivers.length > 0) {
+        const driverId = drivers[0].id;
+        await assignDriver(orderId, driverId);
+        // Mark driver as unavailable
+        await supabase.from('drivers').update({ is_available: false }).eq('id', driverId);
+        toast.success('Driver auto-assigned to order');
+      } else {
+        // Fallback: notify admin for manual assignment
+        await supabase.from('notifications').insert({
+          user_id: user?.id,
+          order_id: orderId,
+          type: 'order_status',
+          title: 'Manual Driver Assignment Needed',
+          message: 'No available drivers for auto-assignment. Please assign manually.',
+          delivery_method: ['in_app']
+        });
+        toast.warning('No available drivers for auto-assignment. Admin override required.');
+      }
+    } catch (error) {
+      console.error('Auto-assign driver error:', error);
+      toast.error('Failed to auto-assign driver');
     }
   };
 

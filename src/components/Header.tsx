@@ -63,6 +63,14 @@ export function Header() {
                 <Button variant="ghost" onClick={handleSignOut} className="text-gray-600">
                   {t('auth.signOut')}
                 </Button>
+                {user.roles?.includes('admin') && (
+                  <Link 
+                    to="/admin/demo-data" 
+                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  >
+                    Demo Data
+                  </Link>
+                )}
               </div>
             ) : (
               <Button onClick={() => navigate('/auth')} variant="outline">
