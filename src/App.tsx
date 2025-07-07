@@ -17,6 +17,7 @@ import { ErrorViewer } from './components/ErrorViewer';
 import './utils/errorLogger'; // Initialize error logging
 import { DeveloperLogin } from "@/components/auth/DeveloperLogin";
 import { DeveloperProtectedRoute } from "@/components/DeveloperProtectedRoute";
+import { DemoDataManager } from "@/components/admin/DemoDataManager";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +65,7 @@ function App() {
                             <RestaurantDashboard />
                           </ProtectedRoute>
                         } />
+                        <Route path="/admin/demo-data" element={<DemoDataManager />} />
                         {/* Add other routes here */}
                       </Routes>
                     </DeveloperProtectedRoute>

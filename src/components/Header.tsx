@@ -68,7 +68,7 @@ export function Header() {
                     to="/admin/demo-data" 
                     className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
                   >
-                    Demo Data
+                    Demo Content
                   </Link>
                 )}
               </div>
