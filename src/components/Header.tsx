@@ -46,12 +46,20 @@ export function Header({ className }: { className?: string }) {
               {t('common.courierRequest')}
             </Link>
             {!user && (
-              <Link 
-                to="/partner-info" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                {t('common.partnerInfo')}
-              </Link>
+              <>
+                <Link 
+                  to="/partner-info" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  {t('common.partnerInfo')}
+                </Link>
+                <Link 
+                  to="/driver/register" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Become a Driver
+                </Link>
+              </>
             )}
           </div>
 

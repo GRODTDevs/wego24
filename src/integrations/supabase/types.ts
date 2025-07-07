@@ -42,15 +42,174 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_documents: {
+        Row: {
+          document_name: string
+          document_type: string
+          document_url: string
+          driver_id: string
+          file_size: number | null
+          id: string
+          status: string | null
+          uploaded_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          document_name: string
+          document_type: string
+          document_url: string
+          driver_id: string
+          file_size?: number | null
+          id?: string
+          status?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          document_name?: string
+          document_type?: string
+          document_url?: string
+          driver_id?: string
+          file_size?: number | null
+          id?: string
+          status?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_documents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_locations: {
+        Row: {
+          accuracy: number | null
+          created_at: string | null
+          driver_id: string
+          heading: number | null
+          id: string
+          latitude: number
+          longitude: number
+          speed: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string | null
+          driver_id: string
+          heading?: number | null
+          id?: string
+          latitude: number
+          longitude: number
+          speed?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string | null
+          driver_id?: string
+          heading?: number | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          speed?: number | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_locations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_performance: {
+        Row: {
+          average_delivery_time: unknown | null
+          cancelled_deliveries: number | null
+          created_at: string | null
+          customer_rating_average: number | null
+          driver_id: string
+          id: string
+          metric_date: string
+          on_time_percentage: number | null
+          successful_deliveries: number | null
+          total_deliveries: number | null
+          total_earnings: number | null
+          total_reviews: number | null
+        }
+        Insert: {
+          average_delivery_time?: unknown | null
+          cancelled_deliveries?: number | null
+          created_at?: string | null
+          customer_rating_average?: number | null
+          driver_id: string
+          id?: string
+          metric_date: string
+          on_time_percentage?: number | null
+          successful_deliveries?: number | null
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          total_reviews?: number | null
+        }
+        Update: {
+          average_delivery_time?: unknown | null
+          cancelled_deliveries?: number | null
+          created_at?: string | null
+          customer_rating_average?: number | null
+          driver_id?: string
+          id?: string
+          metric_date?: string
+          on_time_percentage?: number | null
+          successful_deliveries?: number | null
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          total_reviews?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_performance_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
+          address: string | null
+          approved_at: string | null
+          approved_by: string | null
+          background_check_status: string | null
+          city: string | null
           created_at: string | null
           current_location: Json | null
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          first_name: string | null
           id: string
+          insurance_expiry_date: string | null
           is_active: boolean | null
           is_available: boolean | null
+          last_name: string | null
+          license_expiry_date: string | null
           license_number: string | null
+          postal_code: string | null
           rating: number | null
+          registration_status: string | null
           total_deliveries: number | null
           updated_at: string | null
           user_id: string | null
@@ -58,13 +217,28 @@ export type Database = {
           vehicle_type: string
         }
         Insert: {
+          address?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          background_check_status?: string | null
+          city?: string | null
           created_at?: string | null
           current_location?: Json | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string | null
           id?: string
+          insurance_expiry_date?: string | null
           is_active?: boolean | null
           is_available?: boolean | null
+          last_name?: string | null
+          license_expiry_date?: string | null
           license_number?: string | null
+          postal_code?: string | null
           rating?: number | null
+          registration_status?: string | null
           total_deliveries?: number | null
           updated_at?: string | null
           user_id?: string | null
@@ -72,13 +246,28 @@ export type Database = {
           vehicle_type: string
         }
         Update: {
+          address?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          background_check_status?: string | null
+          city?: string | null
           created_at?: string | null
           current_location?: Json | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string | null
           id?: string
+          insurance_expiry_date?: string | null
           is_active?: boolean | null
           is_available?: boolean | null
+          last_name?: string | null
+          license_expiry_date?: string | null
           license_number?: string | null
+          postal_code?: string | null
           rating?: number | null
+          registration_status?: string | null
           total_deliveries?: number | null
           updated_at?: string | null
           user_id?: string | null
