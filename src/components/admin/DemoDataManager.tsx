@@ -17,6 +17,7 @@ export function DemoDataManager() {
         first_name: "Demo",
         last_name: "User",
         email: "demo.user@wego24.com",
+        phone: "+34000000000",
         is_demo: true,
         city: "Demo City",
         country: "DemoLand",
@@ -24,23 +25,94 @@ export function DemoDataManager() {
         is_active: true,
       }];
       const demoDrivers = [
-        { name: "Demo Driver 1", email: "demo.driver1@wego24.com", phone: "+34000000001", is_demo: true, vehicle_type: "car" },
-        { name: "Demo Driver 2", email: "demo.driver2@wego24.com", phone: "+34000000002", is_demo: true, vehicle_type: "car" },
+        {
+          user_id: demoProfileId,
+          first_name: "Demo",
+          last_name: "Driver 1",
+          email: "demo.driver1@wego24.com",
+          phone: "+34000000001",
+          is_demo: true,
+          vehicle_type: "car",
+          city: "Demo City",
+          is_active: true,
+          is_available: true,
+          registration_status: "approved",
+          background_check_status: "approved",
+          rating: 4.8,
+          total_deliveries: 42
+        },
+        {
+          user_id: demoProfileId,
+          first_name: "Demo",
+          last_name: "Driver 2",
+          email: "demo.driver2@wego24.com",
+          phone: "+34000000002",
+          is_demo: true,
+          vehicle_type: "car",
+          city: "Demo City",
+          is_active: true,
+          is_available: false,
+          registration_status: "pending",
+          background_check_status: "pending",
+          rating: 4.2,
+          total_deliveries: 17
+        },
       ];
+      // Create demo partner application
+      const demoPartnerApplicationId = "b1b2c3d4-e5f6-7890-abcd-ef1234567890";
+      const demoPartnerApplication = [{
+        id: demoPartnerApplicationId,
+        user_id: demoProfileId,
+        business_name: "Demo Partner Business",
+        business_type: "restaurant",
+        email: "demo.partner@wego24.com",
+        phone: "+34000000003",
+        address: "789 Partner Ave",
+        city: "Demo City",
+        postal_code: "12345",
+        description: "Demo partner application for testing.",
+        status: "approved",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_demo: true,
+      }];
+      const { error: partnerAppErr } = await supabase
+        .from("partner_applications")
+        .insert(demoPartnerApplication);
+      if (partnerAppErr) { throw partnerAppErr; }
+
+      // Create demo partner
+      const demoPartnerId = "c1d2e3f4-5678-90ab-cdef-1234567890ab";
+      const demoPartner = [{
+        id: demoPartnerId,
+        name: "Demo Partner",
+        email: "demo.partner@wego24.com",
+        order_count: 0,
+        created_at: new Date().toISOString(),
+        user_id: demoProfileId,
+        is_demo: true,
+      }];
+      const { error: partnerErr } = await supabase
+        .from("partners")
+        .insert(demoPartner);
+      if (partnerErr) { throw partnerErr; }
+
       const demoRestaurants = [
         {
           name: "Demo Restaurant 1",
           email: "demo.rest1@wego24.com",
           is_demo: true,
           address: "123 Demo St",
-          city: "Demo City"
+          city: "Demo City",
+          application_id: demoPartnerApplicationId
         },
         {
           name: "Demo Restaurant 2",
           email: "demo.rest2@wego24.com",
           is_demo: true,
           address: "456 Example Ave",
-          city: "Demo City"
+          city: "Demo City",
+          application_id: demoPartnerApplicationId
         },
       ];
       const demoMenuItems = [
@@ -109,6 +181,8 @@ export function DemoDataManager() {
       await supabase.from("restaurants").delete().eq("is_demo", true);
       await supabase.from("drivers").delete().eq("is_demo", true);
       await supabase.from("profiles").delete().eq("is_demo", true);
+      await supabase.from("partner_applications").delete().eq("is_demo", true);
+      await supabase.from("partners").delete().eq("is_demo", true);
       setResult("Demo data deleted successfully.");
     } catch (err: any) {
       setResult("Error: " + err.message);

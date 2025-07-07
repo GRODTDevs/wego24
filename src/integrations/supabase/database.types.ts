@@ -265,6 +265,7 @@ export type Database = {
           reviewed_by?: string;
           created_at: string;
           updated_at: string;
+          is_demo?: boolean;
         };
       };
       subscribers: {
@@ -389,6 +390,17 @@ export type Database = {
           created_at?: string;
         };
       };
+      partners: {
+        Row: {
+          id: string;
+          name: string;
+          email?: string;
+          order_count?: number;
+          created_at?: string;
+          user_id: string;
+          is_demo: boolean;
+        };
+      };
     };
   };
 };
@@ -418,5 +430,6 @@ export type UsageTracking = Database["public"]["Tables"]["usage_tracking"]["Row"
 export type SubscriptionEvents = Database["public"]["Tables"]["subscription_events"]["Row"];
 export type SubscriptionPlans = Database["public"]["Tables"]["subscription_plans"]["Row"];
 export type DriverEarnings = Database["public"]["Tables"]["driver_earnings"]["Row"];
+export type Partners = Database["public"]["Tables"]["partners"]["Row"];
 // Add more as needed for your tables
 
