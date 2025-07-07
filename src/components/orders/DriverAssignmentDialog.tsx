@@ -44,39 +44,42 @@ export function DriverAssignmentDialog({
 
   const fetchAvailableDrivers = async () => {
     try {
-      // First try to get drivers with profile info using the correct foreign key
-      const { data, error } = await supabase
+      // Get drivers first
+      const { data: driversData, error: driversError } = await supabase
         .from('drivers')
-        .select(`
-          id,
-          user_id,
-          vehicle_type,
-          is_available,
-          rating,
-          profiles!drivers_user_id_profiles_id_fkey(first_name, last_name, phone)
-        `)
+        .select('id, user_id, vehicle_type, is_available, rating')
         .eq('is_active', true)
         .eq('is_available', true);
 
-      if (error) {
-        console.error('Error fetching drivers with profiles:', error);
-        // Fallback - get drivers without profile info
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from('drivers')
-          .select('id, user_id, vehicle_type, is_available, rating')
-          .eq('is_active', true)
-          .eq('is_available', true);
-        
-        if (fallbackError) throw fallbackError;
-        
-        const driversWithEmptyProfiles = (fallbackData || []).map(driver => ({
-          ...driver,
-          profiles: null
-        }));
-        setDrivers(driversWithEmptyProfiles);
-      } else {
-        setDrivers(data || []);
+      if (driversError) throw driversError;
+
+      if (!driversData || driversData.length === 0) {
+        setDrivers([]);
+        return;
       }
+
+      // Get profiles for each driver
+      const driverIds = driversData.map(d => d.user_id).filter(Boolean);
+      
+      let profilesData: any[] = [];
+      if (driverIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, phone')
+          .in('id', driverIds);
+        
+        if (!profilesError) {
+          profilesData = profiles || [];
+        }
+      }
+
+      // Combine drivers with their profiles
+      const driversWithProfiles = driversData.map(driver => ({
+        ...driver,
+        profiles: profilesData.find(p => p.id === driver.user_id) || null
+      }));
+
+      setDrivers(driversWithProfiles);
     } catch (error) {
       console.error('Error fetching drivers:', error);
       toast.error('Failed to load available drivers');

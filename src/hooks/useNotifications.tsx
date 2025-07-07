@@ -87,7 +87,7 @@ export function useNotifications() {
         return;
       }
 
-      const typedNotifications = (data || []) as Notification[];
+      const typedNotifications = (data || []) as unknown as Notification[];
       setNotifications(typedNotifications);
       setUnreadCount(typedNotifications.filter(n => !n.is_read).length);
     } catch (error) {

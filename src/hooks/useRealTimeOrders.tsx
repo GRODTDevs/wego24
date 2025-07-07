@@ -205,7 +205,7 @@ export function useRealTimeOrders(businessId?: string) {
       if (restaurantUsers) {
         for (const user of restaurantUsers) {
           await supabase
-            .from('notifications')
+            .from('notifications' as any)
             .insert({
               user_id: user.user_id,
               order_id: order.id,
@@ -235,7 +235,7 @@ export function useRealTimeOrders(businessId?: string) {
       
       if (message) {
         await supabase
-          .from('notifications')
+          .from('notifications' as any)
           .insert({
             user_id: order.customer_id,
             order_id: order.id,
@@ -252,7 +252,7 @@ export function useRealTimeOrders(businessId?: string) {
   const handleDriverAssignmentNotification = async (order: Order) => {
     try {
       await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .insert({
           user_id: order.customer_id,
           order_id: order.id,
