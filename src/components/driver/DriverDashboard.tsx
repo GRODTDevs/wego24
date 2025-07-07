@@ -3,19 +3,15 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
   Car, 
-  MapPin, 
-  Clock, 
   Star, 
   TrendingUp, 
-  FileText, 
-  Settings,
+  FileText,
   DollarSign,
   Activity
 } from "lucide-react";
@@ -41,16 +37,6 @@ interface DriverData {
   created_at: string;
 }
 
-/**
- * Driver Dashboard Component
- * 
- * Provides a comprehensive dashboard for registered drivers including:
- * - Profile management
- * - Performance metrics
- * - Document status
- * - Earnings tracking
- * - Real-time status controls
- */
 export function DriverDashboard() {
   const { user } = useAuth();
   const [driverData, setDriverData] = useState<DriverData | null>(null);
@@ -63,9 +49,6 @@ export function DriverDashboard() {
     }
   }, [user]);
 
-  /**
-   * Fetches the current driver's profile data
-   */
   const fetchDriverData = async () => {
     try {
       const { data, error } = await supabase
@@ -76,7 +59,6 @@ export function DriverDashboard() {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // No driver profile found
           toast.error("Driver profile not found. Please complete registration first.");
           return;
         }
@@ -93,9 +75,6 @@ export function DriverDashboard() {
     }
   };
 
-  /**
-   * Toggles driver online/offline status
-   */
   const toggleOnlineStatus = async () => {
     if (!driverData) return;
 
@@ -159,7 +138,6 @@ export function DriverDashboard() {
               </p>
             </div>
             
-            {/* Online Status Toggle */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
@@ -185,7 +163,7 @@ export function DriverDashboard() {
                   <Star className="w-5 h-5 text-yellow-500" />
                   <div>
                     <p className="text-sm text-gray-600">Rating</p>
-                    <p className="font-semibold">{driverData.rating.toFixed(1)}</p>
+                    <p className="font-semibold">{driverData.rating?.toFixed(1) || '0.0'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -197,7 +175,7 @@ export function DriverDashboard() {
                   <TrendingUp className="w-5 h-5 text-blue-500" />
                   <div>
                     <p className="text-sm text-gray-600">Deliveries</p>
-                    <p className="font-semibold">{driverData.total_deliveries}</p>
+                    <p className="font-semibold">{driverData.total_deliveries || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -224,7 +202,7 @@ export function DriverDashboard() {
                   <div>
                     <p className="text-sm text-gray-600">Registration</p>
                     <Badge variant={driverData.registration_status === 'approved' ? "default" : "secondary"}>
-                      {driverData.registration_status}
+                      {driverData.registration_status || 'pending'}
                     </Badge>
                   </div>
                 </div>
@@ -252,19 +230,16 @@ export function DriverDashboard() {
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <Clock className="w-8 h-8 mx-auto text-blue-600 mb-2" />
-                      <p className="text-sm text-gray-600">Hours This Week</p>
                       <p className="text-2xl font-bold text-blue-600">32</p>
+                      <p className="text-sm text-gray-600">Hours This Week</p>
                     </div>
                     <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <DollarSign className="w-8 h-8 mx-auto text-green-600 mb-2" />
-                      <p className="text-sm text-gray-600">Earnings This Week</p>
                       <p className="text-2xl font-bold text-green-600">€245</p>
+                      <p className="text-sm text-gray-600">Earnings This Week</p>
                     </div>
                     <div className="text-center p-4 bg-purple-50 rounded-lg">
-                      <TrendingUp className="w-8 h-8 mx-auto text-purple-600 mb-2" />
-                      <p className="text-sm text-gray-600">Completion Rate</p>
                       <p className="text-2xl font-bold text-purple-600">98%</p>
+                      <p className="text-sm text-gray-600">Completion Rate</p>
                     </div>
                   </div>
                 </CardContent>

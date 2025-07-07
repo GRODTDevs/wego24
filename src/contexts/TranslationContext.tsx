@@ -16,6 +16,30 @@ const translations = {
     'common.courierRequest': 'Request Courier',
     'common.partnerInfo': 'Partner Info',
     
+    // Home page
+    'home.welcome': 'Welcome',
+    'home.signOut': 'Sign Out',
+    'home.loginButton': 'Sign In',
+    'home.delivery.badge': 'FAST DELIVERY',
+    'home.delivery.title': 'Get your favorite food',
+    'home.delivery.titleHighlight': 'delivered fast',
+    'home.delivery.description': 'Order from your favorite restaurants and get it delivered quickly',
+    'home.searchPlaceholder': 'Search restaurants, food...',
+    'home.searchButton': 'Search',
+    'home.courier.badge': 'COURIER SERVICE',
+    'home.courier.title': 'Need something delivered?',
+    'home.courier.description': 'Fast and reliable courier service for all your delivery needs',
+    'home.getCourier': 'Get a Courier',
+    'home.partner.badge': 'BECOME A PARTNER',
+    'home.partner.title': 'Partner with us',
+    'home.partner.description': 'Join our network of restaurants and grow your business',
+    'home.partner.button': 'Become a Partner',
+    
+    // Language
+    'language.english': 'English',
+    'language.spanish': 'Spanish',
+    'language.french': 'French',
+    
     // Auth
     'auth.signIn': 'Sign In',
     'auth.signOut': 'Sign Out',
@@ -109,15 +133,33 @@ const translations = {
     // Add Spanish translations as needed
     'common.home': 'Inicio',
     'common.courierRequest': 'Solicitar Mensajero',
+    'common.partnerInfo': 'Información del Socio',
+    'home.welcome': 'Bienvenido',
+    'home.signOut': 'Cerrar Sesión',
+    'home.loginButton': 'Iniciar Sesión',
     'courier.title': 'Solicitar Servicio de Mensajería',
-    // ... other Spanish translations
+    'auth.signIn': 'Iniciar Sesión',
+    'auth.signOut': 'Cerrar Sesión',
+    'driver.become': 'Ser Conductor',
+    'language.english': 'Inglés',
+    'language.spanish': 'Español',
+    'language.french': 'Francés'
   },
   fr: {
     // Add French translations as needed
     'common.home': 'Accueil',
     'common.courierRequest': 'Demander un Coursier',
+    'common.partnerInfo': 'Informations Partenaire',
+    'home.welcome': 'Bienvenue',
+    'home.signOut': 'Se Déconnecter',
+    'home.loginButton': 'Se Connecter',
     'courier.title': 'Demander un Service de Coursier',
-    // ... other French translations
+    'auth.signIn': 'Se Connecter',
+    'auth.signOut': 'Se Déconnecter',
+    'driver.become': 'Devenir Chauffeur',
+    'language.english': 'Anglais',
+    'language.spanish': 'Espagnol',
+    'language.french': 'Français'
   }
 };
 
