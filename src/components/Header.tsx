@@ -6,11 +6,14 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
 import { errorLogger } from "../utils/errorLogger";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export function Header() {
   const { user, signOut } = useAuth();
+  console.log(user);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isAdmin } = useUserRole();
 
   const handleSignOut = async () => {
     try {
@@ -79,35 +82,15 @@ export function Header() {
                 >
                   {t("auth.signOut")}
                 </Button>
-                {/* Robust admin check: handle string, array, or JSON string from userProfile */}
-                {(() => {
-                  let isAdmin = false;
-                  const {roles} = user;
-                  if (roles) {
-                    if (Array.isArray(roles)) {
-                      isAdmin = roles.includes("admin");
-                    } else if (typeof roles === "string") {
-                      try {
-                        const parsed = JSON.parse(roles);
-                        if (Array.isArray(parsed)) {
-                          isAdmin = parsed.includes("admin");
-                        } else if (typeof parsed === "string") {
-                          isAdmin = parsed === "admin";
-                        }
-                      } catch {
-                        isAdmin = roles === "admin";
-                      }
-                    }
-                  }
-                  return isAdmin ? (
-                    <Link
-                      to="/admin/demo-data"
-                      className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
-                    >
-                      Demo Content
-                    </Link>
-                  ) : null;
-                })()}
+                {/* Robust admin check: use useUserRole hook for admin link */}
+                {isAdmin && (
+                  <Link
+                    to="/admin/demo-data"
+                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  >
+                    Demo Content
+                  </Link>
+                )}
               </div>
             ) : (
               <Button onClick={() => navigate("/auth")} variant="outline">

@@ -1,61 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Reviews } from "@/integrations/supabase/database.types";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Star } from "lucide-react";
 
-export function DriverFeedbackSection({ driverId }: { driverId: string }) {
-  const [feedback, setFeedback] = useState<any[]>([]);
+interface DriverFeedbackSectionProps {
+  driverId: string;
+}
+
+export const DriverFeedbackSection: React.FC<DriverFeedbackSectionProps> = ({ driverId }) => {
+  const [feedback, setFeedback] = useState<Reviews[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!driverId) { setLoading(false); return; }
     fetchFeedback();
-    // eslint-disable-next-line
   }, [driverId]);
 
   const fetchFeedback = async () => {
     setLoading(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase
-        .from("driver_feedback")
-        .select("*")
-        .eq("driver_id", driverId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      setFeedback(data || []);
-    } catch (err) {
-      setError("Failed to load feedback");
-    } finally {
-      setLoading(false);
-    }
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("driver_id", driverId)
+      .order("created_at", { ascending: false });
+    if (!error && data) { setFeedback(data); }
+    setLoading(false);
   };
 
+  if (loading) {
+    return <div className="p-4">Loading feedback...</div>;
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Customer Feedback</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div className="text-red-500">{error}</div>
-        ) : feedback.length === 0 ? (
-          <div className="text-gray-500">No feedback yet.</div>
-        ) : (
-          <ul className="space-y-4">
-            {feedback.map((fb) => (
-              <li key={fb.id} className="border-b pb-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-yellow-600">{fb.rating}★</span>
-                  <span className="text-xs text-gray-400">{new Date(fb.created_at).toLocaleString()}</span>
+    <div className="p-4 bg-white rounded shadow border border-gray-100">
+      <h2 className="text-lg font-semibold mb-2">Driver Feedback</h2>
+      {feedback.length === 0 ? (
+        <p className="text-gray-600">No feedback yet for this driver.</p>
+      ) : (
+        <div className="space-y-3">
+          {feedback.map((review) => (
+            <Card key={review.id} className="border border-gray-200">
+              <CardContent className="flex flex-col gap-1 p-3">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-400" />
+                  <span className="font-semibold">{review.rating}/5</span>
+                  <span className="text-xs text-gray-400 ml-2">{review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}</span>
                 </div>
-                <div className="text-gray-700">{fb.comment || "No comment"}</div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
+                {review.comment && <div className="text-gray-700 text-sm mt-1">{review.comment}</div>}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
-}
+};

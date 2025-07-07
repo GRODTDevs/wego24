@@ -35,7 +35,9 @@ const Index = () => {
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       setLocations(data || []);
     } catch (error) {
       console.error("Error fetching locations:", error);

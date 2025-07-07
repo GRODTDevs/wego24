@@ -45,7 +45,9 @@ export function useFileUpload({
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
-    if (!validateFile(file)) return null;
+    if (!validateFile(file)) {
+      return null;
+    }
 
     try {
       setUploading(true);

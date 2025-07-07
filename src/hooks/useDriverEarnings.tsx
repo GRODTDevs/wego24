@@ -1,21 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-export interface DriverEarning {
-  id: string;
-  driver_id: string;
-  order_id: string;
-  amount: number;
-  payout_requested: boolean;
-  payout_approved: boolean;
-  created_at: string;
-}
+import type { Database } from "@/integrations/supabase/database.types";
 
 export interface DriverEarningsSummary {
   total: number;
   thisMonth: number;
   thisWeek: number;
-  earnings: DriverEarning[];
+  earnings: Database["public"]["Tables"]["driver_earnings"]["Row"][];
 }
 
 export function useDriverEarnings(driverId: string) {
@@ -24,7 +15,9 @@ export function useDriverEarnings(driverId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!driverId) return;
+    if (!driverId) {
+      return;
+    }
     fetchEarnings();
     // eslint-disable-next-line
   }, [driverId]);
@@ -38,8 +31,11 @@ export function useDriverEarnings(driverId: string) {
         .select("*")
         .eq("driver_id", driverId)
         .order("created_at", { ascending: false });
-      if (error) throw error;
-      const earnings: DriverEarning[] = data || [];
+      if (error) {
+        throw error;
+      }
+      const earnings: Database["public"]["Tables"]["driver_earnings"]["Row"][] =
+        data || [];
       // Calculate totals
       const now = new Date();
       const startOfWeek = new Date(now);
@@ -50,9 +46,13 @@ export function useDriverEarnings(driverId: string) {
         thisWeek = 0;
       for (const e of earnings) {
         const dt = new Date(e.created_at);
+        if (dt >= startOfMonth) {
+          thisMonth += e.amount;
+        }
         total += e.amount;
-        if (dt >= startOfMonth) thisMonth += e.amount;
-        if (dt >= startOfWeek) thisWeek += e.amount;
+        if (dt >= startOfWeek) {
+          thisWeek += e.amount;
+        }
       }
       setSummary({ total, thisMonth, thisWeek, earnings });
     } catch (err: any) {
@@ -70,7 +70,9 @@ export function useDriverEarnings(driverId: string) {
         .update({ payout_requested: true })
         .eq("driver_id", driverId)
         .eq("payout_requested", false);
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       await fetchEarnings();
       return true;
     } catch (err: any) {

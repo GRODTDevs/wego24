@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,24 +8,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Car, Search, Star, MapPin, Phone } from "lucide-react";
-
-interface Driver {
-  id: string;
-  user_id: string;
-  vehicle_type: string;
-  vehicle_info?: any;
-  license_number?: string;
-  is_active: boolean;
-  is_available: boolean;
-  current_location?: any;
-  rating: number;
-  total_deliveries: number;
-  created_at: string;
-}
+import type { Database } from "@/integrations/supabase/database.types";
 
 export function DriverManagement() {
   const { user } = useAuth();
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [drivers, setDrivers] = useState<Database["public"]["Tables"]["drivers"]["Row"][]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");

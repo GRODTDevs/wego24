@@ -2,38 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-
-export interface Order {
-  id: string;
-  order_number: string;
-  customer_id: string;
-  business_id: string;
-  driver_id?: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled';
-  payment_status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
-  payment_method?: string;
-  subtotal: number;
-  delivery_fee: number;
-  service_fee: number;
-  tax_amount: number;
-  total_amount: number;
-  delivery_address?: any;
-  delivery_instructions?: string;
-  estimated_delivery_time?: string;
-  actual_delivery_time?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  customer_profile?: {
-    first_name?: string;
-    last_name?: string;
-    phone?: string;
-  };
-  restaurant_info?: {
-    name: string;
-    phone?: string;
-  };
-}
+import { Orders } from '@/integrations/supabase/database.types';
 
 export interface OrderStatusHistory {
   id: string;
@@ -46,11 +15,13 @@ export interface OrderStatusHistory {
 
 export function useRealTimeOrders(businessId?: string) {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Orders[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     fetchOrders();
     
@@ -68,7 +39,7 @@ export function useRealTimeOrders(businessId?: string) {
           console.log('Order change received:', payload);
           
           if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order;
+            const newOrder = payload.new as Orders;
             setOrders(current => [newOrder, ...current]);
             
             // Create notification for new order
@@ -80,7 +51,7 @@ export function useRealTimeOrders(businessId?: string) {
               notifyRestaurantUsers(newOrder);
             }
           } else if (payload.eventType === 'UPDATE') {
-            const updatedOrder = payload.new as Order;
+            const updatedOrder = payload.new as Orders;
             setOrders(current => 
               current.map(order => 
                 order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order
@@ -130,7 +101,9 @@ export function useRealTimeOrders(businessId?: string) {
 
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       const typedOrders = (data || []).map(order => ({
         ...order,
@@ -138,7 +111,7 @@ export function useRealTimeOrders(businessId?: string) {
         service_fee: order.service_fee || 0,
         tax_amount: order.tax_amount || 0,
         payment_status: order.payment_status || 'pending'
-      } as Order));
+      } as Orders));
       
       setOrders(typedOrders);
     } catch (error) {
@@ -160,7 +133,9 @@ export function useRealTimeOrders(businessId?: string) {
         })
         .eq('id', orderId);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       toast.success('Order status updated successfully');
       
@@ -182,7 +157,9 @@ export function useRealTimeOrders(businessId?: string) {
         })
         .eq('id', orderId);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       toast.success('Driver assigned successfully');
     } catch (error) {
       console.error('Error assigning driver:', error);
@@ -196,7 +173,7 @@ export function useRealTimeOrders(businessId?: string) {
     return estimatedTime.toISOString();
   };
 
-  const notifyRestaurantUsers = async (order: Order) => {
+  const notifyRestaurantUsers = async (order: Orders) => {
     try {
       // Get restaurant users to notify
       const { data: restaurantUsers } = await supabase
@@ -224,7 +201,7 @@ export function useRealTimeOrders(businessId?: string) {
     }
   };
 
-  const handleStatusChangeNotification = async (order: Order, oldStatus: string) => {
+  const handleStatusChangeNotification = async (order: Orders, oldStatus: string) => {
     try {
       const statusMessages = {
         confirmed: 'Your order has been confirmed and is being prepared',
@@ -254,7 +231,7 @@ export function useRealTimeOrders(businessId?: string) {
     }
   };
 
-  const handleDriverAssignmentNotification = async (order: Order) => {
+  const handleDriverAssignmentNotification = async (order: Orders) => {
     try {
       await supabase
         .from('notifications')
@@ -282,7 +259,9 @@ export function useRealTimeOrders(businessId?: string) {
         .eq('is_available', true)
         .order('updated_at', { ascending: true }) // Prefer least recently assigned
         .limit(1);
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       if (drivers && drivers.length > 0) {
         const driverId = drivers[0].id;
         await assignDriver(orderId, driverId);

@@ -1,29 +1,19 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-
-export interface Notification {
-  id: string;
-  user_id: string;
-  order_id?: string;
-  type: 'order_status' | 'driver_assignment' | 'payment' | 'general';
-  title: string;
-  message: string;
-  is_read: boolean;
-  sent_at: string;
-  delivery_method: string[];
-}
+import { Notifications } from '@/integrations/supabase/database.types';
 
 export function useNotifications() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notifications[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -33,9 +23,11 @@ export function useNotifications() {
         .order('sent_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      const typedNotifications = (data || []) as Notification[];
+      const typedNotifications = (data || []) as Notifications[];
       setNotifications(typedNotifications);
       setUnreadCount(typedNotifications.filter(n => !n.is_read).length);
     } catch (error) {
@@ -53,7 +45,9 @@ export function useNotifications() {
         .update({ is_read: true })
         .eq('id', notificationId);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setNotifications(prev => 
         prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
@@ -65,7 +59,9 @@ export function useNotifications() {
   };
 
   const markAllAsRead = async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -74,7 +70,9 @@ export function useNotifications() {
         .eq('user_id', user.id)
         .eq('is_read', false);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
@@ -84,7 +82,7 @@ export function useNotifications() {
     }
   };
 
-  const createNotification = async (notification: Omit<Notification, 'id' | 'sent_at' | 'is_read'>) => {
+  const createNotification = async (notification: Omit<Notifications, 'id' | 'sent_at' | 'is_read'>) => {
     try {
       const { error } = await supabase
         .from('notifications')
@@ -94,14 +92,18 @@ export function useNotifications() {
           sent_at: new Date().toISOString()
         });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       console.error('Error creating notification:', error);
     }
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     fetchNotifications();
 
@@ -117,7 +119,7 @@ export function useNotifications() {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = payload.new as Notifications;
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
           
