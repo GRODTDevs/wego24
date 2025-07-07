@@ -205,13 +205,14 @@ export function useRealTimeOrders(businessId?: string) {
       if (restaurantUsers) {
         for (const user of restaurantUsers) {
           await supabase
-            .from('notifications' as any)
+            .from('notifications')
             .insert({
               user_id: user.user_id,
               order_id: order.id,
               type: 'order_status',
               title: 'New Order Received',
-              message: `Order ${order.order_number} for €${order.total_amount.toFixed(2)} needs your attention`
+              message: `Order ${order.order_number} for €${order.total_amount.toFixed(2)} needs your attention`,
+              delivery_method: ['in_app']
             });
         }
       }
@@ -235,13 +236,14 @@ export function useRealTimeOrders(businessId?: string) {
       
       if (message) {
         await supabase
-          .from('notifications' as any)
+          .from('notifications')
           .insert({
             user_id: order.customer_id,
             order_id: order.id,
             type: 'order_status',
             title: `Order ${order.order_number} Update`,
-            message
+            message,
+            delivery_method: ['in_app']
           });
       }
     } catch (error) {
@@ -252,13 +254,14 @@ export function useRealTimeOrders(businessId?: string) {
   const handleDriverAssignmentNotification = async (order: Order) => {
     try {
       await supabase
-        .from('notifications' as any)
+        .from('notifications')
         .insert({
           user_id: order.customer_id,
           order_id: order.id,
           type: 'driver_assignment',
           title: `Driver Assigned - Order ${order.order_number}`,
-          message: 'A driver has been assigned to your order and will pick it up soon'
+          message: 'A driver has been assigned to your order and will pick it up soon',
+          delivery_method: ['in_app']
         });
     } catch (error) {
       console.error('Error creating driver assignment notification:', error);

@@ -1,108 +1,152 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, Clock, Package, Truck, User } from "lucide-react";
 import { Order } from "@/hooks/useRealTimeOrders";
-import { formatDistanceToNow } from "date-fns";
 
 interface OrderTimelineViewProps {
   order: Order;
 }
 
-const statusSteps = [
-  { key: 'pending', label: 'Order Placed', icon: Clock },
-  { key: 'confirmed', label: 'Confirmed', icon: CheckCircle },
-  { key: 'preparing', label: 'Preparing', icon: Clock },
-  { key: 'ready', label: 'Ready', icon: CheckCircle },
-  { key: 'out_for_delivery', label: 'Out for Delivery', icon: Clock },
-  { key: 'delivered', label: 'Delivered', icon: CheckCircle }
-];
-
 export function OrderTimelineView({ order }: OrderTimelineViewProps) {
-  const getCurrentStepIndex = () => {
-    return statusSteps.findIndex(step => step.key === order.status);
+  const getTimelineSteps = () => {
+    const baseSteps = [
+      {
+        id: 'pending',
+        title: 'Order Placed',
+        description: 'Customer placed the order',
+        icon: Clock,
+        status: 'completed' as const,
+        timestamp: order.created_at
+      },
+      {
+        id: 'confirmed',
+        title: 'Order Confirmed',
+        description: 'Restaurant accepted the order',
+        icon: CheckCircle,
+        status: order.status === 'pending' ? 'pending' : 'completed' as const,
+        timestamp: order.status !== 'pending' ? order.updated_at : undefined
+      },
+      {
+        id: 'preparing',
+        title: 'Preparing',
+        description: 'Restaurant is preparing your order',
+        icon: Package,
+        status: ['pending', 'confirmed'].includes(order.status) ? 'pending' : 
+                order.status === 'preparing' ? 'current' : 'completed' as const,
+        timestamp: order.status === 'preparing' ? order.updated_at : undefined
+      },
+      {
+        id: 'ready',
+        title: 'Ready for Pickup',
+        description: 'Order is ready for delivery',
+        icon: CheckCircle,
+        status: ['pending', 'confirmed', 'preparing'].includes(order.status) ? 'pending' : 
+                order.status === 'ready' ? 'current' : 'completed' as const,
+        timestamp: order.status === 'ready' ? order.updated_at : undefined
+      }
+    ];
+
+    if (order.driver_id) {
+      baseSteps.push({
+        id: 'out_for_delivery',
+        title: 'Out for Delivery',
+        description: 'Driver is on the way',
+        icon: Truck,
+        status: ['delivered'].includes(order.status) ? 'completed' : 
+                order.status === 'out_for_delivery' ? 'current' : 'pending' as const,
+        timestamp: order.status === 'out_for_delivery' ? order.updated_at : undefined
+      });
+    }
+
+    baseSteps.push({
+      id: 'delivered',
+      title: 'Delivered',
+      description: 'Order has been delivered',
+      icon: User,
+      status: order.status === 'delivered' ? 'completed' : 'pending' as const,
+      timestamp: order.actual_delivery_time || (order.status === 'delivered' ? order.updated_at : undefined)
+    });
+
+    return baseSteps;
   };
 
-  const currentStepIndex = getCurrentStepIndex();
-
-  const getStepStatus = (index: number) => {
-    if (index < currentStepIndex) return 'completed';
-    if (index === currentStepIndex) return 'current';
-    return 'pending';
+  const getStepColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'text-green-600 bg-green-100';
+      case 'current': return 'text-blue-600 bg-blue-100';
+      case 'pending': return 'text-gray-400 bg-gray-100';
+      default: return 'text-gray-400 bg-gray-100';
+    }
   };
+
+  const formatTimestamp = (timestamp?: string) => {
+    if (!timestamp) return '';
+    return new Date(timestamp).toLocaleString();
+  };
+
+  const steps = getTimelineSteps();
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Order Timeline
-          <Badge variant="outline">#{order.order_number}</Badge>
+          <Package className="w-5 h-5" />
+          Order Timeline - #{order.order_number}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {statusSteps.map((step, index) => {
-            const status = getStepStatus(index);
+          {steps.map((step, index) => {
             const Icon = step.icon;
+            const isLast = index === steps.length - 1;
             
             return (
-              <div key={step.key} className="flex items-center gap-3">
-                <div className={`
-                  flex items-center justify-center w-8 h-8 rounded-full border-2
-                  ${status === 'completed' ? 'bg-green-100 border-green-500 text-green-600' : ''}
-                  ${status === 'current' ? 'bg-blue-100 border-blue-500 text-blue-600' : ''}
-                  ${status === 'pending' ? 'bg-gray-100 border-gray-300 text-gray-400' : ''}
-                `}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                
-                <div className="flex-1">
-                  <div className={`font-medium ${
-                    status === 'current' ? 'text-blue-600' : 
-                    status === 'completed' ? 'text-green-600' : 'text-gray-400'
-                  }`}>
-                    {step.label}
+              <div key={step.id} className="flex items-start gap-3">
+                <div className="flex flex-col items-center">
+                  <div className={`p-2 rounded-full ${getStepColor(step.status)}`}>
+                    <Icon className="w-4 h-4" />
                   </div>
-                  
-                  {status === 'current' && (
-                    <div className="text-sm text-gray-500">
-                      {step.key === 'pending' && 'Waiting for restaurant confirmation'}
-                      {step.key === 'confirmed' && 'Restaurant is preparing your order'}
-                      {step.key === 'preparing' && 'Your order is being prepared'}
-                      {step.key === 'ready' && 'Ready for pickup/delivery'}
-                      {step.key === 'out_for_delivery' && 'Driver is on the way'}
-                      {step.key === 'delivered' && 'Order completed'}
-                    </div>
+                  {!isLast && (
+                    <div className={`w-px h-8 mt-2 ${
+                      step.status === 'completed' ? 'bg-green-300' : 'bg-gray-200'
+                    }`} />
                   )}
                 </div>
-
-                {status === 'current' && (
-                  <div className="text-xs text-gray-500">
-                    {formatDistanceToNow(new Date(order.updated_at), { addSuffix: true })}
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-medium">{step.title}</h4>
+                    <Badge 
+                      variant="outline"
+                      className={getStepColor(step.status)}
+                    >
+                      {step.status}
+                    </Badge>
                   </div>
-                )}
+                  <p className="text-sm text-gray-600 mb-1">{step.description}</p>
+                  {step.timestamp && (
+                    <p className="text-xs text-gray-400">
+                      {formatTimestamp(step.timestamp)}
+                    </p>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
 
-        {order.estimated_delivery_time && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-blue-700">
-              <Clock className="w-4 h-4" />
-              <span>
-                Estimated delivery: {new Date(order.estimated_delivery_time).toLocaleString()}
-              </span>
-            </div>
+        {order.delivery_instructions && (
+          <div className="mt-6 p-3 bg-blue-50 rounded-lg">
+            <h5 className="font-medium text-blue-900 mb-1">Delivery Instructions</h5>
+            <p className="text-sm text-blue-700">{order.delivery_instructions}</p>
           </div>
         )}
 
-        {order.status === 'cancelled' && (
-          <div className="mt-4 p-3 bg-red-50 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-red-700">
-              <AlertCircle className="w-4 h-4" />
-              <span>This order has been cancelled</span>
-            </div>
+        {order.notes && (
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <h5 className="font-medium text-gray-900 mb-1">Order Notes</h5>
+            <p className="text-sm text-gray-700">{order.notes}</p>
           </div>
         )}
       </CardContent>
