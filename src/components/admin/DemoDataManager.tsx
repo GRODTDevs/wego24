@@ -11,7 +11,7 @@ export function DemoDataManager() {
     setLoading(true);
     setResult("");
     try {
-      const demoProfileId = "00000000-0000-0000-0000-000000000001";
+      const demoProfileId = "63b5d9eb-ba28-4c29-99c4-68f4d845411b";
       const demoProfile = [{
         id: demoProfileId,
         first_name: "Demo",

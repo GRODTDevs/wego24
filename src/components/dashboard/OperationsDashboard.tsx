@@ -8,7 +8,7 @@ import { DriverManagement } from "@/components/DriverManagement";
 import { SystemHealthMonitor } from "@/components/monitoring/SystemHealthMonitor";
 import { Header } from "@/components/Header";
 import { PartnerApplications } from "@/components/PartnerApplications";
-import { AdminDriverManagement } from "@/components/dashboard/AdminDriverManagement";
+import { AdminDriverManagement } from "./AdminDriverManagement";
 
 export function OperationsDashboard() {
   const { t } = useTranslation();
