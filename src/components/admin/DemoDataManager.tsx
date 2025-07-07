@@ -40,7 +40,7 @@ export function DemoDataManager() {
           background_check_status: "approved",
           rating: 4.8,
           total_deliveries: 42
-        },
+        }
       ];
       // Create demo partner application
       const demoPartnerApplicationId = "b1b2c3d4-e5f6-7890-abcd-ef1234567890";
@@ -158,7 +158,7 @@ export function DemoDataManager() {
           payment_method: "cash",
           delivery_address: { street: "123 Demo St", city: "Demo City" },
           delivery_instructions: "Leave at door",
-          driver_id: drivers[0].id,
+          driver_id: demoProfileId,
           is_demo: true,
         }];
         const { error: orderErr } = await supabase
