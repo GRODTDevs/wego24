@@ -15,6 +15,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { TranslationProvider } from "./contexts/TranslationContext";
+import { UsageMonitor } from "./components/subscription/UsageMonitor";
 import NotFound from "./pages/NotFound";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
@@ -26,66 +27,68 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TranslationProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/signin" element={<Auth />} />
-              <Route path="/signup" element={<Auth />} />
-              <Route path="/forgot-password" element={<Auth />} />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <ProductOwnerDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/restaurant/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <RestaurantDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/driver/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DriverDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              
-              <Route
-                path="/subscription"
-                element={
-                  <ProtectedRoute>
-                    <SubscriptionPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/subscription/success"
-                element={
-                  <ProtectedRoute>
-                    <SubscriptionSuccess />
-                  </ProtectedRoute>
-                }
-              />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
-          <Toaster />
+          <UsageMonitor>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/signin" element={<Auth />} />
+                <Route path="/signup" element={<Auth />} />
+                <Route path="/forgot-password" element={<Auth />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <ProductOwnerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/restaurant/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <RestaurantDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/driver/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DriverDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/subscription"
+                  element={
+                    <ProtectedRoute>
+                      <SubscriptionPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/subscription/success"
+                  element={
+                    <ProtectedRoute>
+                      <SubscriptionSuccess />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Router>
+            <Toaster />
+          </UsageMonitor>
         </TranslationProvider>
       </AuthProvider>
     </QueryClientProvider>

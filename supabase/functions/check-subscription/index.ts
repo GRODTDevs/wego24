@@ -58,6 +58,7 @@ serve(async (req) => {
         subscribed: false,
         subscription_plan_id: null,
         current_period_end: null,
+        subscription_status: 'inactive',
         updated_at: new Date().toISOString(),
       }, { onConflict: 'email' });
       return new Response(JSON.stringify({ subscribed: false }), {
@@ -71,17 +72,30 @@ serve(async (req) => {
 
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
       limit: 1,
     });
-    const hasActiveSub = subscriptions.data.length > 0;
+    
+    let hasActiveSub = false;
     let subscriptionPlanId = null;
     let currentPeriodEnd = null;
+    let subscriptionStatus = 'inactive';
+    let stripeSubscriptionId = null;
+    let cancelAtPeriodEnd = false;
 
-    if (hasActiveSub) {
+    if (subscriptions.data.length > 0) {
       const subscription = subscriptions.data[0];
+      hasActiveSub = subscription.status === 'active';
+      subscriptionStatus = subscription.status;
+      stripeSubscriptionId = subscription.id;
+      cancelAtPeriodEnd = subscription.cancel_at_period_end;
       currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: currentPeriodEnd });
+      
+      logStep("Subscription found", { 
+        subscriptionId: subscription.id, 
+        status: subscription.status,
+        endDate: currentPeriodEnd,
+        cancelAtEnd: cancelAtPeriodEnd
+      });
       
       // Get the plan from our database based on Stripe price ID
       const priceId = subscription.items.data[0].price.id;
@@ -97,25 +111,34 @@ serve(async (req) => {
       
       logStep("Determined subscription plan", { priceId, subscriptionPlanId });
     } else {
-      logStep("No active subscription found");
+      logStep("No subscription found");
     }
 
     await supabaseClient.from("subscribers").upsert({
       email: user.email,
       user_id: user.id,
       stripe_customer_id: customerId,
+      stripe_subscription_id: stripeSubscriptionId,
       subscribed: hasActiveSub,
       subscription_plan_id: subscriptionPlanId,
       current_period_end: currentPeriodEnd,
-      subscription_status: hasActiveSub ? 'active' : 'inactive',
+      subscription_status: subscriptionStatus,
+      cancel_at_period_end: cancelAtPeriodEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'email' });
 
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionPlanId });
+    logStep("Updated database with subscription info", { 
+      subscribed: hasActiveSub, 
+      subscriptionPlanId,
+      status: subscriptionStatus 
+    });
+    
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_plan_id: subscriptionPlanId,
-      current_period_end: currentPeriodEnd
+      current_period_end: currentPeriodEnd,
+      subscription_status: subscriptionStatus,
+      cancel_at_period_end: cancelAtPeriodEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
