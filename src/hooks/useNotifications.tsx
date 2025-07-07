@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export interface Notification {
   id: string;
@@ -36,9 +37,17 @@ export function useNotifications() {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
+          console.log('Notification change received:', payload);
+          
           if (payload.eventType === 'INSERT') {
-            setNotifications(current => [payload.new as Notification, ...current]);
+            const newNotification = payload.new as Notification;
+            setNotifications(current => [newNotification, ...current]);
             setUnreadCount(current => current + 1);
+            
+            // Show toast notification
+            toast.success(newNotification.title, {
+              description: newNotification.message
+            });
           } else if (payload.eventType === 'UPDATE') {
             setNotifications(current =>
               current.map(notif =>
@@ -63,10 +72,17 @@ export function useNotifications() {
     if (!user) return;
 
     try {
-      // Since notifications table doesn't exist yet, just set empty arrays
-      console.log('Notifications table not available yet');
-      setNotifications([]);
-      setUnreadCount(0);
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('sent_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      setNotifications(data || []);
+      setUnreadCount(data?.filter(n => !n.is_read).length || 0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       setNotifications([]);
@@ -76,8 +92,12 @@ export function useNotifications() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // Placeholder for when notifications table exists
-      console.log('Mark notification as read not available yet');
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+
+      if (error) throw error;
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -87,8 +107,13 @@ export function useNotifications() {
     if (!user) return;
 
     try {
-      // Placeholder for when notifications table exists
-      console.log('Mark all notifications as read not available yet');
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      if (error) throw error;
       setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -103,8 +128,17 @@ export function useNotifications() {
     orderId?: string
   ) => {
     try {
-      // Placeholder for when notifications table exists
-      console.log('Create notification not available yet');
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          title,
+          message,
+          type,
+          order_id: orderId
+        });
+
+      if (error) throw error;
     } catch (error) {
       console.error('Error creating notification:', error);
     }

@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OrdersGrid } from "./OrdersGrid";
 import { NotificationCenter } from "./NotificationCenter";
+import { OrderTimelineView } from "./OrderTimelineView";
 import { useRealTimeOrders } from "@/hooks/useRealTimeOrders";
-import { Filter, Package, Clock, CheckCircle, Truck } from "lucide-react";
+import { Filter, Package, Clock, CheckCircle, Truck, AlertCircle, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 interface RealTimeOrderDashboardProps {
   businessId?: string;
@@ -27,7 +29,9 @@ export function RealTimeOrderDashboard({ businessId, userRole = 'restaurant' }: 
       pending: orders.filter(o => o.status === 'pending').length,
       preparing: orders.filter(o => o.status === 'preparing').length,
       ready: orders.filter(o => o.status === 'ready').length,
-      delivered: orders.filter(o => o.status === 'delivered').length
+      out_for_delivery: orders.filter(o => o.status === 'out_for_delivery').length,
+      delivered: orders.filter(o => o.status === 'delivered').length,
+      cancelled: orders.filter(o => o.status === 'cancelled').length
     };
   };
 
@@ -41,14 +45,22 @@ export function RealTimeOrderDashboard({ businessId, userRole = 'restaurant' }: 
           <h1 className="text-2xl font-bold">Order Management</h1>
           <p className="text-gray-600">Real-time order tracking and management</p>
         </div>
-        <NotificationCenter />
+        <div className="flex items-center gap-4">
+          <NotificationCenter />
+          {statusCounts.pending > 0 && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+              <Bell className="w-4 h-4" />
+              <span>{statusCounts.pending} pending order{statusCounts.pending > 1 ? 's' : ''}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -69,10 +81,30 @@ export function RealTimeOrderDashboard({ businessId, userRole = 'restaurant' }: 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Preparing</CardTitle>
-            <Truck className="h-4 w-4 text-orange-600" />
+            <Clock className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{statusCounts.preparing}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Ready</CardTitle>
+            <CheckCircle className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{statusCounts.ready}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Out for Delivery</CardTitle>
+            <Truck className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{statusCounts.out_for_delivery}</div>
           </CardContent>
         </Card>
 
@@ -98,14 +130,14 @@ export function RealTimeOrderDashboard({ businessId, userRole = 'restaurant' }: 
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Orders</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="all">All Orders ({statusCounts.total})</SelectItem>
+            <SelectItem value="pending">Pending ({statusCounts.pending})</SelectItem>
             <SelectItem value="confirmed">Confirmed</SelectItem>
-            <SelectItem value="preparing">Preparing</SelectItem>
-            <SelectItem value="ready">Ready</SelectItem>
-            <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
-            <SelectItem value="delivered">Delivered</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="preparing">Preparing ({statusCounts.preparing})</SelectItem>
+            <SelectItem value="ready">Ready ({statusCounts.ready})</SelectItem>
+            <SelectItem value="out_for_delivery">Out for Delivery ({statusCounts.out_for_delivery})</SelectItem>
+            <SelectItem value="delivered">Delivered ({statusCounts.delivered})</SelectItem>
+            <SelectItem value="cancelled">Cancelled ({statusCounts.cancelled})</SelectItem>
           </SelectContent>
         </Select>
       </div>

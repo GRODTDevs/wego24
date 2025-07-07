@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrderStatusBadge } from "./OrderStatusBadge";
+import { DriverAssignmentDialog } from "./DriverAssignmentDialog";
 import { Clock, MapPin, CreditCard, User, Phone } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Order } from "@/hooks/useRealTimeOrders";
+import { useState } from "react";
 
 interface OrderCardProps {
   order: Order;
@@ -22,6 +24,7 @@ export function OrderCard({
   showActions = true,
   userRole = 'restaurant'
 }: OrderCardProps) {
+  const [showDriverDialog, setShowDriverDialog] = useState(false);
   
   const getNextStatus = (currentStatus: string) => {
     const statusFlow = {
@@ -39,89 +42,140 @@ export function OrderCard({
     return !['delivered', 'cancelled'].includes(status);
   };
 
-  return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">
-            Order #{order.order_number}
-          </CardTitle>
-          <OrderStatusBadge status={order.status} />
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span>{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-gray-500" />
-            <span>€{order.total_amount.toFixed(2)}</span>
-          </div>
-        </div>
+  const getStatusActionText = (status: string) => {
+    const actionTexts = {
+      pending: 'Accept Order',
+      confirmed: 'Start Preparing',
+      preparing: 'Mark Ready',
+      ready: 'Out for Delivery',
+      out_for_delivery: 'Mark Delivered'
+    };
+    return actionTexts[status as keyof typeof actionTexts] || 'Update Status';
+  };
 
-        {order.delivery_address && (
-          <div className="flex items-start gap-2 text-sm">
-            <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
-            <div>
-              <p>{order.delivery_address.street || 'Address provided'}</p>
-              {order.delivery_instructions && (
-                <p className="text-gray-600 text-xs mt-1">
-                  Note: {order.delivery_instructions}
-                </p>
-              )}
+  const formatCustomerInfo = () => {
+    const profile = order.customer_profile;
+    if (profile?.first_name || profile?.last_name) {
+      return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    }
+    return 'Customer';
+  };
+
+  return (
+    <>
+      <Card className="w-full hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">
+              Order #{order.order_number}
+            </CardTitle>
+            <OrderStatusBadge status={order.status} />
+          </div>
+          <div className="text-sm text-gray-600">
+            {formatCustomerInfo()}
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-gray-500" />
+              <span>{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-gray-500" />
+              <span>€{order.total_amount.toFixed(2)}</span>
             </div>
           </div>
-        )}
 
-        {order.driver_id && (
-          <div className="flex items-center gap-2 text-sm">
-            <User className="w-4 h-4 text-gray-500" />
-            <span>Driver assigned</span>
-          </div>
-        )}
+          {order.customer_profile?.phone && (
+            <div className="flex items-center gap-2 text-sm">
+              <Phone className="w-4 h-4 text-gray-500" />
+              <span>{order.customer_profile.phone}</span>
+            </div>
+          )}
 
-        {showActions && canUpdateStatus(order.status) && onStatusUpdate && (
-          <div className="flex gap-2 pt-2">
-            {order.status === 'pending' && (
-              <>
+          {order.delivery_address && (
+            <div className="flex items-start gap-2 text-sm">
+              <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
+              <div>
+                <p>{order.delivery_address.street || 'Address provided'}</p>
+                {order.delivery_instructions && (
+                  <p className="text-gray-600 text-xs mt-1">
+                    Note: {order.delivery_instructions}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {order.driver_id && (
+            <div className="flex items-center gap-2 text-sm">
+              <User className="w-4 h-4 text-gray-500" />
+              <span>Driver assigned</span>
+            </div>
+          )}
+
+          {order.estimated_delivery_time && (
+            <div className="text-xs text-gray-500">
+              Estimated delivery: {new Date(order.estimated_delivery_time).toLocaleString()}
+            </div>
+          )}
+
+          {showActions && canUpdateStatus(order.status) && onStatusUpdate && (
+            <div className="flex gap-2 pt-2">
+              {order.status === 'pending' && (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => onStatusUpdate(order.id, 'confirmed')}
+                    className="flex-1"
+                  >
+                    Accept Order
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onStatusUpdate(order.id, 'cancelled')}
+                    className="flex-1"
+                  >
+                    Decline
+                  </Button>
+                </>
+              )}
+              
+              {order.status !== 'pending' && getNextStatus(order.status) && (
                 <Button
                   size="sm"
-                  onClick={() => onStatusUpdate(order.id, 'confirmed')}
+                  onClick={() => onStatusUpdate(order.id, getNextStatus(order.status)!)}
                   className="flex-1"
                 >
-                  Accept Order
+                  {getStatusActionText(getNextStatus(order.status)!)}
                 </Button>
+              )}
+
+              {order.status === 'ready' && !order.driver_id && onAssignDriver && (
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onStatusUpdate(order.id, 'cancelled')}
+                  onClick={() => setShowDriverDialog(true)}
                   className="flex-1"
                 >
-                  Decline
+                  Assign Driver
                 </Button>
-              </>
-            )}
-            
-            {order.status !== 'pending' && getNextStatus(order.status) && (
-              <Button
-                size="sm"
-                onClick={() => onStatusUpdate(order.id, getNextStatus(order.status)!)}
-                className="flex-1"
-              >
-                {getNextStatus(order.status) === 'confirmed' && 'Confirm Order'}
-                {getNextStatus(order.status) === 'preparing' && 'Start Preparing'}
-                {getNextStatus(order.status) === 'ready' && 'Mark Ready'}
-                {getNextStatus(order.status) === 'out_for_delivery' && 'Out for Delivery'}
-                {getNextStatus(order.status) === 'delivered' && 'Mark Delivered'}
-              </Button>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <DriverAssignmentDialog
+        open={showDriverDialog}
+        onOpenChange={setShowDriverDialog}
+        orderId={order.id}
+        onAssignDriver={onAssignDriver}
+      />
+    </>
   );
 }
