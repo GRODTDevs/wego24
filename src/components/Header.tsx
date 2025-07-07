@@ -24,9 +24,11 @@ export function Header({ className }: { className?: string }) {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg">
-              <span className="font-bold text-xl">WeGo</span>
-            </div>
+            <img 
+              src="/lovable-uploads/999acc8c-4528-415a-85a4-1de255e2fce5.png" 
+              alt="WeGo Logo" 
+              className="h-8 w-auto"
+            />
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -57,7 +59,6 @@ export function Header({ className }: { className?: string }) {
             
             {user ? (
               <div className="flex items-center space-x-2">
-                {/* Show notification center for authenticated users */}
                 <NotificationCenter />
                 
                 <span className="text-sm text-gray-600 hidden md:inline">
