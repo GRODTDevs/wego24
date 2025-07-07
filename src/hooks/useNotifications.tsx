@@ -72,21 +72,13 @@ export function useNotifications() {
     if (!user) return;
 
     try {
-      // Use raw query to access notifications table since it may not be in types yet
+      // Use direct SQL query since notifications table isn't in types yet
       const { data, error } = await supabase
-        .rpc('fetch_user_notifications', { user_uuid: user.id })
-        .then(result => {
-          // If RPC doesn't exist, fall back to direct query
-          if (result.error) {
-            return supabase
-              .from('notifications')
-              .select('*')
-              .eq('user_id', user.id)
-              .order('sent_at', { ascending: false })
-              .limit(50);
-          }
-          return result;
-        });
+        .from('notifications' as any)
+        .select('*')
+        .eq('user_id', user.id)
+        .order('sent_at', { ascending: false })
+        .limit(50);
 
       if (error) {
         console.error('Error fetching notifications:', error);
@@ -108,7 +100,7 @@ export function useNotifications() {
   const markAsRead = async (notificationId: string) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ is_read: true })
         .eq('id', notificationId);
 
@@ -123,7 +115,7 @@ export function useNotifications() {
 
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ is_read: true })
         .eq('user_id', user.id)
         .eq('is_read', false);
@@ -144,7 +136,7 @@ export function useNotifications() {
   ) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .insert({
           user_id: userId,
           title,

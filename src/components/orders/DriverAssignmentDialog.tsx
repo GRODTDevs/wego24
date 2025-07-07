@@ -44,6 +44,7 @@ export function DriverAssignmentDialog({
 
   const fetchAvailableDrivers = async () => {
     try {
+      // First try to get drivers with profile info using the correct foreign key
       const { data, error } = await supabase
         .from('drivers')
         .select(`
@@ -52,32 +53,34 @@ export function DriverAssignmentDialog({
           vehicle_type,
           is_available,
           rating,
-          profiles!drivers_user_id_fkey(first_name, last_name, phone)
+          profiles!drivers_user_id_profiles_id_fkey(first_name, last_name, phone)
         `)
         .eq('is_active', true)
         .eq('is_available', true);
 
-      if (error) throw error;
-      setDrivers(data || []);
-    } catch (error) {
-      console.error('Error fetching drivers:', error);
-      toast.error('Failed to load available drivers');
-      // Fallback - get drivers without profile info
-      try {
-        const { data: fallbackData } = await supabase
+      if (error) {
+        console.error('Error fetching drivers with profiles:', error);
+        // Fallback - get drivers without profile info
+        const { data: fallbackData, error: fallbackError } = await supabase
           .from('drivers')
           .select('id, user_id, vehicle_type, is_available, rating')
           .eq('is_active', true)
           .eq('is_available', true);
+        
+        if (fallbackError) throw fallbackError;
         
         const driversWithEmptyProfiles = (fallbackData || []).map(driver => ({
           ...driver,
           profiles: null
         }));
         setDrivers(driversWithEmptyProfiles);
-      } catch (fallbackError) {
-        console.error('Fallback query failed:', fallbackError);
+      } else {
+        setDrivers(data || []);
       }
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      toast.error('Failed to load available drivers');
+      setDrivers([]);
     }
   };
 
