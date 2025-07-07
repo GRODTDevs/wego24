@@ -1,6 +1,13 @@
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { RealTimeOrderDashboard } from "@/components/orders/RealTimeOrderDashboard";
+import { UserManagement } from "@/components/UserManagement";
+import { DriverManagement } from "@/components/DriverManagement";
+import { SystemHealthMonitor } from "@/components/monitoring/SystemHealthMonitor";
+import { Header } from "@/components/Header";
+import { PartnerApplications } from "@/components/PartnerApplications";
 
 export function OperationsDashboard() {
   const { t } = useTranslation();
@@ -69,89 +76,108 @@ export function OperationsDashboard() {
   if (loading) return <div>{t('dashboard.loading')}</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">{t('dashboard.title')}</h1>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.orders')}</div>
-          <div className="text-2xl font-bold">{metrics.orders}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.revenue')}</div>
-          <div className="text-2xl font-bold">€{metrics.revenue.toFixed(2)}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.activeUsers')}</div>
-          <div className="text-2xl font-bold">{metrics.activeUsers}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.partners')}</div>
-          <div className="text-2xl font-bold">{metrics.partners}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.drivers')}</div>
-          <div className="text-2xl font-bold">{metrics.drivers}</div>
-        </div>
-      </div>
-      <h2 className="text-xl font-semibold mb-2">{t('dashboard.recentOrders')}</h2>
-      <ul className="mb-8">
-        {metrics.recentOrders.map(order => (
-          <li key={order.id} className="border-b py-2 flex justify-between">
-            <span>{order.customer_name} ({order.status})</span>
-            <span>€{order.total_amount?.toFixed(2)}</span>
-          </li>
-        ))}
-      </ul>
-      <h2 className="text-xl font-semibold mb-2">{t('dashboard.courierStatus')}</h2>
-      <ul className="mb-8">
-        {metrics.courierStatus.map(driver => (
-          <li key={driver.id} className="border-b py-2 flex justify-between">
-            <span>{driver.name} ({driver.status})</span>
-            <span>{driver.current_location}</span>
-          </li>
-        ))}
-      </ul>
-      <h2 className="text-xl font-semibold mb-2">{t('dashboard.alerts')}</h2>
-      <ul>
-        {metrics.alerts.map(alert => (
-          <li key={alert.id} className="text-red-600 border-b py-2">
-            {t('dashboard.failedOrder')}: {alert.id}
-          </li>
-        ))}
-      </ul>
-      <h2 className="text-xl font-semibold mb-2">{t('dashboard.partnerAnalytics')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.topPartners')}</div>
-          <ul>
-            {metrics.partnersList?.slice(0, 3).map(partner => (
-              <li key={partner.id} className="flex justify-between py-1">
-                <span>{partner.name}</span>
-                <span>{t('dashboard.orders')}: {partner.order_count}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-gray-500">{t('dashboard.topDrivers')}</div>
-          <ul>
-            {metrics.driversList?.slice(0, 3).map(driver => (
-              <li key={driver.id} className="flex justify-between py-1">
-                <span>{driver.name}</span>
-                <span>{t('dashboard.deliveries')}: {driver.delivery_count}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <h2 className="text-xl font-semibold mb-2">{t('dashboard.recentActivity')}</h2>
-      <ul className="mb-8">
-        {metrics.recentActivity?.map(activity => (
-          <li key={activity.id} className="border-b py-2">
-            {activity.message} <span className="text-gray-400 text-xs">{new Date(activity.timestamp).toLocaleString()}</span>
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <main className="flex-1 p-6">
+        <h1 className="text-2xl font-bold mb-4">{t('dashboard.title')}</h1>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-6 flex flex-wrap gap-2">
+            <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
+            <TabsTrigger value="orders">{t('dashboard.tabs.orders')}</TabsTrigger>
+            <TabsTrigger value="partners">{t('dashboard.tabs.partners')}</TabsTrigger>
+            <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
+            <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
+            <TabsTrigger value="activity">{t('dashboard.tabs.activity')}</TabsTrigger>
+            <TabsTrigger value="alerts">{t('dashboard.tabs.alerts')}</TabsTrigger>
+            <TabsTrigger value="systemHealth">{t('dashboard.tabs.systemHealth')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview">
+            {/* Overview metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+              <div className="bg-white p-3 rounded shadow flex flex-col items-center">
+                <div className="text-gray-500 text-sm">{t('dashboard.orders')}</div>
+                <div className="text-xl font-bold">{metrics.orders}</div>
+              </div>
+              <div className="bg-white p-3 rounded shadow flex flex-col items-center">
+                <div className="text-gray-500 text-sm">{t('dashboard.revenue')}</div>
+                <div className="text-xl font-bold">€{metrics.revenue.toFixed(2)}</div>
+              </div>
+              <div className="bg-white p-3 rounded shadow flex flex-col items-center">
+                <div className="text-gray-500 text-sm">{t('dashboard.activeUsers')}</div>
+                <div className="text-xl font-bold">{metrics.activeUsers}</div>
+              </div>
+              <div className="bg-white p-3 rounded shadow flex flex-col items-center">
+                <div className="text-gray-500 text-sm">{t('dashboard.partners')}</div>
+                <div className="text-xl font-bold">{metrics.partners}</div>
+              </div>
+              <div className="bg-white p-3 rounded shadow flex flex-col items-center">
+                <div className="text-gray-500 text-sm">{t('dashboard.drivers')}</div>
+                <div className="text-xl font-bold">{metrics.drivers}</div>
+              </div>
+            </div>
+            {/* Recent orders */}
+            <h2 className="text-xl font-semibold mb-2">{t('dashboard.recentOrders')}</h2>
+            <ul className="mb-8">
+              {metrics.recentOrders.map(order => (
+                <li key={order.id} className="border-b py-2 flex justify-between">
+                  <span>{order.customer_name} ({order.status})</span>
+                  <span>€{order.total_amount?.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+            {/* Driver status */}
+            <h2 className="text-xl font-semibold mb-2">{t('dashboard.courierStatus')}</h2>
+            <ul className="mb-8">
+              {metrics.courierStatus.map(driver => (
+                <li key={driver.id} className="border-b py-2 flex justify-between">
+                  <span>{driver.name} ({driver.status})</span>
+                  <span>{driver.current_location}</span>
+                </li>
+              ))}
+            </ul>
+          </TabsContent>
+          <TabsContent value="orders">
+            <RealTimeOrderDashboard userRole="admin" />
+          </TabsContent>
+          <TabsContent value="partners">
+            <section>
+              <h2 className="text-xl font-semibold mb-4">Partner Applications & Management</h2>
+              <PartnerApplications />
+            </section>
+          </TabsContent>
+          <TabsContent value="drivers">
+            <DriverManagement />
+          </TabsContent>
+          <TabsContent value="users">
+            <UserManagement />
+          </TabsContent>
+          <TabsContent value="activity">
+            {/* Recent activity log */}
+            <h2 className="text-xl font-semibold mb-2">{t('dashboard.recentActivity')}</h2>
+            <ul className="mb-8">
+              {metrics.recentActivity?.map(activity => (
+                <li key={activity.id} className="border-b py-2">
+                  {activity.message} <span className="text-gray-400 text-xs">{new Date(activity.timestamp).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          </TabsContent>
+          <TabsContent value="alerts">
+            {/* Critical alerts */}
+            <h2 className="text-xl font-semibold mb-2">{t('dashboard.alerts')}</h2>
+            <ul>
+              {metrics.alerts.map(alert => (
+                <li key={alert.id} className="text-red-600 border-b py-2">
+                  {t('dashboard.failedOrder')}: {alert.id}
+                </li>
+              ))}
+            </ul>
+          </TabsContent>
+          <TabsContent value="systemHealth">
+            <SystemHealthMonitor />
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 }

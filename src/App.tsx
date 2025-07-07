@@ -11,7 +11,7 @@ import DriverRegistrationPage from './pages/DriverRegistration';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import DriverDashboard from "./pages/DriverDashboard";
-import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
+import { OperationsDashboard } from "./components/dashboard/OperationsDashboard";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import { ErrorViewer } from './components/ErrorViewer';
 import './utils/errorLogger'; // Initialize error logging
@@ -48,7 +48,7 @@ function App() {
                 } />
                 <Route path="/operations" element={
                   <ProtectedRoute>
-                    <ProductOwnerDashboard />
+                    <OperationsDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/restaurant-dashboard" element={
