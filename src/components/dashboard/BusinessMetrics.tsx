@@ -73,7 +73,7 @@ export function BusinessMetrics({ stats, previousStats, loading }: BusinessMetri
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {[...Array(5)].map((_, i) => (
-          <Card key={i}>
+          <Card key={i} className="border-0 shadow-sm">
             <CardHeader className="pb-3">
               <div className="w-32 h-4 bg-gray-200 animate-pulse rounded"></div>
             </CardHeader>
@@ -95,7 +95,7 @@ export function BusinessMetrics({ stats, previousStats, loading }: BusinessMetri
         const TrendIcon = isPositive ? TrendingUp : TrendingDown;
         
         return (
-          <Card key={index}>
+          <Card key={index} className="border-0 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
                 {metric.title}

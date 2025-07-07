@@ -11,6 +11,7 @@ import { UserProfile as Profile } from "./components/UserProfile";
 import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import DriverDashboard from "./pages/DriverDashboard";
+import CourierRequest from "./pages/CourierRequest";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/signin" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
                 <Route path="/forgot-password" element={<Auth />} />
+                <Route path="/courier-request" element={<CourierRequest />} />
                 <Route
                   path="/profile"
                   element={

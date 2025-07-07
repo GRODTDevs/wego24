@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
 import { useUserRole } from "../hooks/useUserRole";
+import { User } from "lucide-react";
 
 export function Header({ className }: { className?: string }) {
   const { user, signOut } = useAuth();
@@ -61,21 +62,12 @@ export function Header({ className }: { className?: string }) {
               <div className="flex items-center space-x-2">
                 <NotificationCenter />
                 
-                <span className="text-sm text-gray-600 hidden md:inline">
-                  {user.email}
-                </span>
-                
-                {userRole?.includes('admin') && (
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/admin/dashboard">{t('common.adminDashboard')}</Link>
-                  </Button>
-                )}
-                
-                {userRole?.includes('partner') && (
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/partner/dashboard">{t('common.partnerDashboard')}</Link>
-                  </Button>
-                )}
+                <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm">
+                  <User className="w-4 h-4 text-orange-500" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Welcome {user.user_metadata?.first_name || "User"}!
+                  </span>
+                </div>
                 
                 <Button 
                   onClick={handleSignOut} 

@@ -132,7 +132,7 @@ export default function ProductOwnerDashboard() {
       <Header />
       <main className="flex-1 bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Operations</h1>
           
           {/* Enhanced Business Metrics with real percentages */}
           <div className="mb-8">
@@ -226,7 +226,7 @@ export default function ProductOwnerDashboard() {
             <TabsContent value="admin">
               <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white p-6 rounded-lg border">
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
                     <h3 className="text-lg font-semibold mb-4">{t('dashboard.admin.title')}</h3>
                     <p className="text-gray-600 mb-6">{t('dashboard.admin.description')}</p>
                     <SuperuserCreation />
