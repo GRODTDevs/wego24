@@ -11,7 +11,10 @@ import { SuperuserCreation } from "@/components/SuperuserCreation";
 import { PartnerApplications } from "@/components/PartnerApplications";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SubscriptionStatus } from "@/components/subscription/SubscriptionStatus";
+import { UsageChart } from "@/components/subscription/UsageChart";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { formatCurrency } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -25,6 +28,15 @@ interface DashboardStats {
 
 export default function ProductOwnerDashboard() {
   const { t } = useTranslation();
+  const {
+    subscription,
+    usage,
+    loading: subscriptionLoading,
+    refreshing,
+    checkSubscription,
+    openCustomerPortal,
+  } = useSubscription();
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -92,6 +104,40 @@ export default function ProductOwnerDashboard() {
       <main className="flex-1 bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('dashboard.title')}</h1>
+          
+          {/* Subscription Status Banner */}
+          {!subscriptionLoading && (
+            <div className="mb-8">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <h3 className="font-semibold">Subscription Status</h3>
+                        <div className="flex items-center gap-2">
+                          {subscription?.subscribed ? (
+                            <>
+                              <Badge className="bg-green-500">Active</Badge>
+                              <span className="text-sm text-gray-600">
+                                {subscription.plan?.name} - {formatCurrency(subscription.plan?.price_monthly || 0)}/month
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <Badge variant="outline">No Active Subscription</Badge>
+                              <span className="text-sm text-gray-600">
+                                Subscribe to access all features
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
           
           {/* Overview Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -163,12 +209,13 @@ export default function ProductOwnerDashboard() {
 
           {/* Management Tabs */}
           <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid grid-cols-7 w-full">
+            <TabsList className="grid grid-cols-8 w-full">
               <TabsTrigger value="users">{t('dashboard.tabs.users')}</TabsTrigger>
               <TabsTrigger value="locations">{t('dashboard.tabs.locations')}</TabsTrigger>
               <TabsTrigger value="partners">Partners</TabsTrigger>
               <TabsTrigger value="drivers">{t('dashboard.tabs.drivers')}</TabsTrigger>
               <TabsTrigger value="commissions">{t('dashboard.tabs.commissions')}</TabsTrigger>
+              <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
               <TabsTrigger value="admin">{t('dashboard.tabs.admin')}</TabsTrigger>
             </TabsList>
@@ -191,6 +238,18 @@ export default function ProductOwnerDashboard() {
 
             <TabsContent value="commissions">
               <CommissionManagement />
+            </TabsContent>
+
+            <TabsContent value="subscription">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SubscriptionStatus
+                  subscription={subscription}
+                  refreshing={refreshing}
+                  onRefresh={checkSubscription}
+                  onManageSubscription={openCustomerPortal}
+                />
+                <UsageChart usage={usage} subscription={subscription} />
+              </div>
             </TabsContent>
 
             <TabsContent value="analytics">

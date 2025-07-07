@@ -753,6 +753,186 @@ export type Database = {
           },
         ]
       }
+      subscribers: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscribed: boolean
+          subscription_plan_id: string | null
+          subscription_status: string | null
+          trial_end: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscribed?: boolean
+          subscription_plan_id?: string | null
+          subscription_status?: string | null
+          trial_end?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscribed?: boolean
+          subscription_plan_id?: string | null
+          subscription_status?: string | null
+          trial_end?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscribers_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_events: {
+        Row: {
+          event_data: Json | null
+          event_type: string
+          id: string
+          processed_at: string | null
+          stripe_event_id: string | null
+          subscriber_id: string | null
+        }
+        Insert: {
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          processed_at?: string | null
+          stripe_event_id?: string | null
+          subscriber_id?: string | null
+        }
+        Update: {
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          processed_at?: string | null
+          stripe_event_id?: string | null
+          subscriber_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_drivers: number | null
+          max_orders_per_month: number | null
+          max_restaurants: number | null
+          name: string
+          price_monthly: number
+          stripe_price_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_drivers?: number | null
+          max_orders_per_month?: number | null
+          max_restaurants?: number | null
+          name: string
+          price_monthly: number
+          stripe_price_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_drivers?: number | null
+          max_orders_per_month?: number | null
+          max_restaurants?: number | null
+          name?: string
+          price_monthly?: number
+          stripe_price_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      usage_tracking: {
+        Row: {
+          count: number | null
+          created_at: string | null
+          id: string
+          metric_type: string
+          period_end: string
+          period_start: string
+          subscriber_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          metric_type: string
+          period_end: string
+          period_start: string
+          subscriber_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          metric_type?: string
+          period_end?: string
+          period_start?: string
+          subscriber_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_tracking_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -791,6 +971,16 @@ export type Database = {
         Args: { user_email: string }
         Returns: undefined
       }
+      get_subscription_status: {
+        Args: { user_id: string }
+        Returns: {
+          subscribed: boolean
+          plan_name: string
+          status: string
+          current_period_end: string
+          cancel_at_period_end: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -800,6 +990,10 @@ export type Database = {
       }
       remove_user_role: {
         Args: { _user_id: string; _role: string }
+        Returns: undefined
+      }
+      track_usage: {
+        Args: { p_user_id: string; p_metric_type: string; p_increment?: number }
         Returns: undefined
       }
     }
