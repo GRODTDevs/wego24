@@ -2,7 +2,6 @@
 import { OrderCard } from "./OrderCard";
 import { Order } from "@/hooks/useRealTimeOrders";
 import { EmptyState } from "@/components/EmptyState";
-import { Package } from "lucide-react";
 
 interface OrdersGridProps {
   orders: Order[];
@@ -33,7 +32,6 @@ export function OrdersGrid({
   if (orders.length === 0) {
     return (
       <EmptyState
-        icon={Package}
         title="No orders found"
         description="When orders are placed, they will appear here"
       />

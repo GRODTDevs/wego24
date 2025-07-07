@@ -99,7 +99,17 @@ export function useRealTimeOrders(businessId?: string) {
       const { data, error } = await query;
       
       if (error) throw error;
-      setOrders(data || []);
+      
+      // Type assertion to handle the type mismatch temporarily
+      const typedOrders = (data || []).map(order => ({
+        ...order,
+        delivery_fee: order.delivery_fee || 0,
+        service_fee: order.service_fee || 0,
+        tax_amount: order.tax_amount || 0,
+        payment_status: order.payment_status || 'pending'
+      } as Order));
+      
+      setOrders(typedOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to load orders');
