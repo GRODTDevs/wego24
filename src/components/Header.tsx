@@ -6,6 +6,7 @@ import { useTranslation } from "../contexts/TranslationContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
+import { errorLogger } from "../utils/errorLogger";
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -13,8 +14,13 @@ export function Header() {
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      errorLogger.log(error instanceof Error ? error : 'Sign out failed');
+      console.error('Sign out error:', error);
+    }
   };
 
   return (

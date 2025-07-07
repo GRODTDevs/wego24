@@ -11,9 +11,22 @@ import Auth from './pages/Auth';
 import DriverRegistrationPage from './pages/DriverRegistration';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Toaster } from 'sonner';
-import DriverDashboard from "@/pages/DriverDashboard";
+import DriverDashboard from "./pages/DriverDashboard";
+import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
+import RestaurantDashboard from "./pages/RestaurantDashboard";
+import { ErrorViewer } from './components/ErrorViewer';
+import './utils/errorLogger'; // Initialize error logging
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        console.error('Query failed:', error);
+        return failureCount < 3;
+      },
+    },
+  },
+});
 
 function App() {
   return (
@@ -34,7 +47,18 @@ function App() {
                     <DriverDashboard />
                   </ProtectedRoute>
                 } />
+                <Route path="/operations" element={
+                  <ProtectedRoute>
+                    <ProductOwnerDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/restaurant-dashboard" element={
+                  <ProtectedRoute>
+                    <RestaurantDashboard />
+                  </ProtectedRoute>
+                } />
               </Routes>
+              <ErrorViewer />
             </div>
           </TranslationProvider>
         </AuthProvider>
