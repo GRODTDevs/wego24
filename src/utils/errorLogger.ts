@@ -1,3 +1,4 @@
+
 interface ErrorLog {
   timestamp: string;
   error: string;
@@ -11,6 +12,8 @@ class ErrorLogger {
   private errors: ErrorLog[] = [];
 
   log(error: Error | string, userId?: string) {
+    console.log('ErrorLogger.log called with:', error);
+    
     const errorLog: ErrorLog = {
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : error,
@@ -39,6 +42,7 @@ class ErrorLogger {
       const existingLogs = JSON.parse(localStorage.getItem('errorLogs') || '[]');
       existingLogs.push(errorLog);
       localStorage.setItem('errorLogs', JSON.stringify(existingLogs.slice(-50))); // Keep last 50
+      console.log('Error stored to localStorage');
     } catch (e) {
       console.error('Failed to store error log:', e);
     }
@@ -50,7 +54,9 @@ class ErrorLogger {
 
   getStoredErrors(): ErrorLog[] {
     try {
-      return JSON.parse(localStorage.getItem('errorLogs') || '[]');
+      const stored = JSON.parse(localStorage.getItem('errorLogs') || '[]');
+      console.log('Retrieved stored errors:', stored.length);
+      return stored;
     } catch {
       return [];
     }
@@ -59,6 +65,7 @@ class ErrorLogger {
   clearErrors() {
     this.errors = [];
     localStorage.removeItem('errorLogs');
+    console.log('Errors cleared');
   }
 }
 
@@ -66,9 +73,13 @@ export const errorLogger = new ErrorLogger();
 
 // Global error handler
 window.addEventListener('error', (event) => {
+  console.log('Global error handler triggered:', event);
   errorLogger.log(event.error || event.message);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
+  console.log('Unhandled promise rejection:', event);
   errorLogger.log(event.reason instanceof Error ? event.reason : String(event.reason));
 });
+
+console.log('Error logger initialized');

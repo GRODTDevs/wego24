@@ -143,6 +143,8 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const t = (key: string): string => {
     try {
+      console.log('Translation requested for key:', key, 'language:', language);
+      
       const keys = key.split('.');
       let value: any = translations[language];
       
@@ -166,19 +168,32 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
             break;
           }
         }
-        if (fallback) return fallback;
+        if (fallback) {
+          console.log('Using English fallback for:', key, '=', fallback);
+          return fallback;
+        }
       }
       
       // Return the translation if found, otherwise return the last part of the key
-      return value || key.split('.').pop() || key;
+      const result = value || key.split('.').pop() || key;
+      console.log('Translation result for', key, '=', result);
+      return result;
     } catch (error) {
       console.error('Translation error:', error, 'for key:', key);
       return key.split('.').pop() || key;
     }
   };
 
+  const contextValue = {
+    language,
+    setLanguage,
+    t
+  };
+
+  console.log('TranslationProvider rendering with language:', language);
+
   return (
-    <TranslationContext.Provider value={{ language, setLanguage, t }}>
+    <TranslationContext.Provider value={contextValue}>
       {children}
     </TranslationContext.Provider>
   );
@@ -186,7 +201,10 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 export const useTranslation = () => {
   const context = useContext(TranslationContext);
+  console.log('useTranslation called, context:', context ? 'available' : 'undefined');
+  
   if (context === undefined) {
+    console.error('useTranslation must be used within a TranslationProvider');
     throw new Error('useTranslation must be used within a TranslationProvider');
   }
   return context;

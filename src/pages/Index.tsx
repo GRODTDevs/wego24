@@ -20,7 +20,20 @@ const Index = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, signOut, loading: authLoading } = useAuth();
-  const { t } = useTranslation();
+  
+  // Add error boundary for translation context
+  let t: (key: string) => string;
+  try {
+    const translation = useTranslation();
+    t = translation.t;
+  } catch (error) {
+    console.error('Translation context error:', error);
+    // Fallback function
+    t = (key: string) => {
+      const parts = key.split('.');
+      return parts[parts.length - 1] || key;
+    };
+  }
 
   useEffect(() => {
     fetchLocations();
