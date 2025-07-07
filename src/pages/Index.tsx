@@ -12,6 +12,8 @@ import { Truck, Building2, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/contexts/TranslationContext";
 
+// Ensure all text is wrapped with t('...') and translation keys exist in your translation files (en.json, es.json, etc.)
+
 type Location = Tables<"restaurants">;
 
 const Index = () => {
@@ -100,7 +102,7 @@ const Index = () => {
                   <LocationCard
                     key={location.id}
                     name={location.name}
-                    businessType={location.cuisine_type || "Business"}
+                    businessType={location.cuisine_type || t('locations.businessTypes.restaurant')}
                     image={location.image_url || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"}
                     highlightColor={idx % 2 === 0 ? "red" : "orange"}
                   />
@@ -155,7 +157,7 @@ const Index = () => {
                   type="button"
                 >
                   <Info className="w-5 h-5" />
-                  Learn More
+                  {t('home.partner.buttonInfo')}
                 </Button>
               </Link>
               <Link to="/partner-register">
@@ -164,7 +166,7 @@ const Index = () => {
                   type="button"
                 >
                   <Building2 className="w-5 h-5" />
-                  {t('home.partner.button')}
+                  {t('home.partner.buttonRegister')}
                 </Button>
               </Link>
             </div>
