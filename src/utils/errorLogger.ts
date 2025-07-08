@@ -1,4 +1,3 @@
-
 interface ErrorLog {
   timestamp: string;
   error: string;
@@ -83,3 +82,24 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 console.log('Error logger initialized');
+
+// Utility to wrap async functions and log errors to the frontend
+export async function withErrorLogging<T>(fn: () => Promise<T>, userId?: string): Promise<T | undefined> {
+  try {
+    return await fn();
+  } catch (error) {
+    errorLogger.log(error, userId);
+    // Optionally, you can show a toast or push to a global error state here
+    return undefined;
+  }
+}
+
+// Utility to wrap sync functions
+export function withSyncErrorLogging<T>(fn: () => T, userId?: string): T | undefined {
+  try {
+    return fn();
+  } catch (error) {
+    errorLogger.log(error, userId);
+    return undefined;
+  }
+}

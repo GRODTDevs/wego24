@@ -1,14 +1,16 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { OrdersGrid } from "./OrdersGrid";
-import { NotificationCenter } from "./NotificationCenter";
-import { OrderTimelineView } from "./OrderTimelineView";
+import { Bell, Package, Clock, CheckCircle, Truck, Filter } from "lucide-react";
 import { useRealTimeOrders } from "@/hooks/useRealTimeOrders";
-import { Filter, Package, Clock, CheckCircle, Truck, AlertCircle, Bell } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+// import { NotificationCenter } from "@/components/NotificationCenter";
+import { OrdersGrid } from "@/components/orders/OrdersGrid";
+
+// Order Processing
+// - RealTimeOrderDashboard/OrderManagement: Real-time order dashboard for partners, status tracking, driver assignment, notifications
+// - OrderTimelineView: Order timeline and status history
+// - Admin and partner views for order management
 
 interface RealTimeOrderDashboardProps {
   businessId?: string;
@@ -46,7 +48,7 @@ export function RealTimeOrderDashboard({ businessId, userRole = 'restaurant' }: 
           <p className="text-gray-600">Real-time order tracking and management</p>
         </div>
         <div className="flex items-center gap-4">
-          <NotificationCenter />
+          {/* <NotificationCenter /> */}
           {statusCounts.pending > 0 && (
             <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
               <Bell className="w-4 h-4" />

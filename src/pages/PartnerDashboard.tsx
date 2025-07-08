@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +11,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Building2, Package, Settings, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
+import { errorLogger, withErrorLogging } from "@/utils/errorLogger";
+import { MenuManagement } from "@/components/MenuManagement";
+import { OrderManagement } from "@/components/OrderManagement";
+import { CommissionManagement } from "@/components/CommissionManagement";
+import { BusinessMetrics } from "@/components/dashboard/BusinessMetrics";
+import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
 
 type Restaurant = Tables<"restaurants">;
 type PartnerApplication = Tables<"partner_applications">;
@@ -22,13 +27,10 @@ export default function PartnerDashboard() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [application, setApplication] = useState<PartnerApplication | null>(null);
   const [loading, setLoading] = useState(true);
+  const [orderCount, setOrderCount] = useState<number>(0);
+  const [totalRevenue, setTotalRevenue] = useState<number>(0);
 
-  useEffect(() => {
-    if (user) {
-      fetchPartnerData();
-    }
-  }, [user]);
-
+  // Move fetchPartnerData outside of useEffect so it's in scope
   const fetchPartnerData = async () => {
     try {
       // First check if user has a restaurant
@@ -41,10 +43,42 @@ export default function PartnerDashboard() {
         .eq("user_id", user?.id)
         .eq("is_active", true);
 
-      if (restaurantError) throw restaurantError;
+      if (restaurantError) {
+        throw restaurantError;
+      }
 
       if (restaurantUsers && restaurantUsers.length > 0 && restaurantUsers[0].restaurants) {
-        setRestaurant(restaurantUsers[0].restaurants as Restaurant);
+        // Fix: restaurantUsers[0].restaurants may be an array, so use first element if so
+        const restaurantData = Array.isArray(restaurantUsers[0].restaurants)
+          ? restaurantUsers[0].restaurants[0]
+          : restaurantUsers[0].restaurants;
+        setRestaurant(restaurantData as Restaurant);
+
+        // Fetch order count and total revenue for this restaurant
+        if (restaurantData && restaurantData.id) {
+          // Fetch order count
+          const { count: ordersCount, error: ordersError } = await supabase
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantData.id);
+          if (!ordersError && typeof ordersCount === "number") {
+            setOrderCount(ordersCount);
+          } else {
+            setOrderCount(0);
+          }
+
+          // Fetch total revenue
+          const { data: revenueData, error: revenueError } = await supabase
+            .from("orders")
+            .select("total")
+            .eq("restaurant_id", restaurantData.id);
+          if (!revenueError && Array.isArray(revenueData)) {
+            const revenue = revenueData.reduce((sum, order) => sum + (order.total || 0), 0);
+            setTotalRevenue(revenue);
+          } else {
+            setTotalRevenue(0);
+          }
+        }
       } else {
         // Check for partner application
         const { data: appData, error: appError } = await supabase
@@ -54,7 +88,9 @@ export default function PartnerDashboard() {
           .order("created_at", { ascending: false })
           .limit(1);
 
-        if (appError) throw appError;
+        if (appError) {
+          throw appError;
+        }
         if (appData && appData.length > 0) {
           setApplication(appData[0]);
         }
@@ -66,6 +102,14 @@ export default function PartnerDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    withErrorLogging(async () => {
+      if (user) {
+        fetchPartnerData();
+      }
+    });
+  }, [user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -267,81 +311,36 @@ export default function PartnerDashboard() {
               </TabsList>
 
               <TabsContent value="overview">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600">Total Orders</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">0</div>
-                      <p className="text-sm text-gray-500">No orders yet</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600">Revenue</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">€0.00</div>
-                      <p className="text-sm text-gray-500">This month</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600">Products</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">0</div>
-                      <p className="text-sm text-gray-500">Add your first product</p>
-                    </CardContent>
-                  </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <BusinessMetrics
+                  stats={{
+                    totalOrders: orderCount,
+                    totalRevenue: totalRevenue,
+                    activeLocations: 1, // Replace with real data if available
+                    activeDrivers: 0,   // Replace with real data if available
+                    totalUsers: 0       // Replace with real data if available
+                  }}
+                  loading={false}
+                  />
+                  <RevenueProgress currentRevenue={totalRevenue} />
                 </div>
+                <CommissionManagement />
               </TabsContent>
 
               <TabsContent value="products">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Product Management</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Products Yet</h3>
-                      <p className="text-gray-600 mb-4">Start by adding your first product to your menu.</p>
-                      <button className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-400 text-white rounded-lg hover:from-orange-400 hover:to-red-500 transition-colors">
-                        Add Product
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
+                {restaurant && (
+                  <MenuManagement businessId={restaurant.id} />
+                )}
               </TabsContent>
 
               <TabsContent value="orders">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Order Management</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Yet</h3>
-                      <p className="text-gray-600">Orders will appear here once customers start ordering.</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                {restaurant && (
+                  <OrderManagement businessId={restaurant.id} />
+                )}
               </TabsContent>
 
               <TabsContent value="settings">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Restaurant Settings</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">Restaurant settings and configuration options will be available here.</p>
-                  </CardContent>
-                </Card>
+                <div className="text-gray-600">Restaurant settings and configuration options will be available here.</div>
               </TabsContent>
             </Tabs>
           </div>

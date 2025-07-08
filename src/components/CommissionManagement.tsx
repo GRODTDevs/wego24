@@ -1,13 +1,12 @@
-
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Edit2, Save } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+
+// Commission Tracking
+// - CommissionManagement: Flexible commission rules for drivers and restaurants, admin UI for managing rates, real-time calculation and reporting, editable/toggleable rules in UI
 
 interface CommissionRule {
   id: string;
@@ -170,7 +169,7 @@ export function CommissionManagement() {
                     placeholder="None"
                   />
                 ) : (
-                  rule.minAmount ? `$${rule.minAmount}` : "None"
+                  rule.minAmount ? `€${rule.minAmount}` : "None"
                 )}
               </TableCell>
               <TableCell>
@@ -183,35 +182,25 @@ export function CommissionManagement() {
                     placeholder="None"
                   />
                 ) : (
-                  rule.maxAmount ? `$${rule.maxAmount}` : "None"
+                  rule.maxAmount ? `€${rule.maxAmount}` : "None"
                 )}
               </TableCell>
               <TableCell>
-                <Badge
-                  className={rule.isActive ? "bg-green-100 text-green-800 cursor-pointer" : "bg-red-100 text-red-800 cursor-pointer"}
-                  onClick={() => toggleRuleStatus(rule.id)}
-                >
+                <span className={rule.isActive ? "text-green-600" : "text-gray-400"}>
                   {rule.isActive ? "Active" : "Inactive"}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell>
                 {isEditing ? (
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleSaveRule(rule.id)}>
-                      <Save className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                      Cancel
-                    </Button>
-                  </div>
+                  <>
+                    <Button size="sm" onClick={() => handleSaveRule(rule.id)} className="mr-2">Save</Button>
+                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>Cancel</Button>
+                  </>
                 ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditRule(rule.id)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <>
+                    <Button size="sm" variant="outline" onClick={() => handleEditRule(rule.id)} className="mr-2">Edit</Button>
+                    <Button size="sm" variant="outline" onClick={() => toggleRuleStatus(rule.id)}>{rule.isActive ? "Disable" : "Enable"}</Button>
+                  </>
                 )}
               </TableCell>
             </TableRow>
@@ -225,72 +214,20 @@ export function CommissionManagement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Commission Overview</CardTitle>
+          <CardTitle>Driver Commission Rules</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {driverRules.filter(r => r.isActive).length}
-              </div>
-              <div className="text-sm text-gray-600">Active Driver Rules</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {restaurantRules.filter(r => r.isActive).length}
-              </div>
-              <div className="text-sm text-gray-600">Active Restaurant Rules</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {driverRules.reduce((sum, rule) => rule.isActive ? sum + rule.rate : sum, 0) / driverRules.filter(r => r.isActive).length || 0}%
-              </div>
-              <div className="text-sm text-gray-600">Avg Driver Commission</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {restaurantRules.reduce((sum, rule) => rule.isActive ? sum + rule.rate : sum, 0) / restaurantRules.filter(r => r.isActive).length || 0}%
-              </div>
-              <div className="text-sm text-gray-600">Avg Restaurant Commission</div>
-            </div>
-          </div>
+          {renderRuleTable(driverRules, "driver")}
         </CardContent>
       </Card>
-
-      <Tabs defaultValue="drivers" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="drivers">Driver Commissions</TabsTrigger>
-          <TabsTrigger value="restaurants">Restaurant Commissions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="drivers">
-          <Card>
-            <CardHeader>
-              <CardTitle>Driver Commission Rules</CardTitle>
-              <p className="text-sm text-gray-600">
-                Manage commission rates payable to drivers based on different criteria
-              </p>
-            </CardHeader>
-            <CardContent>
-              {renderRuleTable(driverRules, "driver")}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="restaurants">
-          <Card>
-            <CardHeader>
-              <CardTitle>Restaurant Commission Rules</CardTitle>
-              <p className="text-sm text-gray-600">
-                Manage commission rates payable by restaurants based on different criteria
-              </p>
-            </CardHeader>
-            <CardContent>
-              {renderRuleTable(restaurantRules, "restaurant")}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card>
+        <CardHeader>
+          <CardTitle>Restaurant Commission Rules</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {renderRuleTable(restaurantRules, "restaurant")}
+        </CardContent>
+      </Card>
     </div>
   );
 }

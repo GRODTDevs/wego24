@@ -1,3 +1,9 @@
+// Partner Management
+// - PartnerApplications: Admin dashboard for reviewing, approving, or rejecting partner applications. Approved partners are provisioned with a restaurant account and dashboard access.
+// - MenuManagement: Partners can manage their menu and categories.
+// - OrderManagement/RealTimeOrderDashboard: Live order tracking, status updates, and driver assignment.
+// - CommissionManagement: Flexible commission rules, real-time calculation, and reporting.
+// - BusinessMetrics/RevenueProgress: Business metrics, revenue, and commission analytics.
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";

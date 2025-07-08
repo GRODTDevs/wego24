@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Tables } from '@/integrations/supabase/types';
+import { errorLogger, withErrorLogging } from "@/utils/errorLogger";
 
 // Export the Order type using the proper database type
 export type Order = Tables<'orders'> & {
@@ -32,69 +33,71 @@ export function useRealTimeOrders(businessId?: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    withErrorLogging(async () => {
+      if (!user) {
+        return;
+      }
 
-    fetchOrders();
-    
-    // Subscribe to real-time changes
-    const channel = supabase
-      .channel('orders-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders'
-        },
-        async (payload) => {
-          console.log('Order change received:', payload);
-          
-          if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order;
-            setOrders(current => [newOrder, ...current]);
+      fetchOrders();
+      
+      // Subscribe to real-time changes
+      const channel = supabase
+        .channel('orders-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'orders'
+          },
+          async (payload) => {
+            console.log('Order change received:', payload);
             
-            // Create notification for new order
-            if (newOrder.status === 'pending') {
-              toast.success('New order received!', {
-                description: `Order ${newOrder.order_number} - €${newOrder.total_amount.toFixed(2)}`
-              });
-              // Notify restaurant users
-              notifyRestaurantUsers(newOrder);
+            if (payload.eventType === 'INSERT') {
+              const newOrder = payload.new as Order;
+              setOrders(current => [newOrder, ...current]);
+              
+              // Create notification for new order
+              if (newOrder.status === 'pending') {
+                toast.success('New order received!', {
+                  description: `Order ${newOrder.order_number} - €${newOrder.total_amount.toFixed(2)}`
+                });
+                // Notify restaurant users
+                notifyRestaurantUsers(newOrder);
+              }
+            } else if (payload.eventType === 'UPDATE') {
+              const updatedOrder = payload.new as Order;
+              setOrders(current => 
+                current.map(order => 
+                  order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order
+                )
+              );
+              // Handle status change notifications
+              if (payload.old?.status !== updatedOrder.status) {
+                handleStatusChangeNotification(updatedOrder, payload.old?.status);
+              }
+              // Handle driver assignment notifications
+              if (payload.old?.driver_id !== updatedOrder.driver_id && updatedOrder.driver_id) {
+                handleDriverAssignmentNotification(updatedOrder);
+              }
+              // Order automation: auto-assign driver when order is ready and no driver assigned
+              if (
+                updatedOrder.status === 'ready' &&
+                !updatedOrder.driver_id
+              ) {
+                await autoAssignDriver(updatedOrder.id);
+              }
+            } else if (payload.eventType === 'DELETE') {
+              setOrders(current => current.filter(order => order.id !== payload.old.id));
             }
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedOrder = payload.new as Order;
-            setOrders(current => 
-              current.map(order => 
-                order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order
-              )
-            );
-            // Handle status change notifications
-            if (payload.old?.status !== updatedOrder.status) {
-              handleStatusChangeNotification(updatedOrder, payload.old?.status);
-            }
-            // Handle driver assignment notifications
-            if (payload.old?.driver_id !== updatedOrder.driver_id && updatedOrder.driver_id) {
-              handleDriverAssignmentNotification(updatedOrder);
-            }
-            // Order automation: auto-assign driver when order is ready and no driver assigned
-            if (
-              updatedOrder.status === 'ready' &&
-              !updatedOrder.driver_id
-            ) {
-              await autoAssignDriver(updatedOrder.id);
-            }
-          } else if (payload.eventType === 'DELETE') {
-            setOrders(current => current.filter(order => order.id !== payload.old.id));
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    });
   }, [user, businessId]);
 
   const fetchOrders = async () => {

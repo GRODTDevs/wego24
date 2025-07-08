@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +80,11 @@ export function OrderCard({
     }
     
     return 'Address provided';
+  };
+
+  const canShowAssignDriver = () => {
+    // Only show assign driver if order is ready, no driver assigned, and user is admin or restaurant
+    return order.status === 'ready' && !order.driver_id && (userRole === 'admin' || userRole === 'restaurant');
   };
 
   return (
@@ -177,7 +181,7 @@ export function OrderCard({
                 </Button>
               )}
 
-              {order.status === 'ready' && !order.driver_id && onAssignDriver && (
+              {canShowAssignDriver() && onAssignDriver && (
                 <Button
                   size="sm"
                   variant="outline"

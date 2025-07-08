@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { errorLogger, withErrorLogging } from '@/utils/errorLogger';
 
 export interface SubscriptionPlan {
   id: string;
@@ -57,7 +57,9 @@ export function useSubscription() {
         .eq('is_active', true)
         .order('price_monthly');
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       // Transform the data to match our interface, handling the Json type properly
       const transformedPlans: SubscriptionPlan[] = (data || []).map(plan => ({
@@ -84,88 +86,99 @@ export function useSubscription() {
   };
 
   const checkSubscription = async (showToast = false) => {
-    if (!user) return;
+    await withErrorLogging(async () => {
+      if (!user) {
+        return;
+      }
 
-    try {
-      setRefreshing(true);
-      
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      // Fetch the subscription details from our database
-      const { data: subData, error: subError } = await supabase
-        .from('subscribers')
-        .select(`
-          id,
-          subscribed,
-          subscription_plan_id,
-          current_period_end,
-          subscription_status,
-          cancel_at_period_end,
-          subscription_plans!subscribers_subscription_plan_id_fkey (
-            id,
-            name,
-            description,
-            price_monthly,
-            features,
-            max_orders_per_month,
-            max_restaurants,
-            max_drivers,
-            is_active
-          )
-        `)
-        .eq('user_id', user.id)
-        .single();
-
-      if (subError && subError.code !== 'PGRST116') {
-        console.error('Error fetching subscription details:', subError);
-      } else if (subData) {
-        // Transform the subscription plan data
-        const planData = subData.subscription_plans;
-        const transformedSubscription: UserSubscription = {
-          id: subData.id,
-          subscribed: subData.subscribed,
-          subscription_plan_id: subData.subscription_plan_id,
-          current_period_end: subData.current_period_end,
-          subscription_status: subData.subscription_status,
-          cancel_at_period_end: subData.cancel_at_period_end,
-          plan: planData ? {
-            id: planData.id,
-            name: planData.name,
-            description: planData.description || '',
-            price_monthly: planData.price_monthly,
-            max_orders_per_month: planData.max_orders_per_month || 0,
-            max_restaurants: planData.max_restaurants || 0,
-            max_drivers: planData.max_drivers || 0,
-            is_active: planData.is_active || false,
-            features: Array.isArray(planData.features) 
-              ? (planData.features as string[])
-              : typeof planData.features === 'string' 
-                ? [planData.features] 
-                : []
-          } : undefined
-        };
+      try {
+        setRefreshing(true);
         
-        setSubscription(transformedSubscription);
-      }
+        const { data, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        });
 
-      if (showToast) {
-        toast.success('Subscription status refreshed');
+        if (error) {
+          throw error;
+        }
+
+        // Fetch the subscription details from our database
+        const { data: subData, error: subError } = await supabase
+          .from('subscribers')
+          .select(`
+            id,
+            subscribed,
+            subscription_plan_id,
+            current_period_end,
+            subscription_status,
+            cancel_at_period_end,
+            subscription_plans!subscribers_subscription_plan_id_fkey (
+              id,
+              name,
+              description,
+              price_monthly,
+              features,
+              max_orders_per_month,
+              max_restaurants,
+              max_drivers,
+              is_active
+            )
+          `)
+          .eq('user_id', user.id)
+          .single();
+
+        if (subError && subError.code !== 'PGRST116') {
+          errorLogger.log(subError);
+          console.error('Error fetching subscription details:', subError);
+        } else if (subData) {
+          // Transform the subscription plan data
+          const planData = subData.subscription_plans;
+          // Handle if planData is an array (which is likely due to the join)
+          const planObj = Array.isArray(planData) ? planData[0] : planData;
+          if (planObj) {
+            const transformedSubscription: UserSubscription = {
+              id: subData.id,
+              subscribed: subData.subscribed,
+              subscription_plan_id: subData.subscription_plan_id,
+              current_period_end: subData.current_period_end,
+              subscription_status: subData.subscription_status,
+              cancel_at_period_end: subData.cancel_at_period_end,
+              plan: {
+                id: planObj.id,
+                name: planObj.name,
+                description: planObj.description || '',
+                price_monthly: planObj.price_monthly,
+                max_orders_per_month: planObj.max_orders_per_month || 0,
+                max_restaurants: planObj.max_restaurants || 0,
+                max_drivers: planObj.max_drivers || 0,
+                is_active: planObj.is_active || false,
+                features: Array.isArray(planObj.features)
+                  ? (planObj.features as string[])
+                  : typeof planObj.features === 'string'
+                    ? [planObj.features]
+                    : []
+              }
+            };
+            
+            setSubscription(transformedSubscription);
+          }
+        }
+
+        if (showToast) {
+          toast.success('Subscription status refreshed');
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        if (showToast) {
+          toast.error('Failed to refresh subscription status');
+        }
+      } finally {
+        setRefreshing(false);
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      if (showToast) {
-        toast.error('Failed to refresh subscription status');
-      }
-    } finally {
-      setRefreshing(false);
-      setLoading(false);
-    }
+    }, user?.id);
   };
 
   const fetchUsage = async () => {

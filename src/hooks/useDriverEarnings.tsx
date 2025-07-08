@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/database.types";
+import { errorLogger, withErrorLogging } from "@/utils/errorLogger";
 
 export interface DriverEarningsSummary {
   total: number;
@@ -15,10 +16,12 @@ export function useDriverEarnings(driverId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!driverId) {
-      return;
-    }
-    fetchEarnings();
+    withErrorLogging(async () => {
+      if (!driverId) {
+        return;
+      }
+      fetchEarnings();
+    });
     // eslint-disable-next-line
   }, [driverId]);
 

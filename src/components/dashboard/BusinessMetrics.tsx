@@ -1,10 +1,12 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { TrendingUp, TrendingDown, AlertTriangle, DollarSign, Users, Package, Truck } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Users, Package, Truck } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
+
+// Analytics & Business Metrics
+// - BusinessMetrics: Real-time business metrics (orders, revenue, users, partners, drivers)
+// - RevenueProgress: Revenue and commission tracking, progress to targets
+// - Historical metrics tracking: business_metrics_history table, daily snapshot, and growth calculations
 
 interface BusinessMetricsProps {
   stats: {

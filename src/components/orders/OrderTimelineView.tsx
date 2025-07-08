@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, Package, Truck, User } from "lucide-react";
@@ -121,15 +120,13 @@ export function OrderTimelineView({ order }: OrderTimelineViewProps) {
                       variant="outline"
                       className={getStepColor(step.status)}
                     >
-                      {step.status}
+                      {step.status.charAt(0).toUpperCase() + step.status.slice(1)}
                     </Badge>
+                    {step.timestamp && (
+                      <span className="text-xs text-gray-500 ml-2">{formatTimestamp(step.timestamp)}</span>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">{step.description}</p>
-                  {step.timestamp && (
-                    <p className="text-xs text-gray-400">
-                      {formatTimestamp(step.timestamp)}
-                    </p>
-                  )}
+                  <div className="text-sm text-gray-600">{step.description}</div>
                 </div>
               </div>
             );
@@ -139,14 +136,14 @@ export function OrderTimelineView({ order }: OrderTimelineViewProps) {
         {order.delivery_instructions && (
           <div className="mt-6 p-3 bg-blue-50 rounded-lg">
             <h5 className="font-medium text-blue-900 mb-1">Delivery Instructions</h5>
-            <p className="text-sm text-blue-700">{order.delivery_instructions}</p>
+            <div className="text-gray-800 text-sm">{order.delivery_instructions}</div>
           </div>
         )}
 
         {order.notes && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <h5 className="font-medium text-gray-900 mb-1">Order Notes</h5>
-            <p className="text-sm text-gray-700">{order.notes}</p>
+          <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
+            <h5 className="font-medium text-yellow-900 mb-1">Order Notes</h5>
+            <div className="text-gray-800 text-sm">{order.notes}</div>
           </div>
         )}
       </CardContent>

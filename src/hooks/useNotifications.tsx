@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Notifications } from '@/integrations/supabase/database.types';
+import { errorLogger, withErrorLogging } from "@/utils/errorLogger";
 
 export function useNotifications() {
   const { user } = useAuth();
@@ -101,39 +102,41 @@ export function useNotifications() {
   };
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    withErrorLogging(async () => {
+      if (!user) {
+        return;
+      }
 
-    fetchNotifications();
+      fetchNotifications();
 
-    // Subscribe to real-time notifications
-    const channel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          const newNotification = payload.new as Notifications;
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
-          // Show toast notification
-          toast.info(newNotification.title, {
-            description: newNotification.message
-          });
-        }
-      )
-      .subscribe();
+      // Subscribe to real-time notifications
+      const channel = supabase
+        .channel('notifications-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            const newNotification = payload.new as Notifications;
+            setNotifications(prev => [newNotification, ...prev]);
+            setUnreadCount(prev => prev + 1);
+            
+            // Show toast notification
+            toast.info(newNotification.title, {
+              description: newNotification.message
+            });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    });
   }, [user]);
 
   return {
