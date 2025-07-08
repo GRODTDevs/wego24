@@ -126,6 +126,7 @@ export function useSubscription() {
         console.error('Error fetching subscription details:', subError);
       } else if (subData) {
         // Transform the subscription plan data
+        const planData = subData.subscription_plans;
         const transformedSubscription: UserSubscription = {
           id: subData.id,
           subscribed: subData.subscribed,
@@ -133,19 +134,19 @@ export function useSubscription() {
           current_period_end: subData.current_period_end,
           subscription_status: subData.subscription_status,
           cancel_at_period_end: subData.cancel_at_period_end,
-          plan: subData.subscription_plans ? {
-            id: subData.subscription_plans.id,
-            name: subData.subscription_plans.name,
-            description: subData.subscription_plans.description || '',
-            price_monthly: subData.subscription_plans.price_monthly,
-            max_orders_per_month: subData.subscription_plans.max_orders_per_month || 0,
-            max_restaurants: subData.subscription_plans.max_restaurants || 0,
-            max_drivers: subData.subscription_plans.max_drivers || 0,
-            is_active: subData.subscription_plans.is_active || false,
-            features: Array.isArray(subData.subscription_plans.features) 
-              ? (subData.subscription_plans.features as string[])
-              : typeof subData.subscription_plans.features === 'string' 
-                ? [subData.subscription_plans.features] 
+          plan: planData ? {
+            id: planData.id,
+            name: planData.name,
+            description: planData.description || '',
+            price_monthly: planData.price_monthly,
+            max_orders_per_month: planData.max_orders_per_month || 0,
+            max_restaurants: planData.max_restaurants || 0,
+            max_drivers: planData.max_drivers || 0,
+            is_active: planData.is_active || false,
+            features: Array.isArray(planData.features) 
+              ? (planData.features as string[])
+              : typeof planData.features === 'string' 
+                ? [planData.features] 
                 : []
           } : undefined
         };

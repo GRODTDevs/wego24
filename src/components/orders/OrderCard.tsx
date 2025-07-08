@@ -61,6 +61,28 @@ export function OrderCard({
     return 'Customer';
   };
 
+  const getDeliveryAddress = () => {
+    if (!order.delivery_address) return null;
+    
+    try {
+      // Handle if delivery_address is already an object
+      if (typeof order.delivery_address === 'object' && order.delivery_address !== null) {
+        const addr = order.delivery_address as any;
+        return addr.street || 'Address provided';
+      }
+      
+      // Handle if delivery_address is a string
+      if (typeof order.delivery_address === 'string') {
+        const parsed = JSON.parse(order.delivery_address);
+        return parsed.street || 'Address provided';
+      }
+    } catch (error) {
+      console.error('Error parsing delivery address:', error);
+    }
+    
+    return 'Address provided';
+  };
+
   return (
     <>
       <Card className="w-full hover:shadow-md transition-shadow">
@@ -100,7 +122,7 @@ export function OrderCard({
             <div className="flex items-start gap-2 text-sm">
               <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
               <div>
-                <p>{order.delivery_address.street || 'Address provided'}</p>
+                <p>{getDeliveryAddress()}</p>
                 {order.delivery_instructions && (
                   <p className="text-gray-600 text-xs mt-1">
                     Note: {order.delivery_instructions}
