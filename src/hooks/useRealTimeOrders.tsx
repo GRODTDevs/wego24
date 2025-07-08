@@ -1,8 +1,22 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Orders } from '@/integrations/supabase/database.types';
+import { Tables } from '@/integrations/supabase/types';
+
+// Export the Order type using the proper database type
+export type Order = Tables<'orders'> & {
+  customer_profile?: {
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+  };
+  restaurant_info?: {
+    name?: string;
+    phone?: string;
+  };
+};
 
 export interface OrderStatusHistory {
   id: string;
@@ -15,7 +29,7 @@ export interface OrderStatusHistory {
 
 export function useRealTimeOrders(businessId?: string) {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<Orders[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +53,7 @@ export function useRealTimeOrders(businessId?: string) {
           console.log('Order change received:', payload);
           
           if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Orders;
+            const newOrder = payload.new as Order;
             setOrders(current => [newOrder, ...current]);
             
             // Create notification for new order
@@ -51,7 +65,7 @@ export function useRealTimeOrders(businessId?: string) {
               notifyRestaurantUsers(newOrder);
             }
           } else if (payload.eventType === 'UPDATE') {
-            const updatedOrder = payload.new as Orders;
+            const updatedOrder = payload.new as Order;
             setOrders(current => 
               current.map(order => 
                 order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order
@@ -111,7 +125,7 @@ export function useRealTimeOrders(businessId?: string) {
         service_fee: order.service_fee || 0,
         tax_amount: order.tax_amount || 0,
         payment_status: order.payment_status || 'pending'
-      } as Orders));
+      } as Order));
       
       setOrders(typedOrders);
     } catch (error) {
@@ -173,7 +187,7 @@ export function useRealTimeOrders(businessId?: string) {
     return estimatedTime.toISOString();
   };
 
-  const notifyRestaurantUsers = async (order: Orders) => {
+  const notifyRestaurantUsers = async (order: Order) => {
     try {
       // Get restaurant users to notify
       const { data: restaurantUsers } = await supabase
@@ -201,7 +215,7 @@ export function useRealTimeOrders(businessId?: string) {
     }
   };
 
-  const handleStatusChangeNotification = async (order: Orders, oldStatus: string) => {
+  const handleStatusChangeNotification = async (order: Order, oldStatus: string) => {
     try {
       const statusMessages = {
         confirmed: 'Your order has been confirmed and is being prepared',
@@ -231,7 +245,7 @@ export function useRealTimeOrders(businessId?: string) {
     }
   };
 
-  const handleDriverAssignmentNotification = async (order: Orders) => {
+  const handleDriverAssignmentNotification = async (order: Order) => {
     try {
       await supabase
         .from('notifications')

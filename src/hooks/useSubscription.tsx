@@ -60,7 +60,7 @@ export function useSubscription() {
       if (error) throw error;
       
       // Transform the data to match our interface, handling the Json type properly
-      const transformedPlans: SubscriptionPlan[] = data?.map(plan => ({
+      const transformedPlans: SubscriptionPlan[] = (data || []).map(plan => ({
         id: plan.id,
         name: plan.name,
         description: plan.description || '',
@@ -74,7 +74,7 @@ export function useSubscription() {
           : typeof plan.features === 'string' 
             ? [plan.features] 
             : []
-      })) || [];
+      }));
       
       setPlans(transformedPlans);
     } catch (error) {

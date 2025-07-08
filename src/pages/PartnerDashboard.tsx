@@ -43,7 +43,7 @@ export default function PartnerDashboard() {
 
       if (restaurantError) throw restaurantError;
 
-      if (restaurantUsers && restaurantUsers.length > 0) {
+      if (restaurantUsers && restaurantUsers.length > 0 && restaurantUsers[0].restaurants) {
         setRestaurant(restaurantUsers[0].restaurants as Restaurant);
       } else {
         // Check for partner application
