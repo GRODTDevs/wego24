@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
 
-type Language = "en" | "es" | "fr";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+type Language = 'en' | 'es' | 'de';
+
+interface Translations {
+  [key: string]: string;
+}
 
 interface TranslationContextType {
   language: Language;
@@ -8,457 +13,587 @@ interface TranslationContextType {
   t: (key: string) => string;
 }
 
-export const translations = {
+const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
+
+const translations: Record<Language, Translations> = {
   en: {
-    nav: {
-      home: "Home",
-      courierRequest: "Courier Request",
-      partnerInfo: "Partner Info",
-      become: "Become a Partner",
-      signIn: "Sign In",
-    },
-    auth: {
-      signOut: "Sign Out",
-    },
-    footer: {
-      rights: "All rights reserved.",
-      beta: "BETA",
-    },
-    home: {
-      delivery: {
-        badge: "LOCAL DELIVERY",
-        title: "Order from your",
-        titleHighlight: "favorite places",
-        description:
-          "Discover amazing restaurants, cafes, and local shops in your area.",
-      },
-      searchPlaceholder: "Search restaurants, cafes, shops...",
-      searchButton: "Search",
-      courier: {
-        badge: "COURIER SERVICE",
-        title: "Need something delivered?",
-        description:
-          "Our professional couriers can pick up and deliver anything you need, anywhere in the city. Fast, reliable, and affordable.",
-      },
-      getCourier: "Get Courier",
-      partner: {
-        badge: "BUSINESS PARTNERSHIP",
-        title: "Grow your business with us",
-        description:
-          "Join our platform and reach more customers. Increase your sales with our delivery network and grow your business today.",
-        buttonInfo: "Learn More",
-        buttonRegister: "Become a Partner",
-      },
-    },
-    locations: {
-      businessTypes: {
-        restaurant: "Restaurant",
-        cafe: "Cafe",
-        shop: "Shop",
-      },
-    },
-    lang: {
-      english: "EN",
-      spanish: "ES",
-    },
-    modal: {
-      welcomeTitle: "Welcome to WeGo!",
-      welcomeDescription:
-        "Explore local restaurants, order food, and get anything delivered.",
-      productOwnerStepsTitle: "How it works:",
-      step: {
-        searchRestaurants: "Search for restaurants",
-        viewMenu: "View the menu",
-        reviewFlows: "Check delivery flows",
-        loggedIn: "You are logged in!",
-        loginPrompt: "Log in to place an order.",
-      },
-    },
-    courierRequest: {
-      title: "Courier Request",
-      description: "Book a courier to deliver your items quickly and safely.",
-      pickup: {
-        title: "Pickup Details",
-        locationLabel: "Location *",
-        locationPlaceholder: "Enter pickup address",
-        dateLabel: "Date",
-        datePlaceholder: "dd/mm/yyyy",
-        timeLabel: "Time",
-        timePlaceholder: "--:--",
-      },
-      item: {
-        title: "Item Details",
-        descriptionLabel: "Description *",
-        descriptionPlaceholder: "Describe the item to be delivered",
-        sizeLabel: "Size",
-        sizePlaceholder: "e.g. Medium box",
-        weightLabel: "Weight",
-        weightPlaceholder: "e.g. 2kg",
-      },
-      dropoff: {
-        title: "Dropoff Details",
-        locationLabel: "Location *",
-        locationPlaceholder: "Enter dropoff address",
-        dateLabel: "Date",
-        datePlaceholder: "dd/mm/yyyy",
-        timeLabel: "Time",
-        timePlaceholder: "--:--",
-      },
-      specialInstructions: "Special Instructions",
-      specialInstructionsPlaceholder: "Any additional info for the courier?",
-      priceCalculated: "Price calculated",
-      processing: "Processing...",
-      pay: "Pay",
-      andBookDelivery: "and book delivery",
-      signInPrompt: "Please sign in to book a courier.",
-      errors: {
-        enterAddresses: "Please enter both pickup and dropoff addresses.",
-        findAddresses: "Could not find one or both addresses.",
-        calculatingPrice: "Error calculating price.",
-        signIn: "You must be signed in to pay.",
-        calculatePrice: "Please calculate the price first.",
-        paymentSession: "Error creating payment session.",
-        processingPayment: "Error processing payment.",
-        fillFields: "Please fill in all required fields.",
-      },
-      calculation: {
-        title: "Price Calculation",
-        calculate: "Calculate",
-        calculating: "Calculating...",
-        baseFee: "Base Fee",
-        distanceFee: "Distance Fee",
-        total: "Total",
-      },
-    },
-    common: {
-      backToHome: "Back to Home",
-      signIn: "Sign In",
-    },
-    dashboard: {
-      dashboard: "Operations",
-      loading: "Loading Operations Data...",
-      title: "Operations",
-      orders: "Orders",
-      revenue: "Revenue",
-      activeUsers: "Active Users",
-      partners: "Partners",
-      drivers: "Drivers",
-      recentOrders: "Recent Orders",
-      courierStatus: "Courier Status",
-      alerts: "Alerts",
-      failedOrder: "Failed Order",
-      partnerAnalytics: "Partner & Driver Analytics",
-      topPartners: "Top Partners",
-      topDrivers: "Top Drivers",
-      deliveries: "Deliveries",
-      recentActivity: "Recent Activity",
-      driverSchedules: "Driver Schedules",
-      driverFeedback: "Driver Feedback",
-      driver: "Driver",
-      dayOfWeek: "Day of Week",
-      startTime: "Start Time",
-      endTime: "End Time",
-      rating: "Rating",
-      comment: "Comment",
-      date: "Date",
-      weeklyAvailability: "Weekly Availability",
-      saveAvailability: "Save Availability",
-      saving: "Saving...",
-      noDrivers: "No drivers found",
-      noFeedback: "No feedback yet.",
-      errorLoading: "Failed to load data.",
-      feedback: "Feedback",
-      earnings: "Earnings",
-      requestPayout: "Request Payout",
-      payoutRequested: "Payout request sent!",
-      payoutError: "Failed to request payout. Please try again.",
-      hoursThisWeek: "Hours This Week",
-      earningsThisWeek: "Earnings This Week",
-      completionRate: "Completion Rate",
-      tabs: {
-        overview: "Overview",
-        orders: "Orders",
-        partners: "Partners",
-        drivers: "Drivers",
-        users: "Users",
-        activity: "Activity",
-        alerts: "Alerts",
-        systemHealth: "System Health",
-      },
-      ordersTabPlaceholder: "Order management and analytics coming soon.",
-      partnersTabPlaceholder: "Partner management and analytics coming soon.",
-      driversTabPlaceholder: "Driver analytics coming soon.",
-      usersTabPlaceholder: "User management coming soon.",
-      systemHealthTabPlaceholder: "System health monitoring coming soon.",
-    },
+    // Navigation
+    'nav.home': 'Home',
+    'nav.restaurants': 'Restaurants',
+    'nav.orders': 'Orders',
+    'nav.driver': 'Driver',
+    'nav.partner': 'Partner',
+    'nav.dashboard': 'Dashboard',
+    'nav.profile': 'Profile',
+    'nav.login': 'Login',
+    'nav.logout': 'Logout',
+    'nav.signup': 'Sign Up',
+    'nav.admin': 'Admin',
+    'nav.subscription': 'Subscription',
+    'nav.courier': 'Courier',
+    'nav.settings': 'Settings',
+    'nav.help': 'Help',
+    'nav.contact': 'Contact',
+    
+    // Common
+    'common.loading': 'Loading...',
+    'common.error': 'Error',
+    'common.success': 'Success',
+    'common.cancel': 'Cancel',
+    'common.confirm': 'Confirm',
+    'common.save': 'Save',
+    'common.delete': 'Delete',
+    'common.edit': 'Edit',
+    'common.view': 'View',
+    'common.back': 'Back',
+    'common.next': 'Next',
+    'common.previous': 'Previous',
+    'common.search': 'Search',
+    'common.filter': 'Filter',
+    'common.sort': 'Sort',
+    'common.total': 'Total',
+    'common.subtotal': 'Subtotal',
+    'common.tax': 'Tax',
+    'common.fee': 'Fee',
+    'common.price': 'Price',
+    'common.quantity': 'Quantity',
+    'common.name': 'Name',
+    'common.email': 'Email',
+    'common.phone': 'Phone',
+    'common.address': 'Address',
+    'common.city': 'City',
+    'common.status': 'Status',
+    'common.date': 'Date',
+    'common.time': 'Time',
+    'common.description': 'Description',
+    'common.notes': 'Notes',
+    'common.rating': 'Rating',
+    'common.review': 'Review',
+    'common.submit': 'Submit',
+    'common.close': 'Close',
+    'common.open': 'Open',
+    'common.closed': 'Closed',
+    'common.available': 'Available',
+    'common.unavailable': 'Unavailable',
+    'common.active': 'Active',
+    'common.inactive': 'Inactive',
+    'common.pending': 'Pending',
+    'common.approved': 'Approved',
+    'common.rejected': 'Rejected',
+    'common.completed': 'Completed',
+    'common.cancelled': 'Cancelled',
+    
+    // Authentication
+    'auth.welcome': 'Welcome to WeGo24',
+    'auth.signin': 'Sign In',
+    'auth.signup': 'Sign Up',
+    'auth.signout': 'Sign Out',
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.confirmPassword': 'Confirm Password',
+    'auth.firstName': 'First Name',
+    'auth.lastName': 'Last Name',
+    'auth.forgotPassword': 'Forgot Password?',
+    'auth.resetPassword': 'Reset Password',
+    'auth.createAccount': 'Create Account',
+    'auth.alreadyHaveAccount': 'Already have an account?',
+    'auth.dontHaveAccount': "Don't have an account?",
+    'auth.signInWith': 'Sign in with',
+    'auth.orContinueWith': 'Or continue with',
+    
+    // Restaurant
+    'restaurant.menu': 'Menu',
+    'restaurant.orderNow': 'Order Now',
+    'restaurant.addToCart': 'Add to Cart',
+    'restaurant.viewCart': 'View Cart',
+    'restaurant.checkout': 'Checkout',
+    'restaurant.deliveryFee': 'Delivery Fee',
+    'restaurant.minimumOrder': 'Minimum Order',
+    'restaurant.deliveryTime': 'Delivery Time',
+    'restaurant.rating': 'Rating',
+    'restaurant.reviews': 'Reviews',
+    'restaurant.cuisine': 'Cuisine',
+    'restaurant.openingHours': 'Opening Hours',
+    
+    // Orders
+    'order.placeOrder': 'Place Order',
+    'order.orderHistory': 'Order History',
+    'order.orderDetails': 'Order Details',
+    'order.orderNumber': 'Order Number',
+    'order.orderStatus': 'Order Status',
+    'order.orderTotal': 'Order Total',
+    'order.deliveryAddress': 'Delivery Address',
+    'order.deliveryInstructions': 'Delivery Instructions',
+    'order.paymentMethod': 'Payment Method',
+    'order.estimatedDelivery': 'Estimated Delivery',
+    'order.trackOrder': 'Track Order',
+    
+    // Driver
+    'driver.dashboard': 'Driver Dashboard',
+    'driver.availability': 'Availability',
+    'driver.earnings': 'Earnings',
+    'driver.performance': 'Performance',
+    'driver.documents': 'Documents',
+    'driver.profile': 'Profile',
+    'driver.settings': 'Settings',
+    'driver.online': 'Online',
+    'driver.offline': 'Offline',
+    'driver.acceptOrder': 'Accept Order',
+    'driver.declineOrder': 'Decline Order',
+    'driver.pickupLocation': 'Pickup Location',
+    'driver.deliveryLocation': 'Delivery Location',
+    'driver.orderPicked': 'Order Picked Up',
+    'driver.orderDelivered': 'Order Delivered',
+    
+    // Partner
+    'partner.dashboard': 'Partner Dashboard',
+    'partner.register': 'Partner Registration',
+    'partner.application': 'Application',
+    'partner.businessInfo': 'Business Information',
+    'partner.contactInfo': 'Contact Information',
+    'partner.locationInfo': 'Location Information',
+    'partner.businessName': 'Business Name',
+    'partner.businessType': 'Business Type',
+    'partner.businessDescription': 'Business Description',
+    'partner.menuManagement': 'Menu Management',
+    'partner.orderManagement': 'Order Management',
+    'partner.analytics': 'Analytics',
+    
+    // Admin
+    'admin.dashboard': 'Admin Dashboard',
+    'admin.users': 'Users',
+    'admin.restaurants': 'Restaurants',
+    'admin.drivers': 'Drivers',
+    'admin.orders': 'Orders',
+    'admin.analytics': 'Analytics',
+    'admin.settings': 'Settings',
+    'admin.reports': 'Reports',
+    'admin.demoData': 'Demo Data',
+    'admin.systemHealth': 'System Health',
+    
+    // Profile
+    'profile.personalInfo': 'Personal Information',
+    'profile.preferences': 'Preferences',
+    'profile.notifications': 'Notifications',
+    'profile.privacy': 'Privacy',
+    'profile.changePassword': 'Change Password',
+    'profile.deleteAccount': 'Delete Account',
+    'profile.language': 'Language',
+    'profile.theme': 'Theme',
+    
+    // Subscription
+    'subscription.plans': 'Subscription Plans',
+    'subscription.currentPlan': 'Current Plan',
+    'subscription.upgrade': 'Upgrade',
+    'subscription.cancel': 'Cancel',
+    'subscription.billing': 'Billing',
+    'subscription.paymentMethod': 'Payment Method',
+    'subscription.invoices': 'Invoices',
+    
+    // Error Messages
+    'error.general': 'Something went wrong. Please try again.',
+    'error.network': 'Network error. Please check your connection.',
+    'error.unauthorized': 'You are not authorized to perform this action.',
+    'error.notFound': 'The requested resource was not found.',
+    'error.validation': 'Please check your input and try again.',
+    
+    // Success Messages
+    'success.saved': 'Changes saved successfully!',
+    'success.deleted': 'Item deleted successfully!',
+    'success.created': 'Item created successfully!',
+    'success.updated': 'Item updated successfully!',
+    'success.orderPlaced': 'Order placed successfully!',
+    'success.passwordChanged': 'Password changed successfully!',
   },
   es: {
-    nav: {
-      home: "Inicio",
-      courierRequest: "Mensajería",
-      partnerInfo: "Información Socio",
-      become: "Hazte Socio",
-      signIn: "Iniciar Sesión",
-    },
-    auth: {
-      signOut: "Cerrar Sesión",
-    },
-    footer: {
-      rights: "Todos los derechos reservados.",
-      beta: "BETA",
-    },
-    home: {
-      delivery: {
-        badge: "ENTREGA LOCAL",
-        title: "Pide de tus",
-        titleHighlight: "lugares favoritos",
-        description:
-          "Descubre increíbles restaurantes, cafeterías y tiendas locales en tu área.",
-      },
-      searchPlaceholder: "Buscar restaurantes, cafeterías, tiendas...",
-      searchButton: "Buscar",
-      courier: {
-        badge: "SERVICIO DE MENSAJERÍA",
-        title: "¿Necesitas algo entregado?",
-        description:
-          "Nuestros mensajeros profesionales pueden recoger y entregar cualquier cosa que necesites, en cualquier lugar de la ciudad. Rápido, confiable y económico.",
-      },
-      getCourier: "Obtener Mensajero",
-      partner: {
-        badge: "ASOCIACIÓN COMERCIAL",
-        title: "Haz crecer tu negocio con nosotros",
-        description:
-          "Únete a nuestra plataforma y llega a más clientes. Aumenta tus ventas con nuestra red de entrega y haz crecer tu negocio hoy.",
-        buttonInfo: "Más Información",
-        buttonRegister: "Convertirse en Socio",
-      },
-    },
-    locations: {
-      businessTypes: {
-        restaurant: "Restaurante",
-        cafe: "Cafetería",
-        shop: "Tienda",
-      },
-    },
-    lang: {
-      english: "EN",
-      spanish: "ES",
-    },
-    modal: {
-      welcomeTitle: "¡Bienvenido a WeGo!",
-      welcomeDescription:
-        "Explora restaurantes locales, pide comida y recibe cualquier cosa a domicilio.",
-      productOwnerStepsTitle: "Cómo funciona:",
-      step: {
-        searchRestaurants: "Busca restaurantes",
-        viewMenu: "Ver el menú",
-        reviewFlows: "Revisa los flujos de entrega",
-        loggedIn: "¡Has iniciado sesión!",
-        loginPrompt: "Inicia sesión para hacer un pedido.",
-      },
-    },
-    courierRequest: {
-      title: "Solicitud de Mensajero",
-      description:
-        "Reserva un mensajero para entregar tus artículos de forma rápida y segura.",
-      pickup: {
-        title: "Detalles de Recogida",
-        locationLabel: "Ubicación *",
-        locationPlaceholder: "Introduce la dirección de recogida",
-        dateLabel: "Fecha",
-        datePlaceholder: "dd/mm/aaaa",
-        timeLabel: "Hora",
-        timePlaceholder: "--:--",
-      },
-      item: {
-        title: "Detalles del Artículo",
-        descriptionLabel: "Descripción *",
-        descriptionPlaceholder: "Describe el artículo a entregar",
-        sizeLabel: "Tamaño",
-        sizePlaceholder: "ej. Caja mediana",
-        weightLabel: "Peso",
-        weightPlaceholder: "ej. 2kg",
-      },
-      dropoff: {
-        title: "Detalles de Entrega",
-        locationLabel: "Ubicación *",
-        locationPlaceholder: "Introduce la dirección de entrega",
-        dateLabel: "Fecha",
-        datePlaceholder: "dd/mm/aaaa",
-        timeLabel: "Hora",
-        timePlaceholder: "--:--",
-      },
-      specialInstructions: "Instrucciones Especiales",
-      specialInstructionsPlaceholder:
-        "¿Alguna información adicional para el mensajero?",
-      priceCalculated: "Precio calculado",
-      processing: "Procesando...",
-      pay: "Pagar",
-      andBookDelivery: "y reservar entrega",
-      signInPrompt: "Por favor, inicia sesión para reservar un mensajero.",
-      errors: {
-        enterAddresses:
-          "Por favor, introduce ambas direcciones de recogida y entrega.",
-        findAddresses: "No se pudo encontrar una o ambas direcciones.",
-        calculatingPrice: "Error al calcular el precio.",
-        signIn: "Debes iniciar sesión para pagar.",
-        calculatePrice: "Por favor, calcula el precio primero.",
-        paymentSession: "Error al crear la sesión de pago.",
-        processingPayment: "Error al procesar el pago.",
-        fillFields: "Por favor, completa todos los campos obligatorios.",
-      },
-      calculation: {
-        title: "Cálculo de Precio",
-        calculate: "Calcular",
-        calculating: "Calculando...",
-        baseFee: "Tarifa Base",
-        distanceFee: "Tarifa por Distancia",
-        total: "Total",
-      },
-    },
-    common: {
-      backToHome: "Volver al inicio",
-      signIn: "Iniciar Sesión",
-    },
-    dashboard: {
-      dashboard: "Operaciones",
-      loading: "Cargando panel...",
-      title: "Panel de Operaciones",
-      orders: "Pedidos",
-      revenue: "Ingresos",
-      activeUsers: "Usuarios Activos",
-      partners: "Socios",
-      drivers: "Repartidores",
-      recentOrders: "Pedidos Recientes",
-      courierStatus: "Estado de Mensajeros",
-      alerts: "Alertas",
-      failedOrder: "Pedido Fallido",
-      partnerAnalytics: "Analítica de Socios y Repartidores",
-      topPartners: "Socios Destacados",
-      topDrivers: "Repartidores Destacados",
-      deliveries: "Entregas",
-      recentActivity: "Actividad Reciente",
-      driverSchedules: "Horarios de Repartidores",
-      driverFeedback: "Comentarios de Repartidores",
-      driver: "Repartidor",
-      dayOfWeek: "Día de la Semana",
-      startTime: "Hora de Inicio",
-      endTime: "Hora de Fin",
-      rating: "Valoración",
-      comment: "Comentario",
-      date: "Fecha",
-      weeklyAvailability: "Disponibilidad Semanal",
-      saveAvailability: "Guardar Disponibilidad",
-      saving: "Guardando...",
-      noDrivers: "No se encontraron repartidores",
-      noFeedback: "Aún no hay comentarios.",
-      errorLoading: "Error al cargar los datos.",
-      feedback: "Comentarios",
-      earnings: "Ganancias",
-      requestPayout: "Solicitar Pago",
-      payoutRequested: "¡Solicitud de pago enviada!",
-      payoutError: "Error al solicitar el pago. Inténtalo de nuevo.",
-      hoursThisWeek: "Horas Esta Semana",
-      earningsThisWeek: "Ganancias Esta Semana",
-      completionRate: "Tasa de Finalización",
-      tabs: {
-        overview: "Resumen",
-        orders: "Pedidos",
-        partners: "Socios",
-        drivers: "Repartidores",
-        users: "Usuarios",
-        activity: "Actividad",
-        alerts: "Alertas",
-        systemHealth: "Salud del Sistema",
-      },
-      ordersTabPlaceholder: "Gestión y análisis de pedidos próximamente.",
-      partnersTabPlaceholder: "Gestión y análisis de socios próximamente.",
-      driversTabPlaceholder: "Análisis de repartidores próximamente.",
-      usersTabPlaceholder: "Gestión de usuarios próximamente.",
-      systemHealthTabPlaceholder: "Monitorización de la salud del sistema próximamente.",
-    },
+    // Navigation
+    'nav.home': 'Inicio',
+    'nav.restaurants': 'Restaurantes',
+    'nav.orders': 'Pedidos',
+    'nav.driver': 'Conductor',
+    'nav.partner': 'Socio',
+    'nav.dashboard': 'Panel',
+    'nav.profile': 'Perfil',
+    'nav.login': 'Iniciar Sesión',
+    'nav.logout': 'Cerrar Sesión',
+    'nav.signup': 'Registrarse',
+    'nav.admin': 'Admin',
+    'nav.subscription': 'Suscripción',
+    'nav.courier': 'Mensajero',
+    'nav.settings': 'Configuración',
+    'nav.help': 'Ayuda',
+    'nav.contact': 'Contacto',
+    
+    // Common
+    'common.loading': 'Cargando...',
+    'common.error': 'Error',
+    'common.success': 'Éxito',
+    'common.cancel': 'Cancelar',
+    'common.confirm': 'Confirmar',
+    'common.save': 'Guardar',
+    'common.delete': 'Eliminar',
+    'common.edit': 'Editar',
+    'common.view': 'Ver',
+    'common.back': 'Atrás',
+    'common.next': 'Siguiente',
+    'common.previous': 'Anterior',
+    'common.search': 'Buscar',
+    'common.filter': 'Filtrar',
+    'common.sort': 'Ordenar',
+    'common.total': 'Total',
+    'common.subtotal': 'Subtotal',
+    'common.tax': 'Impuesto',
+    'common.fee': 'Tarifa',
+    'common.price': 'Precio',
+    'common.quantity': 'Cantidad',
+    'common.name': 'Nombre',
+    'common.email': 'Email',
+    'common.phone': 'Teléfono',
+    'common.address': 'Dirección',
+    'common.city': 'Ciudad',
+    'common.status': 'Estado',
+    'common.date': 'Fecha',
+    'common.time': 'Hora',
+    'common.description': 'Descripción',
+    'common.notes': 'Notas',
+    'common.rating': 'Calificación',
+    'common.review': 'Reseña',
+    'common.submit': 'Enviar',
+    'common.close': 'Cerrar',
+    'common.open': 'Abierto',
+    'common.closed': 'Cerrado',
+    'common.available': 'Disponible',
+    'common.unavailable': 'No Disponible',
+    'common.active': 'Activo',
+    'common.inactive': 'Inactivo',
+    'common.pending': 'Pendiente',
+    'common.approved': 'Aprobado',
+    'common.rejected': 'Rechazado',
+    'common.completed': 'Completado',
+    'common.cancelled': 'Cancelado',
+    
+    // Authentication
+    'auth.welcome': 'Bienvenido a WeGo24',
+    'auth.signin': 'Iniciar Sesión',
+    'auth.signup': 'Registrarse',
+    'auth.signout': 'Cerrar Sesión',
+    'auth.email': 'Email',
+    'auth.password': 'Contraseña',
+    'auth.confirmPassword': 'Confirmar Contraseña',
+    'auth.firstName': 'Nombre',
+    'auth.lastName': 'Apellido',
+    'auth.forgotPassword': '¿Olvidaste tu contraseña?',
+    'auth.resetPassword': 'Restablecer Contraseña',
+    'auth.createAccount': 'Crear Cuenta',
+    'auth.alreadyHaveAccount': '¿Ya tienes una cuenta?',
+    'auth.dontHaveAccount': '¿No tienes una cuenta?',
+    'auth.signInWith': 'Iniciar sesión con',
+    'auth.orContinueWith': 'O continúa con',
+    
+    // Restaurant
+    'restaurant.menu': 'Menú',
+    'restaurant.orderNow': 'Pedir Ahora',
+    'restaurant.addToCart': 'Añadir al Carrito',
+    'restaurant.viewCart': 'Ver Carrito',
+    'restaurant.checkout': 'Finalizar Compra',
+    'restaurant.deliveryFee': 'Tarifa de Envío',
+    'restaurant.minimumOrder': 'Pedido Mínimo',
+    'restaurant.deliveryTime': 'Tiempo de Entrega',
+    'restaurant.rating': 'Calificación',
+    'restaurant.reviews': 'Reseñas',
+    'restaurant.cuisine': 'Cocina',
+    'restaurant.openingHours': 'Horarios de Apertura',
+    
+    // Orders
+    'order.placeOrder': 'Realizar Pedido',
+    'order.orderHistory': 'Historial de Pedidos',
+    'order.orderDetails': 'Detalles del Pedido',
+    'order.orderNumber': 'Número de Pedido',
+    'order.orderStatus': 'Estado del Pedido',
+    'order.orderTotal': 'Total del Pedido',
+    'order.deliveryAddress': 'Dirección de Entrega',
+    'order.deliveryInstructions': 'Instrucciones de Entrega',
+    'order.paymentMethod': 'Método de Pago',
+    'order.estimatedDelivery': 'Entrega Estimada',
+    'order.trackOrder': 'Rastrear Pedido',
+    
+    // Driver
+    'driver.dashboard': 'Panel del Conductor',
+    'driver.availability': 'Disponibilidad',
+    'driver.earnings': 'Ganancias',
+    'driver.performance': 'Rendimiento',
+    'driver.documents': 'Documentos',
+    'driver.profile': 'Perfil',
+    'driver.settings': 'Configuración',
+    'driver.online': 'En Línea',
+    'driver.offline': 'Desconectado',
+    'driver.acceptOrder': 'Aceptar Pedido',
+    'driver.declineOrder': 'Rechazar Pedido',
+    'driver.pickupLocation': 'Ubicación de Recogida',
+    'driver.deliveryLocation': 'Ubicación de Entrega',
+    'driver.orderPicked': 'Pedido Recogido',
+    'driver.orderDelivered': 'Pedido Entregado',
+    
+    // Partner
+    'partner.dashboard': 'Panel del Socio',
+    'partner.register': 'Registro de Socio',
+    'partner.application': 'Aplicación',
+    'partner.businessInfo': 'Información del Negocio',
+    'partner.contactInfo': 'Información de Contacto',
+    'partner.locationInfo': 'Información de Ubicación',
+    'partner.businessName': 'Nombre del Negocio',
+    'partner.businessType': 'Tipo de Negocio',
+    'partner.businessDescription': 'Descripción del Negocio',
+    'partner.menuManagement': 'Gestión de Menú',
+    'partner.orderManagement': 'Gestión de Pedidos',
+    'partner.analytics': 'Analíticas',
+    
+    // Admin
+    'admin.dashboard': 'Panel de Admin',
+    'admin.users': 'Usuarios',
+    'admin.restaurants': 'Restaurantes',
+    'admin.drivers': 'Conductores',
+    'admin.orders': 'Pedidos',
+    'admin.analytics': 'Analíticas',
+    'admin.settings': 'Configuración',
+    'admin.reports': 'Reportes',
+    'admin.demoData': 'Datos de Demo',
+    'admin.systemHealth': 'Salud del Sistema',
+    
+    // Profile
+    'profile.personalInfo': 'Información Personal',
+    'profile.preferences': 'Preferencias',
+    'profile.notifications': 'Notificaciones',
+    'profile.privacy': 'Privacidad',
+    'profile.changePassword': 'Cambiar Contraseña',
+    'profile.deleteAccount': 'Eliminar Cuenta',
+    'profile.language': 'Idioma',
+    'profile.theme': 'Tema',
+    
+    // Subscription
+    'subscription.plans': 'Planes de Suscripción',
+    'subscription.currentPlan': 'Plan Actual',
+    'subscription.upgrade': 'Mejorar',
+    'subscription.cancel': 'Cancelar',
+    'subscription.billing': 'Facturación',
+    'subscription.paymentMethod': 'Método de Pago',
+    'subscription.invoices': 'Facturas',
+    
+    // Error Messages
+    'error.general': 'Algo salió mal. Por favor, inténtalo de nuevo.',
+    'error.network': 'Error de red. Por favor, verifica tu conexión.',
+    'error.unauthorized': 'No estás autorizado para realizar esta acción.',
+    'error.notFound': 'El recurso solicitado no fue encontrado.',
+    'error.validation': 'Por favor, verifica tu entrada e inténtalo de nuevo.',
+    
+    // Success Messages
+    'success.saved': '¡Cambios guardados exitosamente!',
+    'success.deleted': '¡Elemento eliminado exitosamente!',
+    'success.created': '¡Elemento creado exitosamente!',
+    'success.updated': '¡Elemento actualizado exitosamente!',
+    'success.orderPlaced': '¡Pedido realizado exitosamente!',
+    'success.passwordChanged': '¡Contraseña cambiada exitosamente!',
+  },
+  de: {
+    // Navigation
+    'nav.home': 'Startseite',
+    'nav.restaurants': 'Restaurants',
+    'nav.orders': 'Bestellungen',
+    'nav.driver': 'Fahrer',
+    'nav.partner': 'Partner',
+    'nav.dashboard': 'Dashboard',
+    'nav.profile': 'Profil',
+    'nav.login': 'Anmelden',
+    'nav.logout': 'Abmelden',
+    'nav.signup': 'Registrieren',
+    'nav.admin': 'Admin',
+    'nav.subscription': 'Abonnement',
+    'nav.courier': 'Kurier',
+    'nav.settings': 'Einstellungen',
+    'nav.help': 'Hilfe',
+    'nav.contact': 'Kontakt',
+    
+    // Common
+    'common.loading': 'Lädt...',
+    'common.error': 'Fehler',
+    'common.success': 'Erfolg',
+    'common.cancel': 'Abbrechen',
+    'common.confirm': 'Bestätigen',
+    'common.save': 'Speichern',
+    'common.delete': 'Löschen',
+    'common.edit': 'Bearbeiten',
+    'common.view': 'Ansehen',
+    'common.back': 'Zurück',
+    'common.next': 'Weiter',
+    'common.previous': 'Vorherige',
+    'common.search': 'Suchen',
+    'common.filter': 'Filter',
+    'common.sort': 'Sortieren',
+    'common.total': 'Gesamt',
+    'common.subtotal': 'Zwischensumme',
+    'common.tax': 'Steuer',
+    'common.fee': 'Gebühr',
+    'common.price': 'Preis',
+    'common.quantity': 'Menge',
+    'common.name': 'Name',
+    'common.email': 'E-Mail',
+    'common.phone': 'Telefon',
+    'common.address': 'Adresse',
+    'common.city': 'Stadt',
+    'common.status': 'Status',
+    'common.date': 'Datum',
+    'common.time': 'Zeit',
+    'common.description': 'Beschreibung',
+    'common.notes': 'Notizen',
+    'common.rating': 'Bewertung',
+    'common.review': 'Rezension',
+    'common.submit': 'Absenden',
+    'common.close': 'Schließen',
+    'common.open': 'Geöffnet',
+    'common.closed': 'Geschlossen',
+    'common.available': 'Verfügbar',
+    'common.unavailable': 'Nicht Verfügbar',
+    'common.active': 'Aktiv',
+    'common.inactive': 'Inaktiv',
+    'common.pending': 'Ausstehend',
+    'common.approved': 'Genehmigt',
+    'common.rejected': 'Abgelehnt',
+    'common.completed': 'Abgeschlossen',
+    'common.cancelled': 'Storniert',
+    
+    // Authentication
+    'auth.welcome': 'Willkommen bei WeGo24',
+    'auth.signin': 'Anmelden',
+    'auth.signup': 'Registrieren',
+    'auth.signout': 'Abmelden',
+    'auth.email': 'E-Mail',
+    'auth.password': 'Passwort',
+    'auth.confirmPassword': 'Passwort Bestätigen',
+    'auth.firstName': 'Vorname',
+    'auth.lastName': 'Nachname',
+    'auth.forgotPassword': 'Passwort vergessen?',
+    'auth.resetPassword': 'Passwort Zurücksetzen',
+    'auth.createAccount': 'Konto Erstellen',
+    'auth.alreadyHaveAccount': 'Haben Sie bereits ein Konto?',
+    'auth.dontHaveAccount': 'Haben Sie noch kein Konto?',
+    'auth.signInWith': 'Anmelden mit',
+    'auth.orContinueWith': 'Oder fortfahren mit',
+    
+    // Restaurant
+    'restaurant.menu': 'Menü',
+    'restaurant.orderNow': 'Jetzt Bestellen',
+    'restaurant.addToCart': 'In den Warenkorb',
+    'restaurant.viewCart': 'Warenkorb Ansehen',
+    'restaurant.checkout': 'Zur Kasse',
+    'restaurant.deliveryFee': 'Liefergebühr',
+    'restaurant.minimumOrder': 'Mindestbestellung',
+    'restaurant.deliveryTime': 'Lieferzeit',
+    'restaurant.rating': 'Bewertung',
+    'restaurant.reviews': 'Bewertungen',
+    'restaurant.cuisine': 'Küche',
+    'restaurant.openingHours': 'Öffnungszeiten',
+    
+    // Orders
+    'order.placeOrder': 'Bestellung Aufgeben',
+    'order.orderHistory': 'Bestellhistorie',
+    'order.orderDetails': 'Bestelldetails',
+    'order.orderNumber': 'Bestellnummer',
+    'order.orderStatus': 'Bestellstatus',
+    'order.orderTotal': 'Bestellsumme',
+    'order.deliveryAddress': 'Lieferadresse',
+    'order.deliveryInstructions': 'Lieferanweisungen',
+    'order.paymentMethod': 'Zahlungsmethode',
+    'order.estimatedDelivery': 'Geschätzte Lieferung',
+    'order.trackOrder': 'Bestellung Verfolgen',
+    
+    // Driver
+    'driver.dashboard': 'Fahrer Dashboard',
+    'driver.availability': 'Verfügbarkeit',
+    'driver.earnings': 'Einnahmen',
+    'driver.performance': 'Leistung',
+    'driver.documents': 'Dokumente',
+    'driver.profile': 'Profil',
+    'driver.settings': 'Einstellungen',
+    'driver.online': 'Online',
+    'driver.offline': 'Offline',
+    'driver.acceptOrder': 'Bestellung Annehmen',
+    'driver.declineOrder': 'Bestellung Ablehnen',
+    'driver.pickupLocation': 'Abholort',
+    'driver.deliveryLocation': 'Lieferort',
+    'driver.orderPicked': 'Bestellung Abgeholt',
+    'driver.orderDelivered': 'Bestellung Geliefert',
+    
+    // Partner
+    'partner.dashboard': 'Partner Dashboard',
+    'partner.register': 'Partner Registrierung',
+    'partner.application': 'Bewerbung',
+    'partner.businessInfo': 'Geschäftsinformationen',
+    'partner.contactInfo': 'Kontaktinformationen',
+    'partner.locationInfo': 'Standortinformationen',
+    'partner.businessName': 'Geschäftsname',
+    'partner.businessType': 'Geschäftstyp',
+    'partner.businessDescription': 'Geschäftsbeschreibung',
+    'partner.menuManagement': 'Menüverwaltung',
+    'partner.orderManagement': 'Bestellverwaltung',
+    'partner.analytics': 'Analytik',
+    
+    // Admin
+    'admin.dashboard': 'Admin Dashboard',
+    'admin.users': 'Benutzer',
+    'admin.restaurants': 'Restaurants',
+    'admin.drivers': 'Fahrer',
+    'admin.orders': 'Bestellungen',
+    'admin.analytics': 'Analytik',
+    'admin.settings': 'Einstellungen',
+    'admin.reports': 'Berichte',
+    'admin.demoData': 'Demo Daten',
+    'admin.systemHealth': 'Systemzustand',
+    
+    // Profile
+    'profile.personalInfo': 'Persönliche Informationen',
+    'profile.preferences': 'Einstellungen',
+    'profile.notifications': 'Benachrichtigungen',
+    'profile.privacy': 'Datenschutz',
+    'profile.changePassword': 'Passwort Ändern',
+    'profile.deleteAccount': 'Konto Löschen',
+    'profile.language': 'Sprache',
+    'profile.theme': 'Theme',
+    
+    // Subscription
+    'subscription.plans': 'Abonnement Pläne',
+    'subscription.currentPlan': 'Aktueller Plan',
+    'subscription.upgrade': 'Upgrade',
+    'subscription.cancel': 'Kündigen',
+    'subscription.billing': 'Abrechnung',
+    'subscription.paymentMethod': 'Zahlungsmethode',
+    'subscription.invoices': 'Rechnungen',
+    
+    // Error Messages
+    'error.general': 'Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.',
+    'error.network': 'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.',
+    'error.unauthorized': 'Sie sind nicht berechtigt, diese Aktion auszuführen.',
+    'error.notFound': 'Die angeforderte Ressource wurde nicht gefunden.',
+    'error.validation': 'Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.',
+    
+    // Success Messages
+    'success.saved': 'Änderungen erfolgreich gespeichert!',
+    'success.deleted': 'Element erfolgreich gelöscht!',
+    'success.created': 'Element erfolgreich erstellt!',
+    'success.updated': 'Element erfolgreich aktualisiert!',
+    'success.orderPlaced': 'Bestellung erfolgreich aufgegeben!',
+    'success.passwordChanged': 'Passwort erfolgreich geändert!',
   },
 };
 
-const TranslationContext = createContext<TranslationContextType | undefined>(
-  undefined
-);
-
-export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [language, setLanguage] = useState<Language>("en");
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    // Initialize the context
-    setIsInitialized(true);
-    console.log("TranslationProvider initialized with language:", language);
-  }, [language]);
+export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    try {
-      if (!isInitialized) {
-        console.warn(
-          "Translation context not initialized, using fallback for:",
-          key
-        );
-        return key.split(".").pop() || key;
-      }
-
-      console.log("Translation requested for key:", key, "language:", language);
-
-      const keys = key.split(".");
-      let value: any = translations[language];
-
-      for (const k of keys) {
-        if (value && typeof value === "object") {
-          value = value[k];
-        } else {
-          value = undefined;
-          break;
-        }
-      }
-
-      // If translation not found, try English fallback
-      if (!value && language !== "en") {
-        let fallback: any = translations.en;
-        for (const k of keys) {
-          if (fallback && typeof fallback === "object") {
-            fallback = fallback[k];
-          } else {
-            fallback = undefined;
-            break;
-          }
-        }
-        if (fallback) {
-          console.log("Using English fallback for:", key, "=", fallback);
-          return fallback;
-        }
-      }
-
-      // Return the translation if found, otherwise return the last part of the key
-      const result = value || key.split(".").pop() || key;
-      console.log("Translation result for", key, "=", result);
-      return result;
-    } catch (error) {
-      console.error("Translation error:", error, "for key:", key);
-      return key.split(".").pop() || key;
-    }
+    return translations[language][key] || key;
   };
-
-  const contextValue = {
-    language,
-    setLanguage,
-    t,
-  };
-
-  if (!isInitialized) {
-    return <div>Loading translations...</div>;
-  }
 
   return (
-    <TranslationContext.Provider value={contextValue}>
+    <TranslationContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </TranslationContext.Provider>
   );
@@ -466,14 +601,8 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useTranslation = () => {
   const context = useContext(TranslationContext);
-  console.log(
-    "useTranslation called, context:",
-    context ? "available" : "undefined"
-  );
-
   if (context === undefined) {
-    console.error("useTranslation must be used within a TranslationProvider");
-    throw new Error("useTranslation must be used within a TranslationProvider");
+    throw new Error('useTranslation must be used within a TranslationProvider');
   }
   return context;
 };

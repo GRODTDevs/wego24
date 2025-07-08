@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export function DemoDataManager() {
   const [loading, setLoading] = useState(false);
@@ -10,46 +12,70 @@ export function DemoDataManager() {
   async function insertDemoData() {
     setLoading(true);
     setResult("");
+    
     try {
+      console.log("Starting demo data insertion...");
       const demoProfileId = "63b5d9eb-ba28-4c29-99c4-68f4d845411b";
-      const demoProfile = [
-        {
-          id: demoProfileId,
-          first_name: "Demo",
-          last_name: "User",
-          email: "demo.user@wego24.com",
-          phone: "+34000000000",
-          is_demo: true,
-          city: "Demo City",
-          country: "DemoLand",
-          roles: ["user", "demo"],
-          is_active: true,
-        },
-      ];
-      const demoDrivers = [
-        {
-          user_id: demoProfileId,
-          first_name: "Demo",
-          last_name: "Driver 1",
-          email: "demo.driver1@wego24.com",
-          phone: "+34000000001",
-          is_demo: true,
-          vehicle_type: "car",
-          city: "Demo City",
-          is_active: true,
-          is_available: true,
-          registration_status: "approved",
-          background_check_status: "approved",
-          rating: 4.8,
-          total_deliveries: 42,
-        },
-      ];
+      
+      // Insert demo profile first
+      const demoProfile = {
+        id: demoProfileId,
+        first_name: "Demo",
+        last_name: "User",
+        email: "demo.user@wego24.com",
+        phone: "+34000000000",
+        is_demo: true,
+        city: "Demo City",
+        country: "DemoLand",
+        roles: ["user", "demo"],
+        is_active: true,
+      };
 
-      // Insert partner application and get generated id
+      console.log("Inserting demo profile...");
+      const { error: profileErr } = await supabase
+        .from("profiles")
+        .upsert(demoProfile, { onConflict: 'id' });
+      
+      if (profileErr) {
+        console.error("Profile error:", profileErr);
+        throw profileErr;
+      }
+
+      // Insert demo driver
+      const demoDriver = {
+        user_id: demoProfileId,
+        first_name: "Demo",
+        last_name: "Driver 1",
+        email: "demo.driver1@wego24.com",
+        phone: "+34000000001",
+        is_demo: true,
+        vehicle_type: "car",
+        city: "Demo City",
+        is_active: true,
+        is_available: true,
+        registration_status: "approved",
+        background_check_status: "approved",
+        rating: 4.8,
+        total_deliveries: 42,
+      };
+
+      console.log("Inserting demo driver...");
+      const { error: driverErr } = await supabase
+        .from("drivers")
+        .upsert(demoDriver, { onConflict: 'user_id' });
+      
+      if (driverErr) {
+        console.error("Driver error:", driverErr);
+        throw driverErr;
+      }
+
+      // Insert partner application
+      console.log("Inserting partner application...");
       const { data: partnerAppData, error: partnerAppErr } = await supabase
         .from("partner_applications")
-        .insert([
+        .upsert([
           {
+            id: "demo-partner-app-id",
             user_id: demoProfileId,
             business_name: "Demo Partner Business",
             business_type: "restaurant",
@@ -64,21 +90,23 @@ export function DemoDataManager() {
             updated_at: new Date().toISOString(),
             is_demo: true,
           },
-        ])
+        ], { onConflict: 'id' })
         .select();
+      
       if (partnerAppErr) {
+        console.error("Partner application error:", partnerAppErr);
         throw partnerAppErr;
       }
-      const partnerAppId = partnerAppData?.[0]?.id;
-      if (!partnerAppId) {
-        throw new Error("Failed to get partner application id");
-      }
+      
+      const partnerAppId = partnerAppData?.[0]?.id || "demo-partner-app-id";
 
-      // Insert partner and get generated id
+      // Insert partner
+      console.log("Inserting partner...");
       const { data: partnerData, error: partnerErr } = await supabase
         .from("partners")
-        .insert([
+        .upsert([
           {
+            id: "demo-partner-id",
             name: "Demo Partner",
             email: "demo.partner@wego24.com",
             order_count: 0,
@@ -86,42 +114,45 @@ export function DemoDataManager() {
             user_id: demoProfileId,
             is_demo: true,
           },
-        ])
+        ], { onConflict: 'id' })
         .select();
+      
       if (partnerErr) {
+        console.error("Partner error:", partnerErr);
         throw partnerErr;
       }
-      const partnerId = partnerData?.[0]?.id;
-      if (!partnerId) {
-        throw new Error("Failed to get partner id");
-      }
+      
+      const partnerId = partnerData?.[0]?.id || "demo-partner-id";
 
-      // Insert restaurant(s) using generated application_id
-      const { data: restaurantData, error: restaurantInsertErr } =
-        await supabase
-          .from("restaurants")
-          .insert([
-            {
-              name: "Demo Restaurant 1",
-              email: "demo.rest1@wego24.com",
-              is_demo: true,
-              address: "123 Demo St",
-              city: "Demo City",
-              application_id: partnerAppId,
-            },
-          ])
-          .select();
+      // Insert restaurant
+      console.log("Inserting restaurant...");
+      const { data: restaurantData, error: restaurantInsertErr } = await supabase
+        .from("restaurants")
+        .upsert([
+          {
+            id: "demo-restaurant-id",
+            name: "Demo Restaurant 1",
+            email: "demo.rest1@wego24.com",
+            is_demo: true,
+            address: "123 Demo St",
+            city: "Demo City",
+            application_id: partnerAppId,
+          },
+        ], { onConflict: 'id' })
+        .select();
+      
       if (restaurantInsertErr) {
+        console.error("Restaurant error:", restaurantInsertErr);
         throw restaurantInsertErr;
       }
-      const restaurantId = restaurantData?.[0]?.id;
-      if (!restaurantId) {
-        throw new Error("Failed to get restaurant id");
-      }
+      
+      const restaurantId = restaurantData?.[0]?.id || "demo-restaurant-id";
 
-      // Insert menu items using generated restaurant id
+      // Insert menu items
+      console.log("Inserting menu items...");
       const demoMenuItems = [
         {
+          id: "demo-menu-item-1",
           name: "Demo Pizza",
           description: "A delicious cheese and tomato pizza.",
           price: 10.99,
@@ -137,6 +168,7 @@ export function DemoDataManager() {
           restaurant_id: restaurantId,
         },
         {
+          id: "demo-menu-item-2",
           name: "Demo Burger",
           description: "A juicy beef burger with lettuce and tomato.",
           price: 8.99,
@@ -152,37 +184,24 @@ export function DemoDataManager() {
           restaurant_id: restaurantId,
         },
       ];
+      
       const { error: menuErr } = await supabase
         .from("menu_items")
-        .insert(demoMenuItems);
+        .upsert(demoMenuItems, { onConflict: 'id' });
+      
       if (menuErr) {
+        console.error("Menu items error:", menuErr);
         throw menuErr;
       }
-      const { data: profileData, error: profileErr } = await supabase
-        .from("profiles")
-        .insert(demoProfile)
-        .select();
-      if (profileErr) {
-        throw profileErr;
-      }
-      const { data: drivers, error: driverErr } = await supabase
-        .from("drivers")
-        .insert(demoDrivers)
-        .select();
-      if (driverErr) {
-        throw driverErr;
-      }
-      // Use restaurantData from above instead of redeclaring restaurants
-      if (
-        drivers &&
-        drivers[0] &&
-        restaurantData &&
-        restaurantData[0] &&
-        demoProfileId
-      ) {
-        const demoOrder = [
+
+      // Insert demo order
+      console.log("Inserting demo order...");
+      const { error: orderErr } = await supabase
+        .from("orders")
+        .upsert([
           {
-            business_id: restaurantData[0].id,
+            id: "demo-order-id",
+            business_id: restaurantId,
             customer_id: demoProfileId,
             status: "pending",
             total_amount: 19.98,
@@ -197,17 +216,21 @@ export function DemoDataManager() {
             driver_id: demoProfileId,
             is_demo: true,
           },
-        ];
-        const { error: orderErr } = await supabase
-          .from("orders")
-          .insert(demoOrder);
-        if (orderErr) {
-          throw orderErr;
-        }
+        ], { onConflict: 'id' });
+      
+      if (orderErr) {
+        console.error("Order error:", orderErr);
+        throw orderErr;
       }
+
+      console.log("Demo data insertion completed successfully");
       setResult("Demo data inserted successfully.");
+      toast.success("Demo data inserted successfully!");
+      
     } catch (err: any) {
+      console.error("Demo data insertion failed:", err);
       setResult("Error: " + err.message);
+      toast.error("Failed to insert demo data: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -216,17 +239,27 @@ export function DemoDataManager() {
   async function deleteDemoData() {
     setLoading(true);
     setResult("");
+    
     try {
+      console.log("Starting demo data deletion...");
+      
+      // Delete in reverse order to respect foreign key constraints
       await supabase.from("orders").delete().eq("is_demo", true);
       await supabase.from("menu_items").delete().eq("is_demo", true);
       await supabase.from("restaurants").delete().eq("is_demo", true);
+      await supabase.from("partners").delete().eq("is_demo", true);
+      await supabase.from("partner_applications").delete().eq("is_demo", true);
       await supabase.from("drivers").delete().eq("is_demo", true);
       await supabase.from("profiles").delete().eq("is_demo", true);
-      await supabase.from("partner_applications").delete().eq("is_demo", true);
-      await supabase.from("partners").delete().eq("is_demo", true);
+      
+      console.log("Demo data deletion completed successfully");
       setResult("Demo data deleted successfully.");
+      toast.success("Demo data deleted successfully!");
+      
     } catch (err: any) {
+      console.error("Demo data deletion failed:", err);
       setResult("Error: " + err.message);
+      toast.error("Failed to delete demo data: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -254,7 +287,11 @@ export function DemoDataManager() {
           >
             {loading ? "Deleting..." : "Delete Demo Data"}
           </Button>
-          {result && <div className="text-center mt-2">{result}</div>}
+          {result && (
+            <div className={`text-center mt-2 ${result.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
+              {result}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
