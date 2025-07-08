@@ -42,55 +42,65 @@ export function DemoDataManager() {
           total_deliveries: 42
         }
       ];
-      // Create demo partner application
-      const demoPartnerApplicationId = "b1b2c3d4-e5f6-7890-abcd-ef1234567890";
-      const demoPartnerApplication = [{
-        id: demoPartnerApplicationId,
-        user_id: demoProfileId,
-        business_name: "Demo Partner Business",
-        business_type: "restaurant",
-        email: "demo.partner@wego24.com",
-        phone: "+34000000003",
-        address: "789 Partner Ave",
-        city: "Demo City",
-        postal_code: "12345",
-        description: "Demo partner application for testing.",
-        status: "approved",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        is_demo: true,
-      }];
-      const { error: partnerAppErr } = await supabase
+
+      // Insert partner application and get generated id
+      const { data: partnerAppData, error: partnerAppErr } = await supabase
         .from("partner_applications")
-        .insert(demoPartnerApplication);
-      if (partnerAppErr) { throw partnerAppErr; }
-
-      // Create demo partner
-      const demoPartnerId = "c1d2e3f4-5678-90ab-cdef-1234567890ab";
-      const demoPartner = [{
-        id: demoPartnerId,
-        name: "Demo Partner",
-        email: "demo.partner@wego24.com",
-        order_count: 0,
-        created_at: new Date().toISOString(),
-        user_id: demoProfileId,
-        is_demo: true,
-      }];
-      const { error: partnerErr } = await supabase
-        .from("partners")
-        .insert(demoPartner);
-      if (partnerErr) { throw partnerErr; }
-
-      const demoRestaurants = [
-        {
-          name: "Demo Restaurant 1",
-          email: "demo.rest1@wego24.com",
-          is_demo: true,
-          address: "123 Demo St",
+        .insert([{
+          user_id: demoProfileId,
+          business_name: "Demo Partner Business",
+          business_type: "restaurant",
+          email: "demo.partner@wego24.com",
+          phone: "+34000000003",
+          address: "789 Partner Ave",
           city: "Demo City",
-          application_id: demoPartnerApplicationId
-        },
-      ];
+          postal_code: "12345",
+          description: "Demo partner application for testing.",
+          status: "approved",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_demo: true,
+        }])
+        .select();
+      if (partnerAppErr) { throw partnerAppErr; }
+      const partnerAppId = partnerAppData?.[0]?.id;
+      if (!partnerAppId) throw new Error("Failed to get partner application id");
+
+      // Insert partner and get generated id
+      const { data: partnerData, error: partnerErr } = await supabase
+        .from("partners")
+        .insert([{
+          name: "Demo Partner",
+          email: "demo.partner@wego24.com",
+          order_count: 0,
+          created_at: new Date().toISOString(),
+          user_id: demoProfileId,
+          is_demo: true,
+        }])
+        .select();
+      if (partnerErr) { throw partnerErr; }
+      const partnerId = partnerData?.[0]?.id;
+      if (!partnerId) throw new Error("Failed to get partner id");
+
+      // Insert restaurant(s) using generated application_id
+      const { data: restaurantData, error: restErr } = await supabase
+        .from("restaurants")
+        .insert([
+          {
+            name: "Demo Restaurant 1",
+            email: "demo.rest1@wego24.com",
+            is_demo: true,
+            address: "123 Demo St",
+            city: "Demo City",
+            application_id: partnerAppId
+          },
+        ])
+        .select();
+      if (restErr) { throw restErr; }
+      const restaurantId = restaurantData?.[0]?.id;
+      if (!restaurantId) throw new Error("Failed to get restaurant id");
+
+      // Insert menu items using generated restaurant id
       const demoMenuItems = [
         {
           name: "Demo Pizza",
@@ -104,7 +114,8 @@ export function DemoDataManager() {
           allergens: ["gluten", "dairy"],
           dietary_info: ["vegetarian"],
           display_order: 1,
-          is_demo: true
+          is_demo: true,
+          restaurant_id: restaurantId
         },
         {
           name: "Demo Burger",
@@ -118,9 +129,12 @@ export function DemoDataManager() {
           allergens: ["gluten", "egg"],
           dietary_info: ["contains beef"],
           display_order: 2,
-          is_demo: true
+          is_demo: true,
+          restaurant_id: restaurantId
         },
       ];
+      const { error: menuErr } = await supabase.from("menu_items").insert(demoMenuItems);
+      if (menuErr) { throw menuErr; }
       const { data: profileData, error: profileErr } = await supabase
         .from("profiles")
         .insert(demoProfile)
