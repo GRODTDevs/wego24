@@ -22,29 +22,18 @@ import PartnerRegister from './pages/PartnerRegister';
 import Auth from './pages/Auth';
 import { DriverDashboard } from "./components/driver/DriverDashboard";
 import DriverRegistrationPage from "./pages/DriverRegistration";
-import SecureDeveloperLogin from './pages/SecureDeveloperLogin';
 import NotFound from './pages/NotFound';
 import { useState, useEffect } from "react";
 import "./App.css";
+import { PartnerApprovalPanel } from "./components/admin/PartnerApprovalPanel";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [isDevSession, setIsDevSession] = useState(false);
-
-  useEffect(() => {
-    const devSession = sessionStorage.getItem("dev_session");
-    if (devSession) {
-      const sessionData = JSON.parse(devSession);
-      setIsDevSession(sessionData.authenticated);
-    }
-  }, []);
-
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    return isDevSession ? children : <Navigate to="/dev-login" />;
+    const isAuthenticated = sessionStorage.getItem("auth_token");
+    return isAuthenticated ? children : <Navigate to="/auth" />;
   };
-
-  const DriverLogin = () => <div>Driver Login (Coming Soon)</div>;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,32 +42,20 @@ function App() {
           <SystemSettingsProvider>
             <Router>
               <div className="min-h-screen bg-gray-50 flex flex-col">
-                {isDevSession && <Header />}
+                <Header />
                 <main className="flex-1">
                   <Routes>
-                    <Route path="/dev-login" element={<SecureDeveloperLogin />} />
-                    <Route path="/partner-register" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/partner-info" element={<Navigate to="/auth" />} />
+                    <Route path="/partner-register" element={<Navigate to="/auth" />} />
+                    <Route path="/driver-registration" element={<Navigate to="/auth" />} />
+                    <Route path="/courier-request" element={<Navigate to="/auth" />} />
+                    <Route path="/courier-success" element={<Navigate to="/auth" />} />
                     <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="/auth" element={<ProtectedRoute><Auth /></ProtectedRoute>} />
-                    <Route path="/operations" element={<ProtectedRoute><OperationsDashboard /></ProtectedRoute>} />
-                    <Route path="/driver-dashboard" element={<ProtectedRoute><div>Driver Dashboard (Coming Soon)</div></ProtectedRoute>} />
-                    <Route path="/customer-dashboard" element={<ProtectedRoute><CustomerDashboardPage /></ProtectedRoute>} />
-                    <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
-                    <Route path="/restaurant-dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
-                    <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
-                    <Route path="/subscription/success" element={<ProtectedRoute><SubscriptionSuccess /></ProtectedRoute>} />
-                    <Route path="/admin/analytics" element={<ProtectedRoute><AdvancedAnalyticsPanel /></ProtectedRoute>} />
-                    <Route path="/admin/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
-                    <Route path="/admin/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
-                    <Route path="/courier-request" element={<ProtectedRoute><CourierRequest /></ProtectedRoute>} />
-                    <Route path="/partner-info" element={<ProtectedRoute><PartnerInfo /></ProtectedRoute>} />
-                    <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
-                    <Route path="/driver-login" element={<ProtectedRoute><DriverLogin /></ProtectedRoute>} />
-                    <Route path="/driver-registration" element={<ProtectedRoute><DriverRegistrationPage /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
-                {isDevSession && <Footer />}
+                <Footer />
                 <Toaster />
               </div>
             </Router>

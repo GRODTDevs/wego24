@@ -37,27 +37,6 @@ export function Header() {
             />
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/courier-request"
-              className="hover:text-white transition-colors"
-            >
-              {t("nav.courierRequest")}
-            </Link>
-            <Link
-              to="/partner-info"
-              className="hover:text-white transition-colors"
-            >
-              {t("nav.partnerInfo")}
-            </Link>
-            <Link
-              to="/driver-registration"
-              className="hover:text-white transition-colors"
-            >
-              {t("nav.become")}
-            </Link>
-          </nav>
-
           <div className="flex items-center space-x-4">
             <LanguageSwitcher />
             {user ? (
@@ -72,7 +51,7 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => navigate("/auth")} variant="outline" className="text-white border-white">
+              <Button onClick={() => navigate("/auth")} variant="outline" className="bg-transparent text-white border-white">
                 {t("nav.signIn")}
               </Button>
             )}
