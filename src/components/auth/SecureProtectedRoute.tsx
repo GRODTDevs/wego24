@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,32 +26,17 @@ export const SecureProtectedRoute = ({ children }: SecureProtectedRouteProps) =>
         // Check if session is expired
         if (!session.expires || now > session.expires) {
           sessionStorage.removeItem('dev_session');
-          
-          // Log session expiry
-          await supabase.rpc('log_security_event', {
-            p_user_id: null,
-            p_action: 'dev_session_expired',
-            p_resource_type: 'authentication',
-            p_details: { 
-              timestamp: new Date().toISOString(),
-              expired_at: new Date(session.expires).toISOString()
-            }
-          });
-
           setIsAuthenticated(false);
           return;
         }
 
-        // Validate session structure
-        if (!session.token || !session.authenticated) {
+        if (!session.authenticated) {
           sessionStorage.removeItem('dev_session');
           setIsAuthenticated(false);
           return;
         }
 
-        setSessionValid(true);
         setIsAuthenticated(true);
-
       } catch (error) {
         console.error('Session validation error:', error);
         sessionStorage.removeItem('dev_session');

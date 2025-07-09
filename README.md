@@ -189,7 +189,36 @@ System Settings allow admins to control platform features, pricing, assignment l
   - Year 3: 1,600+ subscribers, €24k/month sub revenue, €26k/month delivery revenue, €20k+ net profit/month.
 
 ---
+
 **Next Steps:**
 
 - Operations CMS/Blog - Create pages and posts, add media, categories etc
 - Full Frontend design evaluation - Modern & Appealing Branding.
+
+## Developer Authentication
+
+### Flow
+
+1. Navigate to `/dev-login`.
+
+2. Enter the developer password (configured via environment variables `VITE_DEV_LOGIN_PASSWORD` or `REACT_APP_DEV_PASSWORD`)
+
+3. Upon successful authentication, a session is stored in `sessionStorage` with the following structure:
+
+   ```json
+   {
+     "token": "randomUUID",
+     "expires": "timestamp",
+     "authenticated": true
+   }
+   ```
+
+4. The session is validated on each protected route.
+
+### Notes
+
+- Sessions expire after 2 hours.
+
+- If the session is invalid or expired, the user is redirected to `/dev-login`.
+
+- The header is hidden on the `/dev-login` page to prevent unauthorized access to navigation.
