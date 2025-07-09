@@ -1,6 +1,5 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SystemSettingsProvider } from "@/contexts/SystemSettingsContext";
 import { TranslationProvider } from "@/contexts/TranslationContext";
@@ -28,11 +27,24 @@ import SecureDeveloperLogin from './pages/SecureDeveloperLogin';
 import { useAuth } from './contexts/AuthContext';
 import { useUserRole } from './hooks/useUserRole';
 import NotFound from './pages/NotFound';
+import { useState, useEffect } from "react";
 import "./App.css";
 
 const queryClient = new QueryClient();
 
 function App() {
+  const [isDevSession, setIsDevSession] = useState(false);
+
+  useEffect(() => {
+    // Check for dev session variable
+    const devSession = sessionStorage.getItem("dev");
+    setIsDevSession(!!devSession);
+  }, []);
+
+  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    return isDevSession ? children : <Navigate to="/dev-login" />;
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TranslationProvider>
@@ -44,15 +56,12 @@ function App() {
                 <main className="flex-1">
                   <Routes>
                     {/* Public routes */}
-                    <Route path="/" element={<Index />} />
-                    <Route path="/courier-request" element={<CourierRequest />} />
-                    <Route path="/partner-info" element={<PartnerInfo />} />
-                    <Route path="/partner-register" element={<PartnerRegister />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/driver-registration" element={<DriverRegistrationPage />} />
+                    <Route path="/dev-login" element={<SecureDeveloperLogin />} />
+                    <Route path="/partner-register" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
+                    <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                    <Route path="/auth" element={<ProtectedRoute><Auth /></ProtectedRoute>} />
                     
                     {/* Secure developer route */}
-                    <Route path="/dev-login" element={<SecureDeveloperLogin />} />
                     <Route 
                       path="/operations" 
                       element={
@@ -101,19 +110,19 @@ function App() {
 
                     {/* Admin routes */}
                     <Route path="/admin/analytics" element={
-                      <ProtectedRoute requireAdmin={true}>
+                      <ProtectedRoute>
                         <AdvancedAnalyticsPanel />
                       </ProtectedRoute>
                     } />
                     
                     <Route path="/admin/regions" element={
-                      <ProtectedRoute requireAdmin={true}>
+                      <ProtectedRoute>
                         <AdminRegionsPanel />
                       </ProtectedRoute>
                     } />
                     
                     <Route path="/admin/issues" element={
-                      <ProtectedRoute requireAdmin={true}>
+                      <ProtectedRoute>
                         <AdminIssueResolutionPanel />
                       </ProtectedRoute>
                     } />
