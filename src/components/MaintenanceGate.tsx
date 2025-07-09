@@ -12,7 +12,8 @@ export default function MaintenanceGate({ children }: { children: React.ReactNod
   }
 
   if (settingsLoading || roleLoading) return null;
-  // If maintenance mode is enabled, only allow access for logged-in admins
+
+  // Strictly block all access for non-admins when maintenance mode is on
   if (settings.maintenance_mode === true || settings.maintenance_mode === "true") {
     if (!isAdmin) {
       if (typeof window !== 'undefined') {
@@ -21,6 +22,7 @@ export default function MaintenanceGate({ children }: { children: React.ReactNod
       return <MaintenancePage />;
     }
   }
+
   if (typeof window !== 'undefined') {
     console.log('[MaintenanceGate] Allowing access');
   }
