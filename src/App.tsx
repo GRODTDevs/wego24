@@ -25,6 +25,7 @@ import { DriverDashboard } from "./components/driver/DriverDashboard";
 import DriverRegistrationPage from "./pages/DriverRegistration";
 import NotFound from './pages/NotFound';
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/contexts/AuthContext";
 import "./App.css";
 import MaintenanceGate from "@/components/MaintenanceGate";
 
@@ -50,15 +51,15 @@ function App() {
 
 function AuthGate() {
   const { isAdmin, loading: roleLoading, userRole } = useUserRole();
-  const isAuthenticated = sessionStorage.getItem("auth_token");
+  const { user } = useAuth();
 
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     if (typeof window !== 'undefined') {
-      console.log('[ProtectedRoute] isAuthenticated:', isAuthenticated, 'isAdmin:', isAdmin, 'roleLoading:', roleLoading);
+      console.log('[ProtectedRoute] user:', user, 'isAdmin:', isAdmin, 'roleLoading:', roleLoading);
     }
-    if (!isAuthenticated) {
+    if (!user) {
       if (typeof window !== 'undefined') {
-        console.log('[ProtectedRoute] Not authenticated, redirecting to /auth');
+        console.log('[ProtectedRoute] No user, redirecting to /auth');
       }
       return <Navigate to="/auth" />;
     }
