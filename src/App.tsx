@@ -20,7 +20,8 @@ import CourierRequest from './pages/CourierRequest';
 import PartnerInfo from './pages/PartnerInfo';
 import PartnerRegister from './pages/PartnerRegister';
 import Auth from './pages/Auth';
-import DriverRegistrationPage from './pages/DriverRegistration';
+import { DriverDashboard } from "./components/driver/DriverDashboard";
+import DriverRegistrationPage from "./pages/DriverRegistration";
 import SecureDeveloperLogin from './pages/SecureDeveloperLogin';
 import NotFound from './pages/NotFound';
 import { useState, useEffect } from "react";
@@ -42,6 +43,8 @@ function App() {
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return isDevSession ? children : <Navigate to="/dev-login" />;
   };
+
+  const DriverLogin = () => <div>Driver Login (Coming Soon)</div>;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -67,6 +70,11 @@ function App() {
                     <Route path="/admin/analytics" element={<ProtectedRoute><AdvancedAnalyticsPanel /></ProtectedRoute>} />
                     <Route path="/admin/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
                     <Route path="/admin/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
+                    <Route path="/courier-request" element={<ProtectedRoute><CourierRequest /></ProtectedRoute>} />
+                    <Route path="/partner-info" element={<ProtectedRoute><PartnerInfo /></ProtectedRoute>} />
+                    <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
+                    <Route path="/driver-login" element={<ProtectedRoute><DriverLogin /></ProtectedRoute>} />
+                    <Route path="/driver-registration" element={<ProtectedRoute><DriverRegistrationPage /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
