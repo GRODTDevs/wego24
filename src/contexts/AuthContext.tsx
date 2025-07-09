@@ -99,9 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Always clear user/session state even if Supabase signOut fails
       setUser(null);
       setSession(null);
-      // Optionally, clear any cached roles
+      // Remove all Supabase session keys from localStorage and sessionStorage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.')) {
+          localStorage.removeItem(key);
+        }
+      });
       Object.keys(sessionStorage).forEach((key) => {
-        if (key.startsWith('user_role_')) {
+        if (key.startsWith('user_role_') || key.startsWith('supabase.auth.')) {
           sessionStorage.removeItem(key);
         }
       });
