@@ -90,8 +90,6 @@ export default function PartnerInfo() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <Header />
-      
       <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 px-4 bg-gradient-to-br from-red-50 via-orange-50 to-white">
@@ -347,8 +345,6 @@ export default function PartnerInfo() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

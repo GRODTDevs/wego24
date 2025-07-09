@@ -187,8 +187,6 @@ const CourierRequest = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
-      
       <main className="flex-1 px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
           <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base">
@@ -256,8 +254,6 @@ const CourierRequest = () => {
           </form>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

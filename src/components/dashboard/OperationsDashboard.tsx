@@ -85,7 +85,6 @@ export function OperationsDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
       <main className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-4">{t('dashboard.title')}</h1>
         <Tabs defaultValue="overview" className="w-full">

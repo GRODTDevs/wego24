@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Info, Building2 } from "lucide-react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -55,7 +53,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <Header />
       <main className="flex-1">
         {/* Delivery Section */}
         <section className="relative h-[340px] md:h-[400px] flex items-center justify-center bg-gray-900 bg-cover bg-center" style={{ backgroundImage: `url('/lovable-uploads/363cf1fe-e5d2-4476-ade0-61691f9e5f58.png')` }}>
@@ -110,7 +107,6 @@ const Index = () => {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };
