@@ -49,15 +49,23 @@ function App() {
 }
 
 function AuthGate() {
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, loading: roleLoading, userRole } = useUserRole();
   const isAuthenticated = sessionStorage.getItem("auth_token");
 
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     if (!isAuthenticated) return <Navigate to="/auth" />;
-    if (roleLoading) return <div className="flex justify-center items-center h-full"><span>Loading...</span></div>;
+    if (roleLoading) return <div className="flex justify-center items-center h-full"><span>Loading role...</span></div>;
+    // Debug output
+    if (typeof window !== 'undefined') {
+      console.log('AuthGate: isAdmin', isAdmin, 'userRole', userRole, 'isAuthenticated', isAuthenticated);
+    }
     if (!isAdmin) return <Navigate to="/auth" />;
     return children;
   };
+
+  if (roleLoading) {
+    return <div className="flex justify-center items-center h-screen"><span>Loading user role...</span></div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
