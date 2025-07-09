@@ -395,6 +395,9 @@ export type Database = {
         Row: {
           id: string;
           name: string;
+          address?: string;
+          businessName?: string;
+          approval?: string;
           email?: string;
           order_count?: number;
           created_at?: string;
