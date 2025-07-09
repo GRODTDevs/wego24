@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,11 +9,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/contexts/TranslationContext";
+import { Header } from "@/components/Header";
 
 export default function Auth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -133,20 +135,15 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to <span className="text-red-500">BiteToGo</span>
-          </CardTitle>
-          <p className="text-gray-600">Your favorite food delivery service</p>
-        </CardHeader>
-        
-        <CardContent>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex flex-col">
+      <Header />
+      <main className="flex-1 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded shadow p-8">
+          <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.welcome')}</h1>
           <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">{t('auth.signin')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
             </TabsList>
             
             {error && (
@@ -160,14 +157,14 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    Email
+                    {t('auth.email')}
                   </Label>
                   <Input
                     id="login-email"
                     type="email"
                     value={loginForm.email}
                     onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="Enter your email"
+                    placeholder={t('auth.enterYourEmail')}
                     required
                   />
                 </div>
@@ -175,7 +172,7 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="login-password" className="flex items-center gap-2">
                     <Lock className="w-4 h-4" />
-                    Password
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Input
@@ -183,7 +180,7 @@ export default function Auth() {
                       type={showPassword ? "text" : "password"}
                       value={loginForm.password}
                       onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Enter your password"
+                      placeholder={t('auth.enterYourPassword')}
                       required
                     />
                     <button
@@ -201,7 +198,7 @@ export default function Auth() {
                   className="w-full bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500"
                   disabled={loading}
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {loading ? t('auth.loggingIn') : t('auth.signin')}
                 </Button>
               </form>
             </TabsContent>
@@ -212,24 +209,24 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="first-name" className="flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      First Name
+                      {t('auth.firstName')}
                     </Label>
                     <Input
                       id="first-name"
                       value={signupForm.firstName}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, firstName: e.target.value }))}
-                      placeholder="John"
+                      placeholder={t('auth.john')}
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
+                    <Label htmlFor="last-name">{t('auth.lastName')}</Label>
                     <Input
                       id="last-name"
                       value={signupForm.lastName}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, lastName: e.target.value }))}
-                      placeholder="Doe"
+                      placeholder={t('auth.doe')}
                       required
                     />
                   </div>
@@ -238,14 +235,14 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    Email
+                    {t('auth.email')}
                   </Label>
                   <Input
                     id="signup-email"
                     type="email"
                     value={signupForm.email}
                     onChange={(e) => setSignupForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="john@example.com"
+                    placeholder={t('auth.john@example.com')}
                     required
                   />
                 </div>
@@ -253,21 +250,21 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="flex items-center gap-2">
                     <Phone className="w-4 h-4" />
-                    Phone (Optional)
+                    {t('auth.phone')} ({t('auth.optional')})
                   </Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={signupForm.phone}
                     onChange={(e) => setSignupForm(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="+1 234 567 8900"
+                    placeholder={t('auth.enterYourPhone')}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="flex items-center gap-2">
                     <Lock className="w-4 h-4" />
-                    Password
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Input
@@ -275,7 +272,7 @@ export default function Auth() {
                       type={showPassword ? "text" : "password"}
                       value={signupForm.password}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Create a password"
+                      placeholder={t('auth.createAPassword')}
                       required
                     />
                     <button
@@ -289,13 +286,13 @@ export default function Auth() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password">{t('auth.confirmPassword')}</Label>
                   <Input
                     id="confirm-password"
                     type={showPassword ? "text" : "password"}
                     value={signupForm.confirmPassword}
                     onChange={(e) => setSignupForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    placeholder="Confirm your password"
+                    placeholder={t('auth.confirmYourPassword')}
                     required
                   />
                 </div>
@@ -305,13 +302,22 @@ export default function Auth() {
                   className="w-full bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500"
                   disabled={loading}
                 >
-                  {loading ? "Creating account..." : "Create Account"}
+                  {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+          <div className="mt-4 text-center">
+            <Button
+              variant="link"
+              onClick={() => navigate('/forgot-password')}
+              className="text-sm text-gray-500 underline"
+            >
+              {t('auth.forgotPassword')}
+            </Button>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

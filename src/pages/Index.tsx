@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LocationCard } from "@/components/LocationCard";
 import { Button } from "@/components/ui/button";
+import { Info, Building2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { InfoModal } from "@/components/InfoModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { Truck, Building2, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/contexts/TranslationContext";
 
@@ -59,94 +57,34 @@ const Index = () => {
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
       <main className="flex-1">
-        {/* Section 1: Local Delivery Search */}
-        <section className="relative py-20 px-4">
-          {/* Subtle radial gradient background */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="w-[900px] h-[900px] bg-gradient-radial from-orange-100 via-white to-transparent rounded-full absolute left-1/2 -top-52 -translate-x-1/2 opacity-60"></div>
-            <div className="w-[500px] h-[500px] bg-gradient-radial from-red-100 via-white to-transparent rounded-full absolute right-10 top-1/3 opacity-40"></div>
-          </div>
-          <div className="relative z-10 flex flex-col items-center max-w-5xl mx-auto">
-            <span className="text-sm font-medium text-orange-600 tracking-widest mb-2 animate-fade-in">{t('home.delivery.badge')}</span>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 text-center">
-              {t('home.delivery.title')} <span className="text-red-500">{t('home.delivery.titleHighlight')}</span>
-            </h1>
-            <p className="text-gray-600 text-lg mb-8 text-center max-w-md">
-              {t('home.delivery.description')}
-            </p>
-            <div className="flex w-full max-w-md gap-2 mb-12">
-              <input
-                className="w-full px-5 py-3 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-400 outline-none shadow-sm bg-white placeholder:text-gray-400"
-                placeholder={t('home.searchPlaceholder')}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-              <Button
-                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-12 px-6 shadow-md flex items-center gap-2"
-                type="button"
-              >
-                <Search className="w-4 h-4" />
-                {t('home.searchButton')}
-              </Button>
-            </div>
-
-            {/* Locations grid */}
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : filteredLocations.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full">
-                {filteredLocations.map((location, idx) => (
-                  <LocationCard
-                    key={location.id}
-                    name={location.name}
-                    businessType={location.cuisine_type || t('locations.businessTypes.restaurant')}
-                    image={location.image_url || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"}
-                    highlightColor={idx % 2 === 0 ? "red" : "orange"}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </section>
-
-        {/* Section 2: Get a Courier */}
-        <section 
-          className="relative py-20 px-4 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('/lovable-uploads/eea68027-6b2e-4c4c-97ff-8f21f0181a9b.png')` }}
-        >
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-          
-          <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto text-center">
-            <span className="text-sm font-medium text-orange-300 tracking-widest mb-4">{t('home.courier.badge')}</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 text-white">
+        {/* Delivery Section */}
+        <section className="relative h-[340px] md:h-[400px] flex items-center justify-center bg-gray-900 bg-cover bg-center" style={{ backgroundImage: `url('/lovable-uploads/363cf1fe-e5d2-4476-ade0-61691f9e5f58.png')` }}>
+          <div className="absolute inset-0 bg-black bg-opacity-60" />
+          <div className="relative z-10 flex flex-col items-center text-center px-4">
+            <span className="text-sm font-medium text-orange-300 tracking-widest mb-2">{t('home.courier.badge')}</span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
               {t('home.courier.title')}
-            </h2>
-            <p className="text-gray-200 text-lg mb-8 max-w-2xl">
+            </h1>
+            <p className="text-lg text-orange-100 mb-6 max-w-xl">
               {t('home.courier.description')}
             </p>
             <Link to="/courier-request">
-              <Button
-                className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
-                type="button"
-              >
-                <Truck className="w-5 h-5" />
-                {t('home.getCourier')}
+              <Button className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg">
+                <span role="img" aria-label="courier">🚚</span> {t('home.getCourier')}
               </Button>
             </Link>
           </div>
         </section>
 
-        {/* Section 3: Become a Partner */}
+        {/* Partner Signup Section */}
         <section className="py-20 px-4 bg-white">
           <div className="flex flex-col items-center max-w-4xl mx-auto text-center">
-            <span className="text-sm font-medium text-blue-600 tracking-widest mb-4">{t('home.partner.badge')}</span>
+            <span className="text-sm font-medium text-blue-600 tracking-widest mb-4">{t('partner.info.heroTitle')}</span>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-6 text-gray-900">
-              {t('home.partner.title')}
+              {t('partner.info.heroDescription')}
             </h2>
             <p className="text-gray-600 text-lg mb-8 max-w-2xl">
-              {t('home.partner.description')}
+              {t('partner.info.ctaDesc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/partner-info">
@@ -156,25 +94,22 @@ const Index = () => {
                   type="button"
                 >
                   <Info className="w-5 h-5" />
-                  {t('home.partner.buttonInfo')}
+                  {t('partner.info.learnMore')}
                 </Button>
               </Link>
               <Link to="/partner-register">
                 <Button
-                  className="bg-gradient-to-r from-red-500 to-orange-400 hover:from-orange-400 hover:to-red-500 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
+                  className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-400 hover:to-blue-600 text-white font-semibold h-14 px-8 shadow-lg flex items-center gap-3 text-lg"
                   type="button"
                 >
                   <Building2 className="w-5 h-5" />
-                  {t('home.partner.buttonRegister')}
+                  {t('partner.info.applyNow')}
                 </Button>
               </Link>
             </div>
           </div>
         </section>
-
-        <InfoModal />
       </main>
-
       <Footer />
     </div>
   );

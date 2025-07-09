@@ -10,7 +10,6 @@ import { useUserRole } from "@/hooks/useUserRole";
 
 export function Header() {
   const { user, signOut } = useAuth();
-  console.log(user);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAdmin } = useUserRole();
@@ -26,7 +25,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+    <header className="bg-red-600 text-white shadow-sm border-b sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
@@ -40,25 +39,25 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               to="/"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="hover:text-white transition-colors"
             >
               {t("nav.home")}
             </Link>
             <Link
               to="/courier-request"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="hover:text-white transition-colors"
             >
               {t("nav.courierRequest")}
             </Link>
             <Link
               to="/partner-info"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="hover:text-white transition-colors"
             >
               {t("nav.partnerInfo")}
             </Link>
             <Link
               to="/driver-registration"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="hover:text-white transition-colors"
             >
               {t("nav.become")}
             </Link>
@@ -71,29 +70,20 @@ export function Header() {
                 <NotificationCenter />
                 <Link
                   to="/operations"
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  className="hover:text-white transition-colors text-sm"
                 >
                   {t("dashboard.dashboard")}
                 </Link>
                 <Button
                   variant="ghost"
                   onClick={handleSignOut}
-                  className="text-gray-600"
+                  className="text-white"
                 >
                   {t("auth.signOut")}
                 </Button>
-                {/* Robust admin check: use useUserRole hook for admin link */}
-                {isAdmin && (
-                  <Link
-                    to="/admin/demo-data"
-                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
-                  >
-                    Demo Content
-                  </Link>
-                )}
               </div>
             ) : (
-              <Button onClick={() => navigate("/auth")} variant="outline">
+              <Button onClick={() => navigate("/auth")} variant="outline" className="text-white border-white">
                 {t("nav.signIn")}
               </Button>
             )}

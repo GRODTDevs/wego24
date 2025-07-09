@@ -11,6 +11,7 @@ import { DropoffSection } from "@/components/courier/DropoffSection";
 import { PriceCalculationSection } from "@/components/courier/PriceCalculationSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useSystemSettings } from "@/contexts/SystemSettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { geocodeAddress, calculateStraightLineDistance } from "@/utils/geocoding";
 import { formatCurrency } from "@/lib/currency";
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 const CourierRequest = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { settings } = useSystemSettings();
   const [formData, setFormData] = useState({
     pickupLocation: "",
     pickupDate: "",
@@ -55,38 +57,33 @@ const CourierRequest = () => {
       toast.error(t('courierRequest.errors.enterAddresses'));
       return;
     }
-
     setCalculatingPrice(true);
     try {
       const [pickupCoords, dropoffCoords] = await Promise.all([
         geocodeAddress(formData.pickupLocation),
         geocodeAddress(formData.dropoffLocation)
       ]);
-
       if (!pickupCoords || !dropoffCoords) {
         toast.error(t('courierRequest.errors.findAddresses'));
         return;
       }
-
       const distance = calculateStraightLineDistance(
         pickupCoords.lat, 
         pickupCoords.lng, 
         dropoffCoords.lat, 
         dropoffCoords.lng
       );
-
-      // Updated pricing structure
-      const baseFee = 8.50;
-      const distanceFee = distance * 0.75;
+      // Use settings for pricing
+      const baseFee = parseFloat(settings.base_delivery_fee ?? 8.50);
+      const perKmFee = parseFloat(settings.per_km_fee ?? 0.75);
+      const distanceFee = Math.max(0, distance) * perKmFee;
       const totalPrice = baseFee + distanceFee;
-
       setPriceCalculation({
         distance,
         totalPrice,
         baseFee,
         distanceFee
       });
-
       toast.success(`${t('courierRequest.priceCalculated')}: ${formatCurrency(totalPrice)}`);
     } catch (error) {
       console.error("Error calculating price:", error);
@@ -139,6 +136,30 @@ const CourierRequest = () => {
       }
 
       window.open(data.url, '_blank');
+
+      // After successful payment, create order with status 'awaiting_driver'
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_id: user.id,
+          business_id: null, // For courier requests, may be null or a special courier business
+          status: 'awaiting_driver',
+          payment_status: 'completed',
+          subtotal: priceCalculation.baseFee + priceCalculation.distanceFee,
+          delivery_fee: priceCalculation.distanceFee,
+          service_fee: 0,
+          tax_amount: 0,
+          total_amount: priceCalculation.totalPrice,
+          delivery_address: formData.dropoffLocation,
+          delivery_instructions: formData.specialInstructions,
+          notes: formData.itemDescription,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      if (orderError) throw orderError;
+      // Optionally: trigger driver assignment logic here or via backend function
       
     } catch (error) {
       console.error("Error processing payment:", error);
