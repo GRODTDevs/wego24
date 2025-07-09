@@ -81,6 +81,7 @@ export function SecureDeveloperAuth() {
   };
 
   return (
+    // hide the header on devlogin page
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
@@ -99,7 +100,7 @@ export function SecureDeveloperAuth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter Access Password"
-              className="w-full"
+              className="w-full align-middle text-center"
               disabled={loading}
               required
             />

@@ -52,85 +52,82 @@ function App() {
           <SystemSettingsProvider>
             <Router>
               <div className="min-h-screen bg-gray-50 flex flex-col">
-                <Header />
-                <main className="flex-1">
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/dev-login" element={<SecureDeveloperLogin />} />
-                    <Route path="/partner-register" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
-                    <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="/auth" element={<ProtectedRoute><Auth /></ProtectedRoute>} />
-                    
-                    {/* Secure developer route */}
-                    <Route 
-                      path="/operations" 
-                      element={
-                        <SecureProtectedRoute>
-                          <OperationsDashboard />
-                        </SecureProtectedRoute>
-                      } 
-                    />
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/dev-login" element={<SecureDeveloperLogin />} />
+                  <Route path="/partner-register" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
+                  <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                  <Route path="/auth" element={<ProtectedRoute><Auth /></ProtectedRoute>} />
+                  
+                  {/* Secure developer route */}
+                  <Route 
+                    path="/operations" 
+                    element={
+                      <SecureProtectedRoute>
+                        <OperationsDashboard />
+                      </SecureProtectedRoute>
+                    } 
+                  />
 
-                    {/* Protected routes */}
-                    <Route path="/driver-dashboard" element={
-                      <ProtectedRoute>
-                        <div>Driver Dashboard (Coming Soon)</div>
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/customer-dashboard" element={
-                      <ProtectedRoute>
-                        <CustomerDashboardPage />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/partner-dashboard" element={
-                      <ProtectedRoute>
-                        <PartnerDashboard />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/restaurant-dashboard" element={
-                      <ProtectedRoute>
-                        <RestaurantDashboard />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/subscription" element={
-                      <ProtectedRoute>
-                        <SubscriptionPage />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/subscription/success" element={
-                      <ProtectedRoute>
-                        <SubscriptionSuccess />
-                      </ProtectedRoute>
-                    } />
+                  {/* Protected routes */}
+                  <Route path="/driver-dashboard" element={
+                    <ProtectedRoute>
+                      <div>Driver Dashboard (Coming Soon)</div>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/customer-dashboard" element={
+                    <ProtectedRoute>
+                      <CustomerDashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/partner-dashboard" element={
+                    <ProtectedRoute>
+                      <PartnerDashboard />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/restaurant-dashboard" element={
+                    <ProtectedRoute>
+                      <RestaurantDashboard />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/subscription" element={
+                    <ProtectedRoute>
+                      <SubscriptionPage />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/subscription/success" element={
+                    <ProtectedRoute>
+                      <SubscriptionSuccess />
+                    </ProtectedRoute>
+                  } />
 
-                    {/* Admin routes */}
-                    <Route path="/admin/analytics" element={
-                      <ProtectedRoute>
-                        <AdvancedAnalyticsPanel />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/admin/regions" element={
-                      <ProtectedRoute>
-                        <AdminRegionsPanel />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/admin/issues" element={
-                      <ProtectedRoute>
-                        <AdminIssueResolutionPanel />
-                      </ProtectedRoute>
-                    } />
+                  {/* Admin routes */}
+                  <Route path="/admin/analytics" element={
+                    <ProtectedRoute>
+                      <AdvancedAnalyticsPanel />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/admin/regions" element={
+                    <ProtectedRoute>
+                      <AdminRegionsPanel />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/admin/issues" element={
+                    <ProtectedRoute>
+                      <AdminIssueResolutionPanel />
+                    </ProtectedRoute>
+                  } />
 
-                    {/* 404 route */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
+                  {/* 404 route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
                 <Footer />
                 <Toaster />
               </div>
