@@ -14,10 +14,10 @@ import DriverDashboardMobile from "@/components/driver/DriverDashboardMobile";
 import AdvancedAnalyticsPanel from "@/components/admin/AdvancedAnalyticsPanel";
 import AdminRegionsPanel from "@/components/admin/AdminRegionsPanel";
 import AdminIssueResolutionPanel from "@/components/admin/AdminIssueResolutionPanel";
-import MobileMenu from "@/components/MobileMenu";
 import Index from './pages/Index';
 import CourierRequest from './pages/CourierRequest';
 import PartnerInfo from './pages/PartnerInfo';
+import PartnerRegister from './pages/PartnerRegister';
 import Auth from './pages/Auth';
 import DriverRegistrationPage from './pages/DriverRegistration';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -78,6 +78,7 @@ function AppRoutes() {
       <Route path="/" element={<Index />} />
       <Route path="/courier-request" element={<CourierRequest />} />
       <Route path="/partner-info" element={<PartnerInfo />} />
+      <Route path="/partner-register" element={<PartnerRegister />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/driver-registration" element={<DriverRegistrationPage />} />
       <Route path="/driver-dashboard" element={
