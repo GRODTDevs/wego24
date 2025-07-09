@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Building2, Mail, Phone, MapPin, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function PartnerRegisterForm() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     businessName: "",
     businessType: "",
@@ -31,10 +33,17 @@ export function PartnerRegisterForm() {
     setError("");
     setSuccess(false);
 
+    if (!user) {
+      setError(t("error.authRequired"));
+      setLoading(false);
+      return;
+    }
+
     try {
       // Insert into partner_applications, not partners
       const { error: dbError } = await supabase.from("partner_applications").insert([
         {
+          user_id: user.id,
           business_name: formData.businessName,
           business_type: formData.businessType,
           email: formData.email,
