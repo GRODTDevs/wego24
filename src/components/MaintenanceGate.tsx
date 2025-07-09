@@ -12,12 +12,14 @@ export default function MaintenanceGate({ children }: { children: React.ReactNod
   }
 
   if (settingsLoading || roleLoading) return null;
-  // Only block non-admins if maintenance mode is enabled
-  if ((settings.maintenance_mode === true || settings.maintenance_mode === "true") && !isAdmin) {
-    if (typeof window !== 'undefined') {
-      console.log('[MaintenanceGate] Maintenance mode active, blocking non-admin');
+  // If maintenance mode is enabled, only allow access for logged-in admins
+  if (settings.maintenance_mode === true || settings.maintenance_mode === "true") {
+    if (!isAdmin) {
+      if (typeof window !== 'undefined') {
+        console.log('[MaintenanceGate] Maintenance mode active, blocking all except admin');
+      }
+      return <MaintenancePage />;
     }
-    return <MaintenancePage />;
   }
   if (typeof window !== 'undefined') {
     console.log('[MaintenanceGate] Allowing access');
