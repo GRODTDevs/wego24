@@ -28,6 +28,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import "./App.css";
 import MaintenanceGate from "@/components/MaintenanceGate";
+import { Button } from "@/components/ui/button";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +52,7 @@ function App() {
 
 function AuthGate() {
   const { isAdmin, loading: roleLoading, userRole } = useUserRole();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     if (typeof window !== 'undefined') {
@@ -88,6 +89,14 @@ function AuthGate() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
+      {/* Always show sign out button if user is authenticated */}
+      {user && (
+        <div className="flex justify-end p-2">
+          <Button onClick={signOut} variant="outline" size="sm">
+            Sign Out
+          </Button>
+        </div>
+      )}
       <main className="flex-1">
         <Routes>
           <Route path="/auth" element={<Auth />} />
