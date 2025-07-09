@@ -7,6 +7,7 @@ import { NotificationCenter } from "./orders/NotificationCenter";
 import { MobileNav } from "./MobileNav";
 import { errorLogger } from "../utils/errorLogger";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useEffect } from "react";
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -14,10 +15,27 @@ export function Header() {
   const navigate = useNavigate();
   const { isAdmin } = useUserRole();
 
+  useEffect(() => {
+    // If user is null, always show sign in
+    if (!user) {
+      // Optionally, clear any cached roles
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith("user_role_")) sessionStorage.removeItem(key);
+      });
+    }
+  }, [user]);
+
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/auth");
+      // Clear all cached roles
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith("user_role_")) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      navigate("/auth", { replace: true });
+      // Removed window.location.reload();
     } catch (error) {
       errorLogger.log(error instanceof Error ? error : "Sign out failed");
       console.error("Sign out error:", error);
@@ -51,7 +69,11 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => navigate("/auth")} variant="outline" className="bg-transparent text-white border-white">
+              <Button
+                onClick={() => navigate("/auth")}
+                variant="outline"
+                className="bg-transparent text-white border-white"
+              >
                 {t("nav.signIn")}
               </Button>
             )}

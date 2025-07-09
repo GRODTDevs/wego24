@@ -89,14 +89,6 @@ function AuthGate() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      {/* Always show sign out button if user is authenticated */}
-      {user && (
-        <div className="flex justify-end p-2">
-          <Button onClick={signOut} variant="outline" size="sm">
-            Sign Out
-          </Button>
-        </div>
-      )}
       <main className="flex-1">
         <Routes>
           <Route path="/auth" element={<Auth />} />
