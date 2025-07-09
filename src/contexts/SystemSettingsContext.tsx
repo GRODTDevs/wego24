@@ -1,52 +1,55 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface SystemSetting {
-  key: string;
-  value: any;
-  description?: string;
-}
+const SystemSettingsContext = createContext<any>(undefined);
 
-interface SystemSettingsContextType {
-  settings: Record<string, any>;
-  refreshSettings: () => Promise<void>;
-  loading: boolean;
-}
-
-const SystemSettingsContext = createContext<SystemSettingsContextType | undefined>(undefined);
-
-export const SystemSettingsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [settings, setSettings] = useState<Record<string, any>>({});
+export function SystemSettingsProvider({ children }: { children: React.ReactNode }) {
+  const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
-  const fetchSettings = async () => {
+  // Define fetchSettings outside useEffect so it can be used in the provider value
+  async function fetchSettings() {
     setLoading(true);
-    const { data, error } = await supabase.from("system_settings").select("key, value");
-    if (!error && data) {
-      const mapped: Record<string, any> = {};
-      data.forEach((row: { key: string; value: any }) => {
-        mapped[row.key] = typeof row.value === "string" && row.value.match(/^\d+(\.\d+)?$/)
-          ? parseFloat(row.value)
-          : row.value;
-      });
-      setSettings(mapped);
+    const { data, error } = await supabase.from("system_settings").select("key,value");
+    if (error) {
+      console.error("[SystemSettingsContext] Error fetching settings:", error);
+      setSettings({});
+    } else {
+      const settingsObj: Record<string, any> = {};
+      if (Array.isArray(data)) {
+        data.forEach((row) => {
+          settingsObj[row.key] = row.value;
+        });
+      }
+      setSettings(settingsObj);
+      if (typeof window !== 'undefined') {
+        console.log('[SystemSettingsContext] fetched settings:', settingsObj);
+      }
     }
     setLoading(false);
-  };
+  }
 
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('[SystemSettingsContext] settings:', settings, 'loading:', loading);
+    }
+  }, [settings, loading]);
 
   return (
     <SystemSettingsContext.Provider value={{ settings, refreshSettings: fetchSettings, loading }}>
       {children}
     </SystemSettingsContext.Provider>
   );
-};
+}
 
 export function useSystemSettings() {
   const ctx = useContext(SystemSettingsContext);
-  if (!ctx) throw new Error("useSystemSettings must be used within SystemSettingsProvider");
+  if (!ctx) {
+    throw new Error("useSystemSettings must be used within SystemSettingsProvider");
+  }
   return ctx;
 }

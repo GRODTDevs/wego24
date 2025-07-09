@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -96,6 +95,12 @@ export const useUserRole = () => {
 
   const isAdmin = userRole === 'admin';
   console.log('isAdmin computed:', isAdmin, 'from role:', userRole);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('[useUserRole] user:', user, 'roles:', userRole, 'isAdmin:', isAdmin, 'loading:', loading);
+    }
+  }, [user, userRole, isAdmin, loading]);
 
   return { userRole, isAdmin, loading: loading || authLoading };
 };

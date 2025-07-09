@@ -8,25 +8,31 @@ export default function MaintenanceGate({ children }: { children: React.ReactNod
   const { isAdmin, loading: roleLoading, userRole } = useUserRole();
   const { user } = useAuth();
 
-  if (typeof window !== 'undefined') {
-    console.log('[MaintenanceGate] settings:', settings, 'settingsLoading:', settingsLoading);
-    console.log('[MaintenanceGate] isAdmin:', isAdmin, 'userRole:', userRole, 'roleLoading:', roleLoading, 'user:', user);
+  // Always wait for settings and role to load before any logic
+  if (settingsLoading || roleLoading) {
+    if (typeof window !== 'undefined') {
+      console.log('[MaintenanceGate] Waiting for settings/role to load');
+    }
+    return null;
   }
 
-  if (settingsLoading || roleLoading) return null;
+  // Fail safe: treat missing/undefined maintenance_mode as enabled
+  const maintenanceOn = settings.maintenance_mode === true || settings.maintenance_mode === "true" || typeof settings.maintenance_mode === 'undefined';
 
-  // Strictly block all access for non-admins and unauthenticated users when maintenance mode is on
-  if (settings.maintenance_mode === true || settings.maintenance_mode === "true") {
+  if (maintenanceOn) {
     if (!user || !isAdmin) {
       if (typeof window !== 'undefined') {
-        console.log('[MaintenanceGate] Maintenance mode active, blocking all except authenticated admin');
+        console.log('[MaintenanceGate] Maintenance mode active (or undefined), blocking all except authenticated admin');
       }
+      // Extra debug: show what is being blocked
+      console.log('[MaintenanceGate] Blocked user:', user, 'isAdmin:', isAdmin, 'userRole:', userRole);
       return <MaintenancePage />;
     }
   }
 
+  // Extra debug: show when access is allowed
   if (typeof window !== 'undefined') {
-    console.log('[MaintenanceGate] Allowing access');
+    console.log('[MaintenanceGate] Allowing access for user:', user, 'isAdmin:', isAdmin, 'userRole:', userRole);
   }
   return <>{children}</>;
 }
