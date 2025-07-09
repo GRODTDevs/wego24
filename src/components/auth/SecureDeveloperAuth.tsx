@@ -91,7 +91,6 @@ export function SecureDeveloperAuth() {
               className="h-16 w-auto rounded-lg"
             />
           </div>
-          <CardTitle className="text-xl font-bold">Developer Access</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,7 +98,7 @@ export function SecureDeveloperAuth() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Developer Password"
+              placeholder="Enter Access Password"
               className="w-full"
               disabled={loading}
               required

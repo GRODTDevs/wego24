@@ -11,7 +11,9 @@ export default function DeveloperLogin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "1vAUBnF3ao9d") {
+    // get password from .env file
+    const envPassword = process.env.REACT_APP_DEV_PASSWORD;
+    if (password === envPassword) {
       // Store authentication in localStorage
       localStorage.setItem("dev_authenticated", "true");
       navigate("/");
