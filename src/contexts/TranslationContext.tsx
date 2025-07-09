@@ -368,6 +368,15 @@ const translations: Record<Language, Translations> = {
     'dashboard.driversTabPlaceholder': 'Driver analytics coming soon.',
     'dashboard.usersTabPlaceholder': 'User management coming soon.',
     'dashboard.systemHealthTabPlaceholder': 'System health monitoring coming soon.',
+    // Business Types
+    'locations.businessTypes.restaurant': 'Restaurant',
+    'locations.businessTypes.cafe': 'Cafe',
+    'locations.businessTypes.bakery': 'Bakery',
+    'locations.businessTypes.fastFood': 'Fast Food',
+    'locations.businessTypes.grocery': 'Grocery',
+    'locations.businessTypes.pharmacy': 'Pharmacy',
+    'locations.businessTypes.retail': 'Retail',
+    'locations.businessTypes.other': 'Other',
   },
   es: {
     // Navigation
@@ -722,6 +731,15 @@ const translations: Record<Language, Translations> = {
     'dashboard.driversTabPlaceholder': 'Análisis de conductores próximamente.',
     'dashboard.usersTabPlaceholder': 'Gestión de usuarios próximamente.',
     'dashboard.systemHealthTabPlaceholder': 'Monitoreo de salud del sistema próximamente.',
+    // Business Types
+    'locations.businessTypes.restaurant': 'Restaurante',
+    'locations.businessTypes.cafe': 'Cafetería',
+    'locations.businessTypes.bakery': 'Panadería',
+    'locations.businessTypes.fastFood': 'Comida Rápida',
+    'locations.businessTypes.grocery': 'Supermercado',
+    'locations.businessTypes.pharmacy': 'Farmacia',
+    'locations.businessTypes.retail': 'Venta al por menor',
+    'locations.businessTypes.other': 'Otro',
   },
   de: {} // Provide empty German translations to satisfy type
 };

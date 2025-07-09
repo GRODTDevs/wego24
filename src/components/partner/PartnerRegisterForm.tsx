@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Building2, Mail, Phone, MapPin, FileText } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function PartnerRegisterForm() {
   const { t } = useTranslation();
@@ -21,11 +22,27 @@ export function PartnerRegisterForm() {
     description: "",
   });
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => setLoading(false), 1200);
+    setError("");
+    setSuccess(false);
+
+    try {
+      const { error: dbError } = await supabase.from("partners").insert([formData]);
+      if (dbError) {
+        setError(t("error.general"));
+      } else {
+        setSuccess(true);
+      }
+    } catch (err) {
+      setError(t("error.network"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -171,6 +188,8 @@ export function PartnerRegisterForm() {
           >
             {loading ? t('partner.register.submitting') : t('partner.register.submit')}
           </Button>
+          {success && <div className="text-green-600 text-center font-semibold mt-4">{t('success.saved')}</div>}
+          {error && <div className="text-red-600 text-center font-semibold mt-4">{error}</div>}
         </form>
       </CardContent>
     </Card>
