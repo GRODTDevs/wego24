@@ -53,13 +53,30 @@ function AuthGate() {
   const isAuthenticated = sessionStorage.getItem("auth_token");
 
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    if (!isAuthenticated) return <Navigate to="/auth" />;
-    if (roleLoading) return <div className="flex justify-center items-center h-full"><span>Loading role...</span></div>;
-    // Debug output
     if (typeof window !== 'undefined') {
-      console.log('AuthGate: isAdmin', isAdmin, 'userRole', userRole, 'isAuthenticated', isAuthenticated);
+      console.log('[ProtectedRoute] isAuthenticated:', isAuthenticated, 'isAdmin:', isAdmin, 'roleLoading:', roleLoading);
     }
-    if (!isAdmin) return <Navigate to="/auth" />;
+    if (!isAuthenticated) {
+      if (typeof window !== 'undefined') {
+        console.log('[ProtectedRoute] Not authenticated, redirecting to /auth');
+      }
+      return <Navigate to="/auth" />;
+    }
+    if (roleLoading) {
+      if (typeof window !== 'undefined') {
+        console.log('[ProtectedRoute] Role loading, showing spinner');
+      }
+      return <div className="flex justify-center items-center h-full"><span>Loading...</span></div>;
+    }
+    if (!isAdmin) {
+      if (typeof window !== 'undefined') {
+        console.log('[ProtectedRoute] Not admin, redirecting to /auth');
+      }
+      return <Navigate to="/auth" />;
+    }
+    if (typeof window !== 'undefined') {
+      console.log('[ProtectedRoute] Access granted, rendering child');
+    }
     return children;
   };
 

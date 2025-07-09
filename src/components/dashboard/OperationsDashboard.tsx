@@ -85,6 +85,12 @@ export function OperationsDashboard() {
     setMaintenanceSaving(false);
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('[OperationsDashboard] Rendering dashboard, metrics:', metrics);
+    }
+  }, [metrics]);
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="flex flex-col items-center gap-4">

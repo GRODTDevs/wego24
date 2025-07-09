@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "@/contexts/TranslationContext";
@@ -6,6 +5,8 @@ import { useTranslation } from "@/contexts/TranslationContext";
 const MobileMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
+
+  console.log('[MobileMenu] open:', open);
 
   return (
     <div className="md:hidden relative">

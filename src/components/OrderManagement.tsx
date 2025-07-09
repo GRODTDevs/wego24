@@ -1,4 +1,3 @@
-
 import { RealTimeOrderDashboard } from "./orders/RealTimeOrderDashboard";
 
 interface OrderManagementProps {
@@ -6,6 +5,8 @@ interface OrderManagementProps {
 }
 
 export function OrderManagement({ businessId }: OrderManagementProps) {
+  console.log('[OrderManagement] businessId:', businessId);
+
   return (
     <RealTimeOrderDashboard 
       businessId={businessId} 

@@ -25,6 +25,8 @@ export function OrderCart({
   onClose,
   onCheckout
 }: OrderCartProps) {
+  console.log('[OrderCart] props:', { open, items, onUpdateQty, onRemove, onClose, onCheckout }); // Debug output
+
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   if (!open) return null;

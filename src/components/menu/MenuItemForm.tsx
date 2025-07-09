@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +36,8 @@ interface MenuItemFormProps {
 }
 
 export function MenuItemForm({ businessId, categories, editingItem, onSuccess, onCancel }: MenuItemFormProps) {
+  console.log('[MenuItemForm] props:', { businessId, categories, editingItem });
+
   const [formData, setFormData] = useState({
     name: editingItem?.name || "",
     description: editingItem?.description || "",

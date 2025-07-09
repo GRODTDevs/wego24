@@ -115,6 +115,8 @@ export function DriverAssignmentDialog({
     }
   };
 
+  console.log('[DriverAssignmentDialog] props:', { open, onOpenChange, orderId, selectedDriver, loading, drivers });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

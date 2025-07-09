@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -44,6 +43,7 @@ interface MenuManagementProps {
 }
 
 export function MenuManagement({ businessId }: MenuManagementProps) {
+  console.log('[MenuManagement] props:', { businessId });
   const { user } = useAuth();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);

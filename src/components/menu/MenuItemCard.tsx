@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Edit, Trash2 } from "lucide-react";
@@ -22,6 +21,8 @@ interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ item, onEdit, onDelete }: MenuItemCardProps) {
+  console.log('[MenuItemCard] props:', { item, onEdit, onDelete });
+
   return (
     <Card>
       <CardContent className="p-4">

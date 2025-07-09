@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -158,6 +157,8 @@ export function SystemHealthMonitor() {
     : 0;
 
   const overallStatus = overallHealth >= 90 ? 'healthy' : overallHealth >= 70 ? 'warning' : 'error';
+
+  console.log('[SystemHealthMonitor] render');
 
   if (loading) {
     return (

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
@@ -13,6 +12,8 @@ interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ title, description, price, quantity, onAdd, onRemove }: MenuItemCardProps) {
+  console.log('[MenuItemCard] props:', { title, description, price, quantity, onAdd, onRemove });
+
   return (
     <div className="flex flex-col gap-1 border-b last:border-b-0 pb-3 last:pb-0 animate-fade-in">
       <div className="flex justify-between items-center">

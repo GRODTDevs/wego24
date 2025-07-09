@@ -17,6 +17,8 @@ export function MobileNav() {
     { to: "/operations", label: t('nav.admin') }
   ];
 
+  console.log('[MobileNav] open:', open);
+
   return (
     <>
       <Button
