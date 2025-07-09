@@ -9,9 +9,11 @@ import { SystemHealthMonitor } from "@/components/monitoring/SystemHealthMonitor
 import { Header } from "@/components/Header";
 import { PartnerApplications } from "@/components/PartnerApplications";
 import { AdminDriverManagement } from "./AdminDriverManagement";
+import { useSystemSettings } from "@/contexts/SystemSettingsContext";
 
 export function OperationsDashboard() {
   const { t } = useTranslation();
+  const { settings, refreshSettings, loading: settingsLoading } = useSystemSettings();
   const [metrics, setMetrics] = useState({
     orders: 0,
     revenue: 0,
@@ -26,6 +28,7 @@ export function OperationsDashboard() {
     recentActivity: [],
   });
   const [loading, setLoading] = useState(true);
+  const [maintenanceSaving, setMaintenanceSaving] = useState(false);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -73,6 +76,14 @@ export function OperationsDashboard() {
     };
     fetchMetrics();
   }, []);
+
+  const handleToggleMaintenance = async () => {
+    setMaintenanceSaving(true);
+    const newValue = !(settings.maintenance_mode === true || settings.maintenance_mode === "true");
+    await supabase.from("system_settings").upsert({ key: "maintenance_mode", value: newValue });
+    await refreshSettings();
+    setMaintenanceSaving(false);
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -187,6 +198,18 @@ export function OperationsDashboard() {
             <SystemHealthMonitor />
           </TabsContent>
         </Tabs>
+        {/* Maintenance mode toggle - visible only to admins */}
+        <div className="my-4 p-4 bg-yellow-50 border border-yellow-300 rounded">
+          <span className="font-semibold mr-2">Maintenance Mode:</span>
+          <button
+            onClick={handleToggleMaintenance}
+            disabled={maintenanceSaving || settingsLoading}
+            className={`px-4 py-2 rounded ${settings.maintenance_mode === true || settings.maintenance_mode === "true" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+          >
+            {settings.maintenance_mode === true || settings.maintenance_mode === "true" ? "Disable" : "Enable"}
+          </button>
+          {maintenanceSaving && <span className="ml-2 text-sm text-gray-500">Saving...</span>}
+        </div>
       </main>
     </div>
   );

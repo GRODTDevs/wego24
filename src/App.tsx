@@ -26,6 +26,7 @@ import DriverRegistrationPage from "./pages/DriverRegistration";
 import NotFound from './pages/NotFound';
 import { useUserRole } from "@/hooks/useUserRole";
 import "./App.css";
+import MaintenanceGate from "@/components/MaintenanceGate";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +37,9 @@ function App() {
         <AuthProvider>
           <SystemSettingsProvider>
             <Router>
-              <AuthGate />
+              <MaintenanceGate>
+                <AuthGate />
+              </MaintenanceGate>
             </Router>
           </SystemSettingsProvider>
         </AuthProvider>
