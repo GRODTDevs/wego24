@@ -29,6 +29,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import "./App.css";
 import MaintenanceGate from "@/components/MaintenanceGate";
 import { Button } from "@/components/ui/button";
+import { PartnersManagementPanel } from "@/components/admin/PartnersManagementPanel";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ function AuthGate() {
           <Route path="/admin/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
           <Route path="/admin/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
           <Route path="/admin/partners" element={<ProtectedRoute><PartnerApprovalPanel /></ProtectedRoute>} />
+          <Route path="/admin/partners-management" element={<ProtectedRoute><PartnersManagementPanel /></ProtectedRoute>} />
           <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
           <Route path="/" element={<Index />} />
           <Route path="*" element={<NotFound />} />
