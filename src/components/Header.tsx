@@ -17,7 +17,7 @@ export function Header() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/");
+      navigate("/auth");
     } catch (error) {
       errorLogger.log(error instanceof Error ? error : "Sign out failed");
       console.error("Sign out error:", error);
