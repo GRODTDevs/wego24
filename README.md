@@ -235,3 +235,19 @@ System Settings allow admins to control platform features, pricing, assignment l
 - **Error Handling**: Fixed repeated redirects and 404s in developer authentication flow.
 - **PartnerApplications**: Enhanced error handling in the approval process to provide more descriptive error messages and log errors for debugging.
 - **create_restaurant_from_application**: Added validation for required fields and logging for restaurant creation to ensure data integrity and traceability.
+
+## Maintenance Mode
+
+The platform supports a global maintenance mode, which can be toggled by an admin from the Operations Dashboard.
+
+- **When enabled:**
+  - Only authenticated admin users can access any part of the app.
+  - All other users (including public and unauthenticated users) see a maintenance/lockdown page, regardless of the route.
+  - The /auth route remains accessible so users can log in, but only admins can proceed past authentication.
+- **When disabled:**
+  - The app operates normally, with public and protected routes accessible as per user roles.
+
+**How to use:**
+- Go to the Operations Dashboard as an admin.
+- Toggle the maintenance mode switch.
+- The change takes effect immediately for all users.
