@@ -4,13 +4,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SystemSettingsProvider } from "@/contexts/SystemSettingsContext";
 import { TranslationProvider } from "@/contexts/TranslationContext";
 import { Toaster } from "@/components/ui/toaster";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import OperationsDashboard from "./components/dashboard/OperationsDashboard";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { OperationsDashboard } from "./components/dashboard/OperationsDashboard";
 import CustomerDashboardPage from "./pages/CustomerDashboardPage";
 import PartnerDashboard from "./pages/PartnerDashboard";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
-import ProductOwnerDashboard from "./pages/ProductOwnerDashboard";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import AdvancedAnalyticsPanel from "@/components/admin/AdvancedAnalyticsPanel";
@@ -27,7 +26,7 @@ import { SecureProtectedRoute } from './components/auth/SecureProtectedRoute';
 import SecureDeveloperLogin from './pages/SecureDeveloperLogin';
 import { useAuth } from './contexts/AuthContext';
 import { useUserRole } from './hooks/useUserRole';
-import { NotFound } from './pages/NotFound';
+import NotFound from './pages/NotFound';
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -117,12 +116,6 @@ function AppContent() {
           } />
 
           {/* Admin routes */}
-          <Route path="/product-owner" element={
-            <ProtectedRoute requireAdmin={true}>
-              <ProductOwnerDashboard />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/admin/analytics" element={
             <ProtectedRoute requireAdmin={true}>
               <AdvancedAnalyticsPanel />
