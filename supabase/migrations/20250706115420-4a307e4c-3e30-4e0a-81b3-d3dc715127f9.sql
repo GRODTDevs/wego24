@@ -1,4 +1,3 @@
-
 -- Create partner applications table
 CREATE TABLE public.partner_applications (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -56,11 +55,23 @@ DECLARE
 BEGIN
   -- Get the application record
   SELECT * INTO app_record FROM public.partner_applications WHERE id = application_id;
-  
+
+  -- Validate application status
   IF app_record.status != 'approved' THEN
     RAISE EXCEPTION 'Application must be approved first';
   END IF;
-  
+
+  -- Validate required fields
+  IF app_record.business_name IS NULL OR app_record.business_name = '' THEN
+    RAISE EXCEPTION 'Business name is required';
+  END IF;
+  IF app_record.email IS NULL OR app_record.email = '' THEN
+    RAISE EXCEPTION 'Email is required';
+  END IF;
+  IF app_record.address IS NULL OR app_record.address = '' THEN
+    RAISE EXCEPTION 'Address is required';
+  END IF;
+
   -- Create restaurant
   INSERT INTO public.restaurants (
     name, email, phone, address, city, postal_code, description, 
@@ -70,11 +81,14 @@ BEGIN
     app_record.address, app_record.city, app_record.postal_code, 
     app_record.description, app_record.business_type, 'pending', application_id
   ) RETURNING id INTO new_restaurant_id;
-  
+
   -- Create restaurant user relationship
   INSERT INTO public.restaurant_users (restaurant_id, user_id, role)
   VALUES (new_restaurant_id, app_record.user_id, 'owner');
-  
+
+  -- Log restaurant creation
+  PERFORM log_event('restaurant_created', 'restaurants', new_restaurant_id, 'Restaurant created from application');
+
   RETURN new_restaurant_id;
 END;
 $$;

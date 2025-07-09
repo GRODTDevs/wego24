@@ -222,3 +222,16 @@ System Settings allow admins to control platform features, pricing, assignment l
 - If the session is invalid or expired, the user is redirected to `/dev-login`.
 
 - The header is hidden on the `/dev-login` page to prevent unauthorized access to navigation.
+
+- **Production Note**: Developer authentication should be disabled in production by removing the `VITE_DEV_LOGIN_PASSWORD` or `REACT_APP_DEV_PASSWORD` environment variables.
+
+## 📝 Changelog
+
+### Recent Updates
+
+- **Developer Authentication**: Simplified logic to ensure robust session handling and consistent use of `sessionStorage`. Updated `/dev-login` to hide the header and redirect unauthenticated users.
+- **Translation Fixes**: Restored and refactored translation keys for homepage, partner register, and courier request sections.
+- **Partner Registration**: Populated business types dropdown via translation context.
+- **Error Handling**: Fixed repeated redirects and 404s in developer authentication flow.
+- **PartnerApplications**: Enhanced error handling in the approval process to provide more descriptive error messages and log errors for debugging.
+- **create_restaurant_from_application**: Added validation for required fields and logging for restaurant creation to ensure data integrity and traceability.

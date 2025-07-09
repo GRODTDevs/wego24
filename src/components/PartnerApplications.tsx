@@ -74,7 +74,10 @@ export function PartnerApplications() {
           application_id: application.id
         });
 
-      if (createError) throw createError;
+      if (createError) {
+        console.error("Error creating restaurant:", createError);
+        throw new Error("Failed to create restaurant from application");
+      }
 
       toast({
         title: "Application Approved",
@@ -87,7 +90,7 @@ export function PartnerApplications() {
       console.error("Error approving application:", error);
       toast({
         title: "Error",
-        description: "Failed to approve application",
+        description: error.message || "Failed to approve application",
         variant: "destructive"
       });
     } finally {
