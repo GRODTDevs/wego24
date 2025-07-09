@@ -32,8 +32,19 @@ export function PartnerRegisterForm() {
     setSuccess(false);
 
     try {
-      const { error: dbError } = await supabase.from("partners").insert([
-        { ...formData, status: "pending", approved: false }
+      // Insert into partner_applications, not partners
+      const { error: dbError } = await supabase.from("partner_applications").insert([
+        {
+          business_name: formData.businessName,
+          business_type: formData.businessType,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postal_code: formData.postalCode,
+          description: formData.description,
+          status: "pending"
+        }
       ]);
       if (dbError) {
         setError(t("error.general"));
