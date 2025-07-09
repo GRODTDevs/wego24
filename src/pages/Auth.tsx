@@ -136,7 +136,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex flex-col">
-      <Header />
+
       <main className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded shadow p-8">
           <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.welcome')}</h1>

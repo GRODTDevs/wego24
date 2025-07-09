@@ -31,7 +31,7 @@ export function DeveloperLogin() {
             <input
               type="password"
               className="w-full border rounded px-3 py-2"
-              placeholder="Developer Password"
+              placeholder="Password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               disabled={loading}

@@ -33,9 +33,9 @@ const translations: Record<Language, Translations> = {
     'nav.settings': 'Settings',
     'nav.help': 'Help',
     'nav.contact': 'Contact',
-    'nav.courierRequest': 'Courier Request',
-    'nav.partnerInfo': 'Partner Info',
-    'nav.become': 'Become a Driver',
+    'nav.courierRequest': 'Couriers',
+    'nav.partnerInfo': 'Partners',
+    'nav.become': 'Drivers',
     'nav.signIn': 'Sign In',
 
     // Common
@@ -387,9 +387,9 @@ const translations: Record<Language, Translations> = {
     'nav.settings': 'Configuración',
     'nav.help': 'Ayuda',
     'nav.contact': 'Contacto',
-    'nav.courierRequest': 'Solicitud de Mensajero',
-    'nav.partnerInfo': 'Información para Socios',
-    'nav.become': 'Hazte Conductor',
+    'nav.courierRequest': 'Mensajeros',
+    'nav.partnerInfo': 'Socios',
+    'nav.become': 'Conductores',
     'nav.signIn': 'Iniciar Sesión',
 
     // Common

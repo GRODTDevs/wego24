@@ -28,21 +28,15 @@ export function Header() {
     <header className="bg-red-600 text-white shadow-sm border-b sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 rounded-sm">
             <img
               src="/lovable-uploads/e9f1fc70-186e-4f21-bbb4-bdaed5b5a6f4.png"
               alt="WeGo Logo"
-              className="h-8 w-auto"
+              className="h-8 w-auto rounded-sm"
             />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className="hover:text-white transition-colors"
-            >
-              {t("nav.home")}
-            </Link>
             <Link
               to="/courier-request"
               className="hover:text-white transition-colors"
@@ -68,12 +62,6 @@ export function Header() {
             {user ? (
               <div className="flex items-center space-x-4">
                 <NotificationCenter />
-                <Link
-                  to="/operations"
-                  className="hover:text-white transition-colors text-sm"
-                >
-                  {t("dashboard.dashboard")}
-                </Link>
                 <Button
                   variant="ghost"
                   onClick={handleSignOut}
