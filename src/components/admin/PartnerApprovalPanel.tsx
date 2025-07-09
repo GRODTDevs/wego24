@@ -21,16 +21,29 @@ export function PartnerApprovalPanel() {
 
 
   const handleApproval = async (id, status) => {
-    // Approve application and create partner
-    const { error: approveError } = await supabase.rpc('create_partner_from_application', {
-      app_id: id
-    });
-    if (approveError) {
-      setError(`Failed to approve partner: ${approveError.message}`);
+    setLoading(true);
+    setError(null);
+    // 1. Update application status
+    const { error: updateError } = await supabase.from("partner_applications").update({ status }).eq("id", id);
+    if (updateError) {
+      setError(`Failed to update application status: ${updateError.message}`);
       setLoading(false);
       return;
     }
+    // 2. If approved, create partner
+    if (status === "approved") {
+      const { error: approveError } = await supabase.rpc('create_partner_from_application', {
+        app_id: id
+      });
+      if (approveError) {
+        setError(`Failed to create partner: ${approveError.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+    // 3. Refresh list
     setPartners(partners.filter((partner) => partner.id !== id));
+    setLoading(false);
   };
   if (loading) return <div>Loading...</div>;
 

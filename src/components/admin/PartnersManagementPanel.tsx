@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Breadcrumbs } from "@/components/admin/Breadcrumbs";
 
 export function PartnersManagementPanel() {
   const [partners, setPartners] = useState([]);
@@ -29,6 +30,7 @@ export function PartnersManagementPanel() {
 
   return (
     <div className="p-6">
+      <Breadcrumbs />
       <h1 className="text-2xl font-bold mb-4">Partners Management</h1>
       <input
         type="text"
