@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +21,7 @@ export function SecureDeveloperAuth() {
 
     try {
       // Use environment variable for secure password check
-      const devPassword = import.meta.env.VITE_DEV_LOGIN_PASSWORD;
+      const devPassword = import.meta.env.VITE_DEV_LOGIN_PASSWORD || process.env.REACT_APP_DEV_PASSWORD;
       
       if (!devPassword) {
         setError("Developer authentication not configured");
