@@ -15,6 +15,7 @@ import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import AdvancedAnalyticsPanel from "@/components/admin/AdvancedAnalyticsPanel";
 import AdminRegionsPanel from "@/components/admin/AdminRegionsPanel";
 import AdminIssueResolutionPanel from "@/components/admin/AdminIssueResolutionPanel";
+import { PartnerApprovalPanel } from "@/components/admin/PartnerApprovalPanel";
 import Index from './pages/Index';
 import CourierRequest from './pages/CourierRequest';
 import PartnerInfo from './pages/PartnerInfo';
@@ -23,46 +24,67 @@ import Auth from './pages/Auth';
 import { DriverDashboard } from "./components/driver/DriverDashboard";
 import DriverRegistrationPage from "./pages/DriverRegistration";
 import NotFound from './pages/NotFound';
-import { useState, useEffect } from "react";
+import { useUserRole } from "@/hooks/useUserRole";
 import "./App.css";
-import { PartnerApprovalPanel } from "./components/admin/PartnerApprovalPanel";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    const isAuthenticated = sessionStorage.getItem("auth_token");
-    return isAuthenticated ? children : <Navigate to="/auth" />;
-  };
-
   return (
     <QueryClientProvider client={queryClient}>
       <TranslationProvider>
         <AuthProvider>
           <SystemSettingsProvider>
             <Router>
-              <div className="min-h-screen bg-gray-50 flex flex-col">
-                <Header />
-                <main className="flex-1">
-                  <Routes>
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/partner-info" element={<Navigate to="/auth" />} />
-                    <Route path="/partner-register" element={<Navigate to="/auth" />} />
-                    <Route path="/driver-registration" element={<Navigate to="/auth" />} />
-                    <Route path="/courier-request" element={<Navigate to="/auth" />} />
-                    <Route path="/courier-success" element={<Navigate to="/auth" />} />
-                    <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <Footer />
-                <Toaster />
-              </div>
+              <AuthGate />
             </Router>
           </SystemSettingsProvider>
         </AuthProvider>
       </TranslationProvider>
     </QueryClientProvider>
+  );
+}
+
+function AuthGate() {
+  const { isAdmin, loading: roleLoading } = useUserRole();
+  const isAuthenticated = sessionStorage.getItem("auth_token");
+
+  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    if (!isAuthenticated) return <Navigate to="/auth" />;
+    if (roleLoading) return <div className="flex justify-center items-center h-full"><span>Loading...</span></div>;
+    if (!isAdmin) return <Navigate to="/auth" />;
+    return children;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/partner-info" element={<PartnerInfo />} />
+          <Route path="/partner-register" element={<PartnerRegister />} />
+          <Route path="/driver-registration" element={<DriverRegistrationPage />} />
+          <Route path="/courier-request" element={<CourierRequest />} />
+          <Route path="/courier-success" element={<div>Courier Success (Coming Soon)</div>} />
+          <Route path="/operations" element={<ProtectedRoute><OperationsDashboard /></ProtectedRoute>} />
+          <Route path="/customer-dashboard" element={<ProtectedRoute><CustomerDashboardPage /></ProtectedRoute>} />
+          <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
+          <Route path="/restaurant-dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
+          <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+          <Route path="/subscription/success" element={<ProtectedRoute><SubscriptionSuccess /></ProtectedRoute>} />
+          <Route path="/admin/analytics" element={<ProtectedRoute><AdvancedAnalyticsPanel /></ProtectedRoute>} />
+          <Route path="/admin/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
+          <Route path="/admin/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
+          <Route path="/admin/partners" element={<ProtectedRoute><PartnerApprovalPanel /></ProtectedRoute>} />
+          <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
+          <Route path="/" element={<Index />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <Footer />
+      <Toaster />
+    </div>
   );
 }
 
