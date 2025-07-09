@@ -88,8 +88,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const signOut = async () => {
-    setLoading(true);
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('[AuthContext] Supabase signOut error:', error);
+      }
+    } catch (err) {
+      console.error('[AuthContext] signOut exception:', err);
+    } finally {
+      // Always clear user/session state even if Supabase signOut fails
+      setUser(null);
+      setSession(null);
+      // Optionally, clear any cached roles
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith('user_role_')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    }
   };
 
   const value = {
