@@ -67,6 +67,16 @@ export function PartnerRegisterForm() {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="max-w-lg mx-auto mt-8 p-6 bg-white rounded shadow text-center">
+        <h2 className="text-xl font-semibold mb-2">{t('partner.register.authRequiredTitle') || 'Sign In Required'}</h2>
+        <p className="mb-4">{t('partner.register.authRequiredMsg') || 'You must be signed in to submit a partner application.'}</p>
+        <Button onClick={() => window.location.href = '/auth'}>{t('nav.signIn') || 'Sign In'}</Button>
+      </div>
+    );
+  }
+
   return (
     <Card className="bg-white bg-opacity-90 backdrop-blur-sm border-0 shadow-2xl">
       <CardHeader className="pb-4">
