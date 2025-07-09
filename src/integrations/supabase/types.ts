@@ -65,6 +65,89 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          attachments: Json | null
+          chat_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          read_by: Json | null
+          sender_id: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          chat_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          read_by?: Json | null
+          sender_id?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          chat_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          read_by?: Json | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string | null
+          participants: Json
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          participants: Json
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          participants?: Json
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_availability: {
         Row: {
           created_at: string | null
@@ -356,6 +439,7 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           rating: number | null
+          region_id: string | null
           registration_status: string | null
           total_deliveries: number | null
           updated_at: string | null
@@ -387,6 +471,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           rating?: number | null
+          region_id?: string | null
           registration_status?: string | null
           total_deliveries?: number | null
           updated_at?: string | null
@@ -418,6 +503,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           rating?: number | null
+          region_id?: string | null
           registration_status?: string | null
           total_deliveries?: number | null
           updated_at?: string | null
@@ -425,7 +511,57 @@ export type Database = {
           vehicle_info?: Json | null
           vehicle_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "drivers_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      issue_resolution_logs: {
+        Row: {
+          action: string
+          details: Json | null
+          id: string
+          issue_id: string | null
+          performed_at: string | null
+          performed_by: string | null
+        }
+        Insert: {
+          action: string
+          details?: Json | null
+          id?: string
+          issue_id?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+        }
+        Update: {
+          action?: string
+          details?: Json | null
+          id?: string
+          issue_id?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issue_resolution_logs_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "order_issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issue_resolution_logs_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       menu_categories: {
         Row: {
@@ -625,6 +761,50 @@ export type Database = {
           },
         ]
       }
+      order_issues: {
+        Row: {
+          detected_at: string | null
+          escalated: boolean | null
+          id: string
+          notes: string | null
+          order_id: string | null
+          resolution: string | null
+          resolved_at: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          detected_at?: string | null
+          escalated?: boolean | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          type: string
+        }
+        Update: {
+          detected_at?: string | null
+          escalated?: boolean | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_issues_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -677,6 +857,7 @@ export type Database = {
         Row: {
           actual_delivery_time: string | null
           business_id: string | null
+          completed_at: string | null
           created_at: string | null
           customer_id: string | null
           delivery_address: Json | null
@@ -684,12 +865,15 @@ export type Database = {
           delivery_instructions: string | null
           driver_id: string | null
           estimated_delivery_time: string | null
+          guest_contact: Json | null
+          guest_user: boolean | null
           id: string
           is_demo: boolean | null
           notes: string | null
           order_number: string
           payment_method: string | null
           payment_status: string | null
+          region_id: string | null
           service_fee: number | null
           status: string
           subtotal: number
@@ -700,6 +884,7 @@ export type Database = {
         Insert: {
           actual_delivery_time?: string | null
           business_id?: string | null
+          completed_at?: string | null
           created_at?: string | null
           customer_id?: string | null
           delivery_address?: Json | null
@@ -707,12 +892,15 @@ export type Database = {
           delivery_instructions?: string | null
           driver_id?: string | null
           estimated_delivery_time?: string | null
+          guest_contact?: Json | null
+          guest_user?: boolean | null
           id?: string
           is_demo?: boolean | null
           notes?: string | null
           order_number?: string
           payment_method?: string | null
           payment_status?: string | null
+          region_id?: string | null
           service_fee?: number | null
           status?: string
           subtotal: number
@@ -723,6 +911,7 @@ export type Database = {
         Update: {
           actual_delivery_time?: string | null
           business_id?: string | null
+          completed_at?: string | null
           created_at?: string | null
           customer_id?: string | null
           delivery_address?: Json | null
@@ -730,12 +919,15 @@ export type Database = {
           delivery_instructions?: string | null
           driver_id?: string | null
           estimated_delivery_time?: string | null
+          guest_contact?: Json | null
+          guest_user?: boolean | null
           id?: string
           is_demo?: boolean | null
           notes?: string | null
           order_number?: string
           payment_method?: string | null
           payment_status?: string | null
+          region_id?: string | null
           service_fee?: number | null
           status?: string
           subtotal?: number
@@ -749,6 +941,45 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_api_keys: {
+        Row: {
+          active: boolean | null
+          api_key: string
+          created_at: string | null
+          id: string
+          partner_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          api_key: string
+          created_at?: string | null
+          id?: string
+          partner_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          api_key?: string
+          created_at?: string | null
+          id?: string
+          partner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_api_keys_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -821,6 +1052,7 @@ export type Database = {
           is_demo: boolean
           name: string
           order_count: number | null
+          region_id: string | null
           user_id: string
         }
         Insert: {
@@ -830,6 +1062,7 @@ export type Database = {
           is_demo?: boolean
           name: string
           order_count?: number | null
+          region_id?: string | null
           user_id: string
         }
         Update: {
@@ -839,9 +1072,18 @@ export type Database = {
           is_demo?: boolean
           name?: string
           order_count?: number | null
+          region_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -910,6 +1152,7 @@ export type Database = {
           phone_verified: boolean | null
           postal_code: string | null
           preferred_language: string | null
+          region_id: string | null
           roles: Json
           sms_notifications: boolean | null
           updated_at: string
@@ -936,6 +1179,7 @@ export type Database = {
           phone_verified?: boolean | null
           postal_code?: string | null
           preferred_language?: string | null
+          region_id?: string | null
           roles?: Json
           sms_notifications?: boolean | null
           updated_at?: string
@@ -962,9 +1206,42 @@ export type Database = {
           phone_verified?: boolean | null
           postal_code?: string | null
           preferred_language?: string | null
+          region_id?: string | null
           roles?: Json
           sms_notifications?: boolean | null
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regions: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          id: string
+          name: string
+          settings: Json | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          name: string
+          settings?: Json | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          settings?: Json | null
         }
         Relationships: []
       }
@@ -1215,6 +1492,42 @@ export type Database = {
           },
         ]
       }
+      security_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -1354,6 +1667,38 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usage_tracking: {
         Row: {
           count: number | null
@@ -1453,6 +1798,16 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: {
+          p_user_id: string
+          p_action: string
+          p_resource_type: string
+          p_resource_id?: string
+          p_details?: Json
+        }
+        Returns: undefined
       }
       remove_user_role: {
         Args: { _user_id: string; _role: string }
