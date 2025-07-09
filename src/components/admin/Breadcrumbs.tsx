@@ -21,10 +21,10 @@ export function Breadcrumbs() {
   const filteredPathnames = pathnames.filter(segment => segment !== 'admin');
 
   return (
-    <nav className="mb-4 text-sm" aria-label="Breadcrumb">
+    <nav className="mb-4 text-sm text-red-600" aria-label="Breadcrumb">
       <ol className="flex items-center space-x-2">
         <li>
-          <Link to="/operations" className="text-blue-600 hover:underline font-semibold">Operations</Link>
+          <Link to="/operations" className="text-red-600 hover:underline font-semibold">Operations</Link>
         </li>
         {filteredPathnames.map((segment, idx) => {
           const to = "/" + filteredPathnames.slice(0, idx + 1).join("/");
@@ -34,7 +34,7 @@ export function Breadcrumbs() {
               {idx === filteredPathnames.length - 1 ? (
                 <span className="text-gray-700 font-semibold">{nameMap[segment] || segment}</span>
               ) : (
-                <Link to={to} className="text-blue-600 hover:underline">{nameMap[segment] || segment}</Link>
+                <Link to={to} className="text-red-600 hover:underline">{nameMap[segment] || segment}</Link>
               )}
             </li>
           );
