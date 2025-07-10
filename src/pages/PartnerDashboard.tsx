@@ -18,6 +18,9 @@ import { OrderManagement } from "@/components/OrderManagement";
 import { CommissionManagement } from "@/components/CommissionManagement";
 import { BusinessMetrics } from "@/components/dashboard/BusinessMetrics";
 import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 type Restaurant = Tables<"restaurants">;
 type PartnerApplication = Tables<"partner_applications">;
@@ -35,6 +38,7 @@ export default function PartnerDashboard() {
   const [orderCount, setOrderCount] = useState<number>(0);
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [restaurantSettings, setRestaurantSettings] = useState<any>(null);
 
   const fetchPartnerData = async () => {
     try {
@@ -73,6 +77,13 @@ export default function PartnerDashboard() {
             : 0;
           setTotalRevenue(revenue);
         }
+        // Fetch restaurant_settings by restaurant_id
+        const { data: settingsData } = await supabase
+          .from("restaurant_settings")
+          .select("*")
+          .eq("restaurant_id", restaurantData.id)
+          .single();
+        setRestaurantSettings(settingsData);
       } else if (user) {
         // Self-service: load restaurant for current user
         const { data: restaurantUsers } = await supabase
@@ -104,6 +115,13 @@ export default function PartnerDashboard() {
               : 0;
             setTotalRevenue(revenue);
           }
+          // Fetch restaurant_settings by restaurant_id
+          const { data: settingsData } = await supabase
+            .from("restaurant_settings")
+            .select("*")
+            .eq("restaurant_id", restaurantData.id)
+            .single();
+          setRestaurantSettings(settingsData);
         } else {
           // Check for partner application
           const { data: appData } = await supabase
@@ -289,7 +307,7 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Restaurant Info Card */}
-            {restaurant && (
+            {restaurant && restaurantSettings && (
               <Card className="mb-6">
                 <CardContent>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
@@ -311,7 +329,7 @@ export default function PartnerDashboard() {
                     </div>
                     <div className="flex-shrink-0 flex items-center justify-end">
                       <a
-                        href={`/shop/${restaurant.id}`}
+                        href={`/shop/${restaurantSettings.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 font-semibold"
@@ -380,10 +398,169 @@ export default function PartnerDashboard() {
               </TabsContent>
 
               <TabsContent value="settings">
-                <div className="text-gray-600">
-                  Restaurant settings and configuration options will be
-                  available here.
-                </div>
+                {restaurantSettings ? (
+                  <form
+                    className="max-w-2xl mx-auto space-y-6"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      const updates: any = {
+                        description: formData.get("description"),
+                        slug: formData.get("slug"),
+                        auto_accept_orders: formData.get("auto_accept_orders") === "on",
+                        max_orders_per_hour: Number(formData.get("max_orders_per_hour")),
+                        advance_order_hours: Number(formData.get("advance_order_hours")),
+                        tax_rate: Number(formData.get("tax_rate")),
+                        service_charge: Number(formData.get("service_charge")),
+                        payment_methods: formData.getAll("payment_methods"),
+                        special_instructions: formData.get("special_instructions"),
+                      };
+                      // Handle logo upload
+                      const logoFile = formData.get("logo") as File;
+                      if (logoFile && logoFile.size > 0) {
+                        const { data, error } = await supabase.storage
+                          .from("restaurant-assets")
+                          .upload(
+                            `logos/${restaurantSettings.restaurant_id}_${Date.now()}`,
+                            logoFile,
+                            { upsert: true }
+                          );
+                        if (!error && data?.path) {
+                          const { data: publicUrlData } = supabase.storage
+                            .from("restaurant-assets")
+                            .getPublicUrl(data.path);
+                          updates.logo_url = publicUrlData.publicUrl;
+                        }
+                      }
+                      // Handle banner upload
+                      const bannerFile = formData.get("banner") as File;
+                      if (bannerFile && bannerFile.size > 0) {
+                        const { data, error } = await supabase.storage
+                          .from("restaurant-assets")
+                          .upload(
+                            `banners/${restaurantSettings.restaurant_id}_${Date.now()}`,
+                            bannerFile,
+                            { upsert: true }
+                          );
+                        if (!error && data?.path) {
+                          const { data: publicUrlData } = supabase.storage
+                            .from("restaurant-assets")
+                            .getPublicUrl(data.path);
+                          updates.banner_url = publicUrlData.publicUrl;
+                        }
+                      }
+                      // Update settings
+                      const { error } = await supabase
+                        .from("restaurant_settings")
+                        .update(updates)
+                        .eq("restaurant_id", restaurantSettings.restaurant_id);
+                      if (error) {
+                        toast.error("Failed to update settings: " + error.message);
+                      } else {
+                        toast.success("Settings updated successfully");
+                        // Refresh settings
+                        const { data: newSettings } = await supabase
+                          .from("restaurant_settings")
+                          .select("*")
+                          .eq("restaurant_id", restaurantSettings.restaurant_id)
+                          .single();
+                        setRestaurantSettings(newSettings);
+                      }
+                    }}
+                  >
+                    <div>
+                      <label className="block font-medium mb-1">Public Slug</label>
+                      <Input
+                        name="slug"
+                        defaultValue={restaurantSettings.slug || ""}
+                        required
+                        minLength={3}
+                        maxLength={64}
+                      />
+                      <div className="text-xs text-gray-500">
+                        This will be used in your public shop link. Must be unique.
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Description</label>
+                      <Textarea
+                        name="description"
+                        defaultValue={restaurantSettings.description || ""}
+                        rows={3}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Logo</label>
+                      {restaurantSettings.logo_url && (
+                        <img
+                          src={restaurantSettings.logo_url}
+                          alt="Logo"
+                          className="h-16 w-16 rounded-full mb-2"
+                        />
+                      )}
+                      <Input type="file" name="logo" accept="image/*" />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Banner</label>
+                      {restaurantSettings.banner_url && (
+                        <img
+                          src={restaurantSettings.banner_url}
+                          alt="Banner"
+                          className="h-24 w-full object-cover mb-2 rounded"
+                        />
+                      )}
+                      <Input type="file" name="banner" accept="image/*" />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Auto Accept Orders</label>
+                      <input type="checkbox" name="auto_accept_orders" defaultChecked={!!restaurantSettings.auto_accept_orders} />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Max Orders Per Hour</label>
+                      <Input type="number" name="max_orders_per_hour" min={1} defaultValue={restaurantSettings.max_orders_per_hour || 20} />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Advance Order Hours</label>
+                      <Input type="number" name="advance_order_hours" min={0} defaultValue={restaurantSettings.advance_order_hours || 24} />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Tax Rate (%)</label>
+                      <Input type="number" name="tax_rate" step="0.01" min={0} defaultValue={restaurantSettings.tax_rate || 0} />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Service Charge (€)</label>
+                      <Input type="number" name="service_charge" step="0.01" min={0} defaultValue={restaurantSettings.service_charge || 0} />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Payment Methods</label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-1">
+                          <input type="checkbox" name="payment_methods" value="cash" defaultChecked={restaurantSettings.payment_methods?.includes("cash")} /> Cash
+                        </label>
+                        <label className="flex items-center gap-1">
+                          <input type="checkbox" name="payment_methods" value="card" defaultChecked={restaurantSettings.payment_methods?.includes("card")} /> Card
+                        </label>
+                        {/* Add more payment methods as needed */}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Special Instructions</label>
+                      <Textarea name="special_instructions" defaultValue={restaurantSettings.special_instructions || ""} rows={2} />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                    >
+                      Save Settings
+                    </Button>
+                  </form>
+                ) : (
+                  <div className="text-gray-600">
+                    Restaurant settings and configuration options will be
+                    available here.
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
