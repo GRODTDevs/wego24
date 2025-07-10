@@ -39,12 +39,17 @@ export default function ShopPage() {
       }
       setRestaurant(restaurantData);
       // Fetch products/menu for this restaurant
-      const { data: productsData } = await supabase
+      const { data: productsData, error: productsError } = await supabase
         .from("products")
         .select("*")
         .eq("restaurant_id", settingsData.restaurant_id)
         .order("created_at", { ascending: true });
-      setProducts(productsData || []);
+      if (productsError) {
+        setError("Failed to load products");
+        setProducts([]);
+      } else {
+        setProducts(productsData || []);
+      }
       setLoading(false);
     };
     if (slug) fetchShop();
@@ -58,7 +63,7 @@ export default function ShopPage() {
     <div className="min-h-screen bg-white">
       {/* Banner */}
       {settings.banner_url && (
-        <div className="w-full h-48 bg-cover bg-center" style={{ backgroundImage: `url(${settings.banner_url})` }} />
+        <div className="w-full h-48 bg-cover bg-center mb-4" style={{ backgroundImage: `url(${settings.banner_url})` }} />
       )}
       <div className="max-w-4xl mx-auto p-6">
         {/* Logo and name */}

@@ -5,8 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { Tables } from "@/integrations/supabase/types";
@@ -21,6 +19,7 @@ import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useSystemSettings } from "@/contexts/SystemSettingsContext";
 
 type Restaurant = Tables<"restaurants">;
 type PartnerApplication = Tables<"partner_applications">;
@@ -39,6 +38,7 @@ export default function PartnerDashboard() {
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [restaurantSettings, setRestaurantSettings] = useState<any>(null);
+  const { settings, loading: settingsLoading } = useSystemSettings();
 
   const fetchPartnerData = async () => {
     try {
@@ -167,14 +167,12 @@ export default function PartnerDashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || settingsLoading) {
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <main className="flex-1 bg-gray-50 p-6 w-full">
-          <div className="w-full">
-            <div className="flex items-center justify-center h-64">
-              <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+          <div className="w-full flex items-center justify-center h-64">
+            <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         </main>
       </div>

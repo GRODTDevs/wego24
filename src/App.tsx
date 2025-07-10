@@ -30,11 +30,15 @@ import "./App.css";
 import MaintenanceGate from "@/components/MaintenanceGate";
 import { Button } from "@/components/ui/button";
 import { PartnersManagementPanel } from "@/components/admin/PartnersManagementPanel";
-import ShopPage from "@/pages/ShopPage";
+import ShopPage from "./pages/ShopPage";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    console.log('[App] Mounted');
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <TranslationProvider>
@@ -105,11 +109,11 @@ function AuthGate() {
           <Route path="/restaurant-dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
           <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
           <Route path="/subscription/success" element={<ProtectedRoute><SubscriptionSuccess /></ProtectedRoute>} />
-          <Route path="/admin/analytics" element={<ProtectedRoute><AdvancedAnalyticsPanel /></ProtectedRoute>} />
-          <Route path="/admin/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
-          <Route path="/admin/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
-          <Route path="/admin/partners" element={<ProtectedRoute><PartnerApprovalPanel /></ProtectedRoute>} />
-          <Route path="/admin/partners-management" element={<ProtectedRoute><PartnersManagementPanel /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><AdvancedAnalyticsPanel /></ProtectedRoute>} />
+          <Route path="/regions" element={<ProtectedRoute><AdminRegionsPanel /></ProtectedRoute>} />
+          <Route path="/issues" element={<ProtectedRoute><AdminIssueResolutionPanel /></ProtectedRoute>} />
+          <Route path="/partners" element={<ProtectedRoute><PartnerApprovalPanel /></ProtectedRoute>} />
+          <Route path="/partners-management" element={<ProtectedRoute><PartnersManagementPanel /></ProtectedRoute>} />
           <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
           <Route path="/partner-dashboard/:partnerId" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
           <Route path="/shop/:slug" element={<ShopPage />} />
