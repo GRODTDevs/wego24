@@ -106,10 +106,9 @@ export function OperationsDashboard() {
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-1 p-6">
         <Breadcrumbs />
-        <h1 className="text-2xl font-bold mb-4">{t('dashboard.title')}</h1>
         <div className="mb-6 flex flex-wrap gap-4">
           <Link to="/admin/partners-management">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 font-semibold">
+            <button className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 font-semibold">
               Manage Partners
             </button>
           </Link>

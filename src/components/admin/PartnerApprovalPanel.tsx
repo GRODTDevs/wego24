@@ -32,13 +32,16 @@ export function PartnerApprovalPanel() {
     }
     // 2. If approved, create partner
     if (status === "approved") {
-      const { error: approveError } = await supabase.rpc('create_partner_from_application', {
-        app_id: id
+      const { error: approveError, data: partnerResult } = await supabase.rpc('create_restaurant_from_application', {
+        app_id: id // <-- must match the SQL function parameter name
       });
       if (approveError) {
         setError(`Failed to create partner: ${approveError.message}`);
         setLoading(false);
         return;
+      }
+      if (typeof window !== 'undefined') {
+        console.log('[PartnerApprovalPanel] create_partner_from_application result:', partnerResult);
       }
     }
     // 3. Refresh list

@@ -396,7 +396,7 @@ export type Database = {
           id: string;
           name: string;
           address?: string;
-          businessName?: string;
+          business_name?: string;
           approval?: string;
           email?: string;
           order_count?: number;

@@ -110,6 +110,7 @@ function AuthGate() {
           <Route path="/admin/partners" element={<ProtectedRoute><PartnerApprovalPanel /></ProtectedRoute>} />
           <Route path="/admin/partners-management" element={<ProtectedRoute><PartnersManagementPanel /></ProtectedRoute>} />
           <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
+          <Route path="/partner-dashboard/:partnerId" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
           <Route path="/" element={<Index />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

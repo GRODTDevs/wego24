@@ -71,7 +71,7 @@ export function PartnerApplications() {
       // Create restaurant from application
       const { error: createError } = await supabase
         .rpc("create_restaurant_from_application", {
-          application_id: application.id
+          app_id: application.id
         });
 
       if (createError) {

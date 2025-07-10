@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/admin/Breadcrumbs";
+import { Link } from "react-router-dom";
 
 export function PartnersManagementPanel() {
   const [partners, setPartners] = useState([]);
@@ -62,7 +63,9 @@ export function PartnersManagementPanel() {
                 <td className="p-2 border">{partner.address}</td>
                 <td className="p-2 border">{partner.created_at?.slice(0,10)}</td>
                 <td className="p-2 border">
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to={`/partner-dashboard/${partner.id}`}>Go to Dashboard</Link>
+                  </Button>
                   {/* Add more actions as needed */}
                 </td>
               </tr>
