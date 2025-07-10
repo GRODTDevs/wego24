@@ -38,17 +38,18 @@ export default function ShopPage() {
         return;
       }
       setRestaurant(restaurantData);
-      // Fetch products/menu for this restaurant
-      const { data: productsData, error: productsError } = await supabase
-        .from("products")
+      // Fetch menu items for this restaurant
+      const { data: menuItemsData, error: menuError } = await supabase
+        .from("menu_items")
         .select("*")
         .eq("restaurant_id", settingsData.restaurant_id)
-        .order("created_at", { ascending: true });
-      if (productsError) {
-        setError("Failed to load products");
+        .eq("status", "available")
+        .order("display_order", { ascending: true });
+      if (menuError) {
+        setError("Failed to load menu items");
         setProducts([]);
       } else {
-        setProducts(productsData || []);
+        setProducts(menuItemsData || []);
       }
       setLoading(false);
     };
@@ -76,18 +77,17 @@ export default function ShopPage() {
             {settings.description && <p className="text-gray-600 mt-1">{settings.description}</p>}
           </div>
         </div>
-        {/* Menu/products */}
-        <h2 className="text-xl font-semibold mb-4">Menu</h2>
+        {/* Menu/menu_items */}
         {products.length === 0 ? (
-          <div className="text-gray-500">No products available yet.</div>
+          <div className="text-gray-500">No menu items available yet.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {products.map(product => (
-              <div key={product.id} className="border rounded-lg p-4 flex flex-col gap-2 bg-gray-50">
-                <div className="font-bold text-lg">{product.name}</div>
-                {product.image_url && <img src={product.image_url} alt={product.name} className="h-32 w-full object-cover rounded" />}
-                <div className="text-gray-700">{product.description}</div>
-                <div className="text-red-600 font-semibold">€{product.price?.toFixed(2)}</div>
+            {products.map(item => (
+              <div key={item.id} className="border rounded-lg p-4 flex flex-col gap-2 bg-gray-50">
+                <div className="font-bold text-lg">{item.name}</div>
+                {item.image_url && <img src={item.image_url} alt={item.name} className="h-32 w-full object-cover rounded" />}
+                <div className="text-gray-700">{item.description}</div>
+                <div className="text-red-600 font-semibold">€{item.price?.toFixed(2)}</div>
               </div>
             ))}
           </div>
