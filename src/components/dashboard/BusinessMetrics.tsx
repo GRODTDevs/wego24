@@ -12,15 +12,15 @@ interface BusinessMetricsProps {
   stats: {
     totalOrders: number;
     totalRevenue: number;
-    activeLocations: number;
-    activeDrivers: number;
+    //activeLocations: number;
+    //activeDrivers: number;
     totalUsers: number;
   };
   previousStats?: {
     totalOrders: number;
     totalRevenue: number;
-    activeLocations: number;
-    activeDrivers: number;
+    //activeLocations: number;
+    //activeDrivers: number;
     totalUsers: number;
   };
   loading: boolean;
@@ -55,7 +55,7 @@ export function BusinessMetrics({ stats, previousStats, loading }: BusinessMetri
       trend: previousStats ? calculateGrowth(stats.totalUsers, previousStats.totalUsers) : 0,
       subtitle: "vs last period"
     },
-    {
+    /*{
       title: "Active Partners",
       value: stats.activeLocations,
       icon: Package,
@@ -69,11 +69,13 @@ export function BusinessMetrics({ stats, previousStats, loading }: BusinessMetri
       trend: previousStats ? calculateGrowth(stats.activeDrivers, previousStats.activeDrivers) : 0,
       subtitle: "vs last period"
     }
+      
+    */
   ];
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(5)].map((_, i) => (
           <Card key={i} className="border-0 shadow-sm">
             <CardHeader className="pb-3">
@@ -90,7 +92,7 @@ export function BusinessMetrics({ stats, previousStats, loading }: BusinessMetri
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {metrics.map((metric, index) => {
         const Icon = metric.icon;
         const isPositive = metric.trend > 0;

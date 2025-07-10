@@ -6,12 +6,13 @@ import { RealTimeOrderDashboard } from "@/components/orders/RealTimeOrderDashboa
 import { UserManagement } from "@/components/UserManagement";
 import { DriverManagement } from "@/components/DriverManagement";
 import { SystemHealthMonitor } from "@/components/monitoring/SystemHealthMonitor";
-import { Header } from "@/components/Header";
 import { PartnerApplications } from "@/components/PartnerApplications";
 import { AdminDriverManagement } from "./AdminDriverManagement";
 import { useSystemSettings } from "@/contexts/SystemSettingsContext";
-import { Link } from "react-router-dom";
+
 import { Breadcrumbs } from "@/components/admin/Breadcrumbs";
+import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
+import { CommissionManagement } from "@/components/CommissionManagement";
 
 export function OperationsDashboard() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export function OperationsDashboard() {
       // Active users (use profiles table)
       const { count: activeUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
       // Partners
-            const { count: partners } = await supabase.from('partners' as any).select('*', { count: 'exact', head: true });
+      const { count: partners } = await supabase.from('partners' as any).select('*', { count: 'exact', head: true });
       // Drivers
       const { count: drivers } = await supabase.from('drivers').select('*', { count: 'exact', head: true });
       // Recent orders
@@ -106,15 +107,9 @@ export function OperationsDashboard() {
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-1 p-6">
         <Breadcrumbs />
-        <div className="mb-6 flex flex-wrap gap-4">
-          <Link to="/admin/partners-management">
-            <button className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 font-semibold">
-              Manage Partners
-            </button>
-          </Link>
-        </div>
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="mb-6 flex flex-wrap gap-2">
+            <TabsTrigger value="metrics">Metrics</TabsTrigger>
             <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
             <TabsTrigger value="orders">{t('dashboard.tabs.orders')}</TabsTrigger>
             <TabsTrigger value="partners">{t('dashboard.tabs.partners')}</TabsTrigger>
@@ -148,6 +143,12 @@ export function OperationsDashboard() {
                 <div className="text-xl font-bold">{metrics.drivers}</div>
               </div>
             </div>
+          </TabsContent>
+          {/* Revenue progress bar */}
+          <TabsContent value="metrics">
+            <RevenueProgress currentRevenue={40.34} />
+          </TabsContent>
+          <TabsContent value="orders">
             {/* Recent orders */}
             <h2 className="text-xl font-semibold mb-2">{t('dashboard.recentOrders')}</h2>
             <ul className="mb-8">
@@ -183,6 +184,8 @@ export function OperationsDashboard() {
             <div className="mt-8">
               <AdminDriverManagement />
             </div>
+            {/* Commission management section */}
+            <CommissionManagement />
           </TabsContent>
           <TabsContent value="users">
             <UserManagement />
@@ -213,6 +216,7 @@ export function OperationsDashboard() {
             <SystemHealthMonitor />
           </TabsContent>
         </Tabs>
+
         {/* Maintenance mode toggle - visible only to admins */}
         <div className="my-4 p-4 bg-yellow-50 border border-yellow-300 rounded">
           <span className="font-semibold mr-2">Maintenance Mode:</span>

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { errorLogger, withErrorLogging } from "@/utils/errorLogger";
 import { MenuManagement } from "@/components/MenuManagement";
 import { OrderManagement } from "@/components/OrderManagement";
-import { CommissionManagement } from "@/components/CommissionManagement";
+
 import { BusinessMetrics } from "@/components/dashboard/BusinessMetrics";
 import { RevenueProgress } from "@/components/dashboard/RevenueProgress";
 import { Input } from "@/components/ui/input";
@@ -300,7 +300,7 @@ export default function PartnerDashboard() {
           <div className="w-full">
             <div className="mb-8">
               <h1 className="text-2xl text-red-900 text-right mb-2">
-                 {restaurant.name}
+                {restaurant.name}
               </h1>
             </div>
 
@@ -371,20 +371,17 @@ export default function PartnerDashboard() {
               </TabsList>
 
               <TabsContent value="overview">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 w-full">
                   <BusinessMetrics
                     stats={{
-                      totalOrders: orderCount,
-                      totalRevenue: totalRevenue,
-                      activeLocations: 1, // Replace with real data if available
-                      activeDrivers: 0, // Replace with real data if available
+                      totalOrders: 10,
+                      totalRevenue: 200,
                       totalUsers: 0, // Replace with real data if available
                     }}
                     loading={false}
                   />
-                  <RevenueProgress currentRevenue={totalRevenue} />
                 </div>
-                <CommissionManagement />
+
               </TabsContent>
 
               <TabsContent value="products">
